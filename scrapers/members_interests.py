@@ -1,6 +1,6 @@
-
-from lxml import etree
+from data_interfaces import mongo
 from lxml import objectify
+import os
 
 categories = [
     "Directorships",
@@ -14,15 +14,10 @@ categories = [
 ]
 
 
-def parse_xml(xml_file):
-    with open(xml_file) as f:
+def parse_xml(xml_path, file_name):
+    with open(xml_path + file_name) as f:
             xml = f.read()
-
     root = objectify.fromstring(xml)
-    print root.tag
-    print root.text
-    print root.attrib
-
     for mp in root.getchildren():
         print mp.attrib["membername"]
         for category in mp.getchildren():
@@ -37,4 +32,10 @@ def parse_category(category):
     for item in category.getchildren():
         print "\t\t", item.text
 
-parse_xml("regmem2014-11-24.xml")
+
+def parse():
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    data = '/regmem'
+    xml_data = current_path + data + "/"
+    for f in os.listdir(xml_data):
+        parse_xml(xml_data, f)

@@ -19,44 +19,56 @@ def parse_xml(xml_path, file_name):
                     category_name = category.attrib["name"].replace(".", "_")
                 else:
                     category_name = category.attrib["name"]
-                cat_data = {category_name: parse_category(category)}
+                cat_data = {
+                    "category_name": category_name.strip(),
+                    "records": parse_category(category)
+                }
                 categories.append(cat_data)
         print "\n---"
-        mp_data = {mp.attrib["membername"]: categories}
+        mp_data = {
+            "mp": mp.attrib["membername"],
+            "interests": categories
+        }
         contents.append(mp_data)
     file_name = file_name.split(".")[0]
-    data = {file_name: contents}
+    data = {
+        "file_name": file_name,
+        "contents": contents
+    }
     cache.db.mps_interests.save(data)
 
 
 def parse_category(category):
-    print "\t ", category.attrib["name"]
-    items = []
-    for item in category.getchildren():
-        if item.getchildren():
-            text = parse_item(item)
+    print "\t *%s" % category.attrib["name"].strip()
+    records = []
+    for record in category.getchildren():
+        items = []
+        for item in record.getchildren():
+            text = u""
+            if item.text is not None:
+                text += item.text
+            if item.getchildren():
+                text += parse_item(item)
             items.append(text)
-        else:
-            text = item.text
-            items.append(text)
-        print "\t\t", text
-    return items
+            print "\t\t", text.strip()
+        print "\t\t---"
+        records.append(items)
+    return records
 
 
 def parse_item(items):
-    string = ""
+    string = u""
     for x in items.getchildren():
+        if x.text is not None:
+            string += x.text
         if x.getchildren():
             for y in x.getchildren():
                 if y.text is not None:
                     string += y.text
-        else:
-            if x.text is not None:
-                string += x.text
     return string.strip()
 
 
-def parse():
+def run():
     current_path = os.path.dirname(os.path.abspath(__file__))
     data = '/regmem'
     xml_data = current_path + data + "/"

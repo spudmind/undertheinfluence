@@ -57,5 +57,6 @@ target/
 # warren test code and data
 members_test.py
 scrapers/regmem/*.*
-utils/MITIE-models/*.*
+utils/MITIE-models/
+.idea/
 

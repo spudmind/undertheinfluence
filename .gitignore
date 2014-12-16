@@ -56,7 +56,9 @@ target/
 
 # warren test code and data
 members_test.py
-scrapers/regmem/*.*
+party_test.py
+scrapers/data/regmem/*.*
 utils/MITIE-models/
 .idea/
+.~lock.*
 

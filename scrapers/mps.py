@@ -5,10 +5,10 @@ import requests
 import os
 
 
-class CacheMPs():
+class MpInfoScaper():
     current_path = os.path.dirname(os.path.abspath(__file__))
     ALL_PARTIES_API = 'http://www.theguardian.com/politics/api/party/all/json'
-    VOTE_MATRIX = 'data/votematrix-2010.csv'
+    VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'
     TEST = None
 
     def __init__(self):
@@ -20,13 +20,14 @@ class CacheMPs():
         self.mps = self.hansard.get_mps()
         self.all_mps = None
 
-    def import_mps(self):
-        #self._get_twfy_data()
+    def run(self):
+        self._get_twfy_data()
         self._get_guardian_data()
         self._get_publicwhip_data()
 
     def _get_twfy_data(self):
         print "Getting Mps from TWFY"
+        print self.mps
         for mp in self.mps:
             self._print_out("MP", mp["name"])
             self._print_out("Party", mp["party"])
@@ -81,7 +82,7 @@ class CacheMPs():
             self._print_out(cached["full_name"], url)
 
     def _get_publicwhip_data(self):
-        with open(CacheMPs.VOTE_MATRIX) as fin:
+        with open(MpInfoScaper.VOTE_MATRIX) as fin:
             rows = (line.split('\t') for line in fin)
             for row in rows:
                 name, id = u'{0} {1}'.format(row[1], row[2]), row[0]
@@ -92,7 +93,7 @@ class CacheMPs():
                 self._print_out(name, url)
 
     def _iterate_guardian_api(self):
-        r = self.requests.get(CacheMPs.ALL_PARTIES_API)
+        r = self.requests.get(MpInfoScaper.ALL_PARTIES_API)
         parties = r.json()["parties"]
         for party in parties:
             party_uri = party["json-url"]
@@ -164,5 +165,6 @@ class CacheMPs():
                 else:
                     self._print_out(x, node[x])
 
-    def _print_out(self, key, value):
+    @staticmethod
+    def _print_out(key, value):
         print "  %-25s%-15s" % (key, value)

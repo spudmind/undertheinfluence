@@ -16,9 +16,9 @@ class MembersInterestsScraper():
     def run(self):
         xml_data = current_path + self.data + "/"
         for f in os.listdir(xml_data):
-            self.parse_xml(xml_data, f)
+            self.scrape_xml(xml_data, f)
 
-    def parse_xml(self, xml_path, file_name):
+    def scrape_xml(self, xml_path, file_name):
         with open(xml_path + file_name) as f:
                 xml = f.read()
         root = objectify.fromstring(xml)
@@ -34,7 +34,7 @@ class MembersInterestsScraper():
                         category_name = category.attrib["name"]
                     cat_data = {
                         "category_name": category_name.strip(),
-                        "records": self.parse_category(category)
+                        "records": self.scrape_category(category)
                     }
                     categories.append(cat_data)
             print "\n---"
@@ -43,14 +43,13 @@ class MembersInterestsScraper():
                 "interests": categories
             }
             contents.append(mp_data)
-        file_name = file_name.split(".")[0]
         data = {
-            "file_name": file_name,
+            "file_name": file_name.split(".")[0],
             "contents": contents
         }
         self.cache.db.scraped_mps_interests.save(data)
 
-    def parse_category(self, category):
+    def scrape_category(self, category):
         print "\t *%s" % category.attrib["name"].strip()
         records = []
         for record in category.getchildren():
@@ -60,7 +59,7 @@ class MembersInterestsScraper():
                 if item.text is not None:
                     text += item.text
                 if item.getchildren():
-                    text += self.parse_item(item)
+                    text += self.scrape_item(item)
                 items.append(text)
                 print "\t\t", text.strip()
             print "\t\t---"
@@ -68,7 +67,7 @@ class MembersInterestsScraper():
         return records
 
     @staticmethod
-    def parse_item(items):
+    def scrape_item(items):
         string = u""
         for x in items.getchildren():
             if x.text is not None:

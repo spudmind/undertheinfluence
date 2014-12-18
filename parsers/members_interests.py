@@ -19,7 +19,6 @@ class MembersInterestsParser:
     def run(self):
         for documents in self.all_interests:
             file_name = documents["file_name"]
-            contents = []
             for entry in documents["contents"]:
                 print "\n", entry["mp"]
                 categories = []
@@ -32,14 +31,10 @@ class MembersInterestsParser:
                     categories.append(cat_data)
                 mp_data = {
                     "mp": entry["mp"],
-                    "categories": categories
+                    "interests": categories,
+                    "file_name": file_name
                 }
-                contents.append(mp_data)
-            data = {
-                "file_name": file_name,
-                "contents": contents
-            }
-            self.cache.db.parsed_mps_interests.save(data)
+                self.cache.db.parsed_mps_interests.save(mp_data)
 
     def _parse_category(self, data):
         category_name = data["category_name"]
@@ -112,7 +107,6 @@ class MembersInterestsParser:
                         "  of " == first[:5].lower():
                     if len(record) > 1:
                         first = record[1]
-                        print "yeahhhhh?"
                 company_name = self._find_company(first)
                 if company_name:
                     payments = [self._find_money(item) for item in record]

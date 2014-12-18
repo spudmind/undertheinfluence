@@ -43,8 +43,8 @@ class PartyFundingScaper:
             "accepted_date": row[17].strip(),
             "reported_date": row[18].strip()
         }
-        #self.print_dic(data)
-        #print "\n\n"
+        self.print_dic(data)
+        print "\n\n"
         self.cache.db.scraped_party_funding.save(data)
 
     @staticmethod

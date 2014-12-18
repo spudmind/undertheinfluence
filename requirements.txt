@@ -1,3 +1,8 @@
+BeautifulSoup==3.2.1
+argparse==1.2.1
+egenix-mx-base==3.2.8
+fuzzywuzzy==0.4.0
 lxml==3.4.1
 pymongo==2.7.2
+requests==2.5.0
 wsgiref==0.1.2

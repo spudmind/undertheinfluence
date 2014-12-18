@@ -1,4 +1,4 @@
-from interfaces import theyworkforyou
+from utils import theyworkforyou
 import simplejson
 
 

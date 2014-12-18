@@ -68,6 +68,7 @@ class TWFY():
         method = params['method']
         del params['method']
         params_encoded = urllib.urlencode(params)
+        print SERVICE_URL+method+'?'+params_encoded
         return urllib.urlopen(SERVICE_URL+method+'?'+params_encoded).read()
 
 

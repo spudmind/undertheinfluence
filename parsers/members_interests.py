@@ -7,7 +7,7 @@ class MembersInterestsParser:
     def __init__(self, entity_extractor):
         self.entity_extractor = entity_extractor
         self.cache = mongo.MongoInterface()
-        self.all_interests = list(self.cache.db.scraped_mps_interests.find())
+        self.all_interests = []
         self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
         self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
         self.known_missing = [
@@ -17,6 +17,7 @@ class MembersInterestsParser:
         ]
 
     def run(self):
+        self.all_interests = list(self.cache.db.scraped_mps_interests.find())
         for documents in self.all_interests:
             file_name = documents["file_name"]
             for entry in documents["contents"]:

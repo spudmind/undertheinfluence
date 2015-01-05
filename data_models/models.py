@@ -51,10 +51,24 @@ class MemberOfParliament(NamedEntity):
         self.set_node_properties(properties, labels)
 
     def link_position(self, position):
-        self.create_relationship(self.vertex, "IN_POSITION", position.vertex)
+        self.create_relationship(
+            self.vertex, "IN_POSITION", position.vertex
+        )
 
     def link_department(self, department):
-        self.create_relationship(self.vertex, "MEMBER_OF", department.vertex)
+        self.create_relationship(
+            self.vertex, "MEMBER_OF", department.vertex
+        )
+
+    def link_interest_category(self, category):
+        self.create_relationship(
+            self.vertex, "INTERESTS_REGISTERED_IN", category.vertex
+        )
+
+    def link_alternate(self, alternate):
+        self.create_relationship(
+            self.vertex, "ALSO_KNOWN_AS", alternate.vertex
+        )
 
     def link_party(self, party):
         party = NamedEntity(party)
@@ -62,15 +76,19 @@ class MemberOfParliament(NamedEntity):
         if not party.exists:
             party.create()
         party.set_node_properties(labels=party_labels)
-        self.create_relationship(self.vertex, "MEMBER_OF", party.vertex)
+        self.create_relationship(
+            self.vertex, "MEMBER_OF", party.vertex
+        )
 
-    def link_session(self, term):
-        self.create_relationship(self.vertex, "REPRESENTATIVE_FOR", term.vertex)
+    def link_elected_term(self, term):
+        self.create_relationship(
+            self.vertex, "ELECTED_FOR", term.vertex
+        )
 
 
 class GovernmentOffice(NamedEntity):
     def __init__(self, name=None):
-        core.BaseDataModel.__init__(self)
+        NamedEntity.__init__(self)
         self.exists = False
         self.label = "Government Office"
         self.primary_attribute = "name"
@@ -88,11 +106,43 @@ class GovernmentOffice(NamedEntity):
         self.set_node_properties(labels=labels)
 
 
+class InterestCategory(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Interest Category"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def link_interest(self, interest):
+        self.create_relationship(
+            self.vertex, "REGISTERED_INTEREST", interest.vertex
+        )
+
+
+class RegisteredInterest(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Registered Interest"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def update_interest_details(self, properties=None):
+        self.set_node_properties(properties)
+
+
 class TermInParliament(core.BaseDataModel):
     def __init__(self, term=None):
         core.BaseDataModel.__init__(self)
         self.exists = False
-        self.label = "Term in Parliament"
+        self.label = "Elected Term"
         self.primary_attribute = "term"
         self.term = term
         self.exists = self.fetch(

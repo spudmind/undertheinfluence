@@ -2,7 +2,7 @@
 import re
 from utils import mongo
 from utils import entity_extraction
-from utils import  entity_resolver
+from utils import entity_resolver
 
 
 class MembersInterestsParser:
@@ -14,11 +14,6 @@ class MembersInterestsParser:
         self.all_interests = []
         self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
         self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
-        self.known_missing = [
-            u"Mirror Group Newspapers",
-            u"YouGov plc",
-            u"Albion Community Power PLC"
-        ]
 
     def run(self):
         self.all_interests = list(self.cache_data.find())
@@ -117,7 +112,7 @@ class MembersInterestsParser:
                         "  of " == first[:5].lower():
                     if len(record) > 1:
                         first = record[1]
-                company_name = self._find_company(first)
+                company_name = self.entity_resolver.find_donor(first)
                 if company_name:
                     payments = [self._find_money(item) for item in record]
                     dates = [self._find_dates(item) for item in record]
@@ -144,11 +139,11 @@ class MembersInterestsParser:
             company_name, amount, destination = None, None, None
             visit_dates, purpose, registered = None, None, None
             if len(record) == 7:
-                company_name = self._find_company(record[0])
+                company_name = self.entity_resolver.find_donor(record[0])
                 if not company_name:
                     company_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
-                destination = self._get_entities(record[3])
+                destination = self.entity_resolver.get_entities(record[3])
                 visit_dates = self._split_if_colon(record[4])
                 purpose = self._split_if_colon(record[5])
                 registered = self._find_dates(record[6])
@@ -156,13 +151,13 @@ class MembersInterestsParser:
             elif len(record) != 7:
                 for item in record:
                     if "Name of donor" in item:
-                        company_name = self._find_company(record[0])
+                        company_name = self.entity_resolver.find_donor(record[0])
                         if not company_name:
                             company_name = self._split_if_colon(record[0])
                     elif "Amount of donation" in item:
                         amount = self._find_money(item)
                     elif "Destination of visit" in item:
-                        destination = self._get_entities(item)
+                        destination = self.entity_resolver.get_entities(item)
                     elif "Date of visit" in item:
                         visit_dates = self._split_if_colon(item)
                     elif "Purpose of visit" in item:
@@ -191,7 +186,7 @@ class MembersInterestsParser:
                 if "(of " == item[:4].lower() or "of " == item[:3].lower():
                     continue
                 else:
-                    company_name = self._find_company(item)
+                    company_name = self.entity_resolver.find_donor(item)
                     dates = self._find_dates(item)
                     if company_name:
                         print "---->", company_name, dates
@@ -213,7 +208,7 @@ class MembersInterestsParser:
             if len(record) == 1:
                 continue
             elif len(record) == 5:
-                company_name = self._find_company(record[0])
+                company_name = self.entity_resolver.find_donor(record[0])
                 if not company_name and ":" in record[0]:
                     company_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
@@ -223,7 +218,7 @@ class MembersInterestsParser:
             else:
                 for item in record:
                     if "Name of donor" in item:
-                        company_name = self._find_company(record[0])
+                        company_name = self.entity_resolver.find_donor(record[0])
                         if not company_name and ":" in item:
                             company_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
@@ -253,7 +248,7 @@ class MembersInterestsParser:
             donor_status, registered, receipt = None, None, None
             full_record = u"\n".join([item for item in record])
             if len(record) == 7:
-                company_name = self._find_company(record[0])
+                company_name = self.entity_resolver.find_donor(record[0])
                 amount = self._find_money(record[2])
                 nature = self._split_if_colon(record[2])
                 receipt = self._find_dates(record[3])
@@ -264,7 +259,7 @@ class MembersInterestsParser:
             else:
                 for item in record:
                     if "Name of donor" in item:
-                        company_name = self._find_company(record[0])
+                        company_name = self.entity_resolver.find_donor(record[0])
                         if not company_name and ":" in item:
                             company_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
@@ -298,7 +293,7 @@ class MembersInterestsParser:
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
             for item in record:
-                locations = self._get_entities(item)
+                locations = self.entity_resolver.get_entities(item)
                 dates = self._find_dates(item)
                 if locations:
                     print "---->", locations, dates
@@ -325,7 +320,7 @@ class MembersInterestsParser:
         records = []
         for record in data["records"]:
             for item in record:
-                company_name = self._find_company(item)
+                company_name = self.entity_resolver.find_donor(item)
                 dates = self._find_dates(item)
                 if company_name:
                     print "---->", company_name, dates
@@ -336,34 +331,6 @@ class MembersInterestsParser:
                     }
                     records.append(entry)
         return records
-
-    def _find_company(self, data):
-        name = None
-        for entry in self.known_missing:
-            if entry in data:
-                name = entry
-        if not name:
-            if ";" in data:
-                line_test = re.sub('\(.+?\)\s*', '', data)
-                if len(line_test.rstrip(';').split(";")) == 2:
-                    company_name = data.split(";")[0].strip().rstrip('.')
-                    # TODO edit this to just remove (a) or (b)
-                    name = re.sub('\(.+?\)\s*', '', company_name)
-            else:
-                company_details = self._get_entities(data)
-                if company_details:
-                    for guess in company_details:
-                        if len(guess) < 3:
-                            continue
-                        elif guess == "Sole":
-                            continue
-                        elif "plc" or "ltd" or "limited" in guess.lower():
-                            name = guess
-                            break
-                        else:
-                            name = guess
-                            break
-        return name
 
     def _find_dates(self, data):
         dates = re.findall(self.date_search, data)
@@ -376,9 +343,6 @@ class MembersInterestsParser:
         money = None
         money = re.findall(self.money_search, data)
         return money
-
-    def _get_entities(self, data):
-        return self.entity_extractor.get_entities(data)
 
     @staticmethod
     def _show_record(data):

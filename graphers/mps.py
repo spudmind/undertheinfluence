@@ -5,7 +5,7 @@ from data_models import models
 class GraphMPs():
     def __init__(self):
         self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.scraped_mp_info
+        self.cache_data = self.cache.db.parsed_mp_info
         self.data_models = models
         self.full_update = True
         self.all_mps = []
@@ -24,6 +24,8 @@ class GraphMPs():
     def graph_mp(self, node):
         print "\n.................."
         print node["full_name"], "x", node["number_of_terms"]
+        if "also_known_as" in node:
+            print "AKA:", node["full_name"]
         print node["party"]
         print ".................."
         #print node["twfy_id"]
@@ -49,7 +51,17 @@ class GraphMPs():
             new_mp.create()
         new_mp.update_mp_details(mp_details)
         new_mp.link_party(mp["party"])
+        if "also_known_as" in mp:
+            aka = self.create_alternate(mp["also_known_as"], mp_details)
+            new_mp.link_alternate(aka)
         return new_mp
+
+    def create_alternate(self, also_known_as, details):
+        aka = self.data_models.MemberOfParliament(also_known_as)
+        if not aka.exists:
+            aka.create()
+        aka.update_mp_details(details)
+        return aka
 
     def import_terms(self, mp, terms):
         for term in terms:
@@ -57,7 +69,7 @@ class GraphMPs():
             print term["entered_house"], "to", term["left_house"]
             print term["left_reason"]
             new_term = self._create_term(term)
-            mp.link_session(new_term)
+            mp.link_elected_term(new_term)
             if "offices_held" in term:
                 self._create_offices(new_term, term["offices_held"])
             print "-"

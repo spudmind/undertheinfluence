@@ -13,6 +13,7 @@ class PartyFundingScaper:
         self.file_name = current_path + '/data/EC-Export-20141215-1737.csv'
         self.csv.open(self.file_name)
         self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.scraped_party_funding
 
     def run(self):
         for row in self.csv.all_rows:
@@ -43,9 +44,9 @@ class PartyFundingScaper:
             "accepted_date": row[17].strip(),
             "reported_date": row[18].strip()
         }
-        self.print_dic(data)
+        #self.print_dic(data)
         print "\n\n"
-        self.cache.db.scraped_party_funding.save(data)
+        self.cache_data.save(data)
 
     @staticmethod
     def print_dic(dictionary):

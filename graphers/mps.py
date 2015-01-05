@@ -5,12 +5,13 @@ from data_models import models
 class GraphMPs():
     def __init__(self):
         self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.scraped_mp_info
         self.data_models = models
         self.full_update = True
         self.all_mps = []
 
     def run(self):
-        self.all_mps = list(self.cache.db.scraped_mp_info.find())
+        self.all_mps = list(self.cache_data.find())
         for doc in self.all_mps:
             self._import(doc)
 

@@ -1,7 +1,5 @@
 import os
-
 from lxml import objectify
-
 from utils import mongo
 
 
@@ -11,6 +9,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 class MembersInterestsScraper():
     def __init__(self):
         self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.scraped_mps_interests
         self.data = '/data/regmem'
 
     def run(self):
@@ -47,7 +46,7 @@ class MembersInterestsScraper():
             "file_name": file_name.split(".")[0],
             "contents": contents
         }
-        self.cache.db.scraped_mps_interests.save(data)
+        self.cache_data.save(data)
 
     def scrape_category(self, category):
         print "\t *%s" % category.attrib["name"].strip()

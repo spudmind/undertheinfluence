@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 import re
 from utils import mongo
+from utils import entity_extraction
+from utils import  entity_resolver
 
 
 class MembersInterestsParser:
-    def __init__(self, entity_extractor):
-        self.entity_extractor = entity_extractor
+    def __init__(self):
+        self.entity_extractor = entity_extraction.NamedEntityExtractor()
+        self.entity_resolver = entity_resolver.MasterEntitiesResolver()
         self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.scraped_mps_interests
         self.all_interests = []
         self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
         self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
@@ -17,25 +21,30 @@ class MembersInterestsParser:
         ]
 
     def run(self):
-        self.all_interests = list(self.cache.db.scraped_mps_interests.find())
+        self.all_interests = list(self.cache_data.find())
         for documents in self.all_interests:
             file_name = documents["file_name"]
             for entry in documents["contents"]:
-                print "\n", entry["mp"]
-                categories = []
-                for category in entry["interests"]:
-                    cat_data = {
-                        "category_name": category["category_name"],
-                        "category_records": self._parse_category(category)
-                    }
-                    #print "\n", cat_data, "\n"
-                    categories.append(cat_data)
+                resolved_name = self.entity_resolver.find_mp(entry["mp"])
+                print "\n", resolved_name
+                categories = self._get_category_data(entry["interests"])
                 mp_data = {
-                    "mp": entry["mp"],
+                    "mp": resolved_name,
                     "interests": categories,
                     "file_name": file_name
                 }
                 self.cache.db.parsed_mps_interests.save(mp_data)
+
+    def _get_category_data(self, categories):
+        categories_data = []
+        for category in categories:
+            cat_data = {
+                "category_name": category["category_name"],
+                "category_records": self._parse_category(category)
+            }
+            #print "\n", cat_data, "\n"
+            categories_data.append(cat_data)
+        return categories_data
 
     def _parse_category(self, data):
         category_name = data["category_name"]
@@ -408,3 +417,7 @@ class MembersInterestsParser:
         if len(text.split(":")) > 1:
             result = text.split(":")[1].strip()
         return result
+
+    @staticmethod
+    def _print_out(key, value):
+        print "  %-30s%-20s" % (key, value)

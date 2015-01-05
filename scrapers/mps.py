@@ -15,6 +15,7 @@ class MpInfoScaper():
         print "Importing MPs"
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.scraped_mp_info
         self.requests = requests
         self.hansard = hansard.TWFYHansard()
         self.mps = self.hansard.get_mps()
@@ -63,13 +64,13 @@ class MpInfoScaper():
                 terms.append(term)
             node["terms"] = terms
             self._report(node)
-            self.cache.db.scraped_mp_info.save(node)
+            self.cache_data.save(node)
             print "---"
 
     def _get_guardian_data(self):
         print "Updating Guardian data"
         self.all_mps = [
-            doc["full_name"] for doc in self.cache.db.scraped_mp_info.find()
+            doc["full_name"] for doc in self.cache_data.find()
         ]
         for person in self._iterate_guardian_api():
             url = person["aristotle-url"]
@@ -113,14 +114,14 @@ class MpInfoScaper():
             name = cand[0]
         else:
             name = search
-        result = self.cache.db.scraped_mp_info.find({"full_name": name}).limit(1)
+        result = self.cache_data.find({"full_name": name}).limit(1)
         try:
             return result[0]
         except IndexError:
             return None
 
     def _update_cached_mp(self, id, key, value):
-        self.cache.db.scraped_mp_info.update({"_id": id}, {"$set": {key: value}})
+        self.cache_data.update({"_id": id}, {"$set": {key: value}})
 
     def _get_office(self, positions):
         offices = []

@@ -81,6 +81,10 @@ class BaseDataModel:
         elif '-' in date:
             d = date.split('-')
             year, month, day = int(d[0]), int(d[1]), int(d[2])
+        elif ' ' in date:
+            d = date.split(' ')
+            month_digit = self._convert_month(d[1])
+            year, month, day = int(d[0]), int(month_digit), int(d[2])
         self.create_relationship(
             self.vertex,
             relationship,
@@ -109,3 +113,8 @@ class BaseDataModel:
         #print day, month, year
         d = dict((v, k) for k, v in enumerate(calendar.month_abbr))
         return {"day": int(day), "month": d[month], "year": int(year)}
+
+    @staticmethod
+    def _convert_month(text):
+        month_to = {v: k for k, v in enumerate(calendar.month_abbr)}
+        return month_to[text[:3]]

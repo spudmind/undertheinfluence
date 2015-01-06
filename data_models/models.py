@@ -106,6 +106,18 @@ class GovernmentOffice(NamedEntity):
         self.set_node_properties(labels=labels)
 
 
+class Contributor(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Contributor"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+
 class InterestCategory(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
@@ -117,25 +129,69 @@ class InterestCategory(NamedEntity):
             self.label, self.primary_attribute, self.name
         )
 
+    def update_category_details(self, properties=None):
+        self.set_node_properties(properties)
+
     def link_interest(self, interest):
         self.create_relationship(
             self.vertex, "REGISTERED_INTEREST", interest.vertex
         )
 
 
-class RegisteredInterest(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
+class RegisteredInterest(core.BaseDataModel):
+    def __init__(self, record=None):
+        core.BaseDataModel.__init__(self)
         self.exists = False
         self.label = "Registered Interest"
-        self.primary_attribute = "name"
-        self.name = name
+        self.primary_attribute = "record"
+        self.record = record
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
+            self.label, self.primary_attribute, self.record
         )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.record
+        )
+        self.exists = True
 
     def update_interest_details(self, properties=None):
         self.set_node_properties(properties)
+
+    def link_contributor(self, contributor):
+        self.create_relationship(
+            contributor.vertex, "CONTRIBUTOR", self.vertex
+        )
+
+    def link_payment(self, payment):
+        self.create_relationship(self.vertex, "REMUNERATION", payment.vertex)
+
+
+class Remuneration(core.BaseDataModel):
+    def __init__(self, summary=None):
+        core.BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Remuneration"
+        self.primary_attribute = "summary"
+        self.summary = summary
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.summary
+        )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.summary
+        )
+        self.exists = True
+
+    def update_details(self, properties=None):
+        self.set_node_properties(properties)
+
+    def set_registered_date(self, date):
+        self.set_date(date, "REGISTERED")
+
+    def set_recieved_date(self, date):
+        self.set_date(date, "RECIEVED")
 
 
 class TermInParliament(core.BaseDataModel):

@@ -123,3 +123,4 @@ class MasterEntitiesResolver:
                 else:
                     name = guess
                     break
+        return name

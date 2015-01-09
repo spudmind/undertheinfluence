@@ -31,14 +31,21 @@ class BaseDataModel:
         else:
             return None
 
-    def create_vertex(self, label, node_key, value):
+    def create_vertex(self, label, node_key, value, merge=True):
         self.vertex = None
-        search_query = u"""
-                MERGE (v:`{0}` {{{1}:"{2}"}})
-                ON MATCH set v:`{0}`
-                ON CREATE set v:`{0}`
-                RETURN v
-            """.format(label, node_key, value)
+        if merge:
+            search_query = u"""
+                    MERGE (v:`{0}` {{{1}:"{2}"}})
+                    ON MATCH set v:`{0}`
+                    ON CREATE set v:`{0}`
+                    RETURN v
+                """.format(label, node_key, value)
+        else:
+            search_query = u"""
+                    CREATE (v:`{0}` {{{1}:"{2}"}})
+                    RETURN v
+                """.format(label, node_key, value)
+            #print search_query
         output = self.query(search_query)
         self.vertex = output[0][0]
         self.vertex.add_labels(label)
@@ -84,7 +91,7 @@ class BaseDataModel:
         elif ' ' in date:
             d = date.split(' ')
             month_digit = self._convert_month(d[1])
-            year, month, day = int(d[0]), int(month_digit), int(d[2])
+            day, month, year = int(d[0]), int(month_digit), int(d[2])
         self.create_relationship(
             self.vertex,
             relationship,

@@ -60,7 +60,7 @@ class MembersInterestsParser:
             #pass
         elif category_name == "Clients":
             self._show_record(data)
-            self._parse_clients(data)
+            return self._parse_clients(data)
             #pass
         elif category_name == "Land and Property":
             self._show_record(data)
@@ -102,7 +102,7 @@ class MembersInterestsParser:
             print "   *", category_name
 
     def _parse_list_record(self, data):
-        company_name, renumeration = None, None
+        company_name, remuneration = None, None
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
@@ -116,16 +116,16 @@ class MembersInterestsParser:
                 if company_name:
                     payments = [self._find_money(item) for item in record]
                     dates = [self._find_dates(item) for item in record]
-                    renumeration = zip(payments, dates)
+                    remuneration = zip(payments, dates)
                 else:
                     print "########", record
                 print " ---> donor:", company_name
-                print " ---> renumeration:", renumeration
+                print " ---> remuneration:", remuneration
                 #print " ---> full record:", full_record
                 print "-"
                 entry = {
                     "interest": company_name,
-                    "renumeration": self._cleanup_remuneration(renumeration),
+                    "remuneration": self._cleanup_remuneration(remuneration),
                     "raw_record": full_record
                 }
                 records.append(entry)
@@ -169,7 +169,7 @@ class MembersInterestsParser:
             print "-"
             entry = {
                 "interest": company_name,
-                "renumeration": amount,
+                "remuneration": amount,
                 "purpose": purpose,
                 "vist_dates": visit_dates,
                 "registered": registered,
@@ -222,7 +222,7 @@ class MembersInterestsParser:
                         if not company_name and ":" in item:
                             company_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
-                        amount = self._find_money(item)
+                        amount = [y for x, y in self._find_money(record[2])]
                     elif "Donor status" in item:
                         donor_status = self._split_if_colon(item)
                     elif "Registered" in item:
@@ -232,7 +232,7 @@ class MembersInterestsParser:
             print "-"
             entry = {
                 "interest": company_name,
-                "renumeration": amount,
+                "remuneration": amount,
                 "donor_status": donor_status,
                 "registered": registered,
                 "raw_record": full_record
@@ -249,7 +249,7 @@ class MembersInterestsParser:
             full_record = u"\n".join([item for item in record])
             if len(record) == 7:
                 company_name = self.entity_resolver.find_donor(record[0])
-                amount = self._find_money(record[2])
+                amount = [y for x, y in self._find_money(record[2])]
                 nature = self._split_if_colon(record[2])
                 receipt = self._find_dates(record[3])
                 accepted = self._find_dates(record[4])
@@ -278,7 +278,7 @@ class MembersInterestsParser:
             print "-"
             entry = {
                 "interest": company_name,
-                "renumeration": amount,
+                "remuneration": amount,
                 "nature": nature,
                 "receipt": receipt,
                 "accepted": accepted,
@@ -367,7 +367,7 @@ class MembersInterestsParser:
                         registered = "Unknown"
                     new_entry = {
                         "amount": entry[0][0][1],
-                        "recieved": received,
+                        "received": received,
                         "registered": registered,
                     }
                     new_list.append(new_entry)

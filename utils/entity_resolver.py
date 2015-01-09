@@ -42,7 +42,10 @@ class MasterEntitiesResolver:
             u"Phoenix Life Assurance Ltd",
             u"Office of Gordon and Sarah Brown",
             u"The Independent",
-            u"Transworld Publishers"
+            u"Transworld Publishers",
+            u"Developing Markets Associates Ltd",
+            u"Democracy Forum Ltd",
+            u"Ambriel Consulting"
         ]
         self.prefixes = [
             "Sir "

@@ -14,7 +14,7 @@ class MasterEntitiesResolver:
         self.master_mps = [
             x["name"] for x in list(self.master_data.find())
         ]
-        self.known_incorrect = [
+        self.known_incorrect_mps = [
             (u"Ian Paisley Jnr", u"Ian Paisley"),
             (u"Nicholas Boles", u"Nick Boles"),
             (u"Nicholas Clegg", u"Nick Clegg"),
@@ -28,7 +28,7 @@ class MasterEntitiesResolver:
             (u"Guardian", u"Guardian News and Media Ltd"),
             (u"YouGov", u"YouGov PLC")
         ]
-        self.known_missing = [
+        self.known_missing_companies = [
             u"IPSOS Mori",
             u"Ipsos MORI",
             u"Ipsos Mori",
@@ -47,8 +47,42 @@ class MasterEntitiesResolver:
             u"Democracy Forum Ltd",
             u"Ambriel Consulting"
         ]
+        self.known_political_parties = [
+            u"Labour Party",
+            u"Alliance Party of Northern Ireland"
+            u"Alliance Party",
+            u"Democratic Unionist Party",
+            u"DUP",
+            u"Sinn Fein",
+            u"Conservative Party",
+            u"Liberal Democrat Party",
+            u"Liberal Democrats",
+            u"Plaid Cymru",
+            u"Independent",
+            u"Social Democratic and Labour Party",
+            u"Scottish National Party",
+            u"Green Party",
+            u"Speaker",
+            u"UK Independence Party",
+            u"UKIP",
+            u"Co-operative Party",
+            u"We Demand A Referendum Now",
+            u"BNP",
+            u"British National Party",
+            u"NO2EU",
+            u"English Democrats"
+        ]
+        self.known_incorrect_parties = [
+            (u"DUP", u"Democratic Unionist Party"),
+            (u"UKIP", u"UK Independence Party"),
+            (u"Alliance Party", u"Alliance Party of Northern Ireland"),
+            (u"Liberal Democrats", u"Liberal Democrat Party"),
+            (u"BNP", u"British National Party")
+        ]
         self.prefixes = [
-            "Sir "
+            u"Sir ",
+            u"Mr ",
+            u"Ms "
         ]
 
     def get_entities(self, search_string):
@@ -61,7 +95,7 @@ class MasterEntitiesResolver:
 
     def find_mp(self, search):
         name = search
-        for incorrect, correct in self.known_incorrect:
+        for incorrect, correct in self.known_incorrect_mps:
             if incorrect in search:
                 name = correct
         for p in self.prefixes:
@@ -73,28 +107,49 @@ class MasterEntitiesResolver:
                 name = cand[0]
         return name
 
-    def find_donor(self, search_string):
+    def find_party(self, search_string):
         name = None
-        for entry in self.known_missing:
+        for entry in self.known_political_parties:
+            if entry in search_string:
+                name = entry
+        for incorrect, correct in self.known_incorrect_parties:
+            if incorrect in search_string or incorrect == name:
+                name = correct
+        if not name:
+            if self.known_political_parties:
+                cand = self.fuzzy_match.extractOne(
+                    name, self.known_political_parties
+                )
+                if cand[1] > 80:
+                    name = cand[0]
+        return name
+
+    def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):
+        name = None
+        for entry in self.known_missing_companies:
             if entry in search_string:
                 name = entry
         if not name:
-            if ";" in search_string:
+            if delimiter in search_string:
                 if "accommodation" in search_string.lower():
                     name = self._parse_donor(search_string)
                 else:
                     line_test = re.sub('\(.+?\)\s*', '', search_string)
-                    if len(line_test.rstrip(';').split(";")) == 2:
-                        company_name = search_string.split(";")[0].strip().rstrip('.')
-                        new_search = search_string.split(";")[0].strip().rstrip('.') + "."
-                        name = self._parse_donor(new_search)
-                        if not name:
-                            # TODO edit this to just remove (a) or (b)
-                            name = re.sub('\(.+?\)\s*', '', company_name)
+                    if len(line_test.rstrip(delimiter).split(delimiter)) == 2:
+                        demlimited = search_string.split(delimiter)[0]
+                        company_name = demlimited.strip().rstrip('.')
+                        new_search = demlimited.strip().rstrip('.') + "."
+                        if fuzzy_delimit:
+                            name = self._parse_donor(new_search)
+                            if not name:
+                                # TODO edit this to just remove (a) or (b)
+                                name = re.sub('\(.+?\)\s*', '', company_name)
+                        else:
+                            name = company_name
         if not name:
             name = self._parse_donor(search_string)
         if name:
-            for incorrect, correct in self.known_incorrect:
+            for incorrect, correct in self.known_incorrect_mps:
                 if incorrect in name:
                     name = correct
         return name

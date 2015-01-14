@@ -35,15 +35,16 @@ class PartyFundingParser():
             parsed["received_date"] = doc["received_date"]
             parsed["reported_date"] = doc["reported_date"]
             parsed["accepted_date"] = doc["accepted_date"]
-            #self._print_out("recipient", parsed["recipient"])
-            #self._print_out("donee_type", parsed["donee_type"])
-            #self._print_out("donor_name", parsed["donor_name"])
-            #self._print_out("donor_type", parsed["donor_type"])
-            #self._print_out("value", parsed["value"])
             if not parsed["recipient"]:
                 self._print_dic(parsed)
                 print "---\n"
             else:
+                #self._print_out("recipient", parsed["recipient"])
+                #self._print_out("donee_type", parsed["donee_type"])
+                #self._print_out("donor_name", parsed["donor_name"])
+                #self._print_out("donor_type", parsed["donor_type"])
+                #self._print_out("value", parsed["value"])
+                #print "---\n"
                 self._parsed_data.save(parsed)
 
     def _parse_recipient(self, entry, entry_type, recipient_type):

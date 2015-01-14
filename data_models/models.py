@@ -86,47 +86,66 @@ class MemberOfParliament(NamedEntity):
         )
 
 
-class GovernmentOffice(NamedEntity):
+class DonationRecipient(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.exists = False
-        self.label = "Government Office"
+        self.label = "Donation Recipient"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
+            "Named Entity", self.primary_attribute, self.name
         )
 
-    def is_department(self):
-        labels = ["Government Department"]
-        self.set_node_properties(labels=labels)
-
-    def is_position(self):
-        labels = ["Government Position"]
-        self.set_node_properties(labels=labels)
-
-
-class Contributor(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
-        self.exists = False
-        self.label = "Contributor"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
-        )
-
-    def update_contributor(self, properties=None):
+    def update_recipient(self, properties=None):
         labels = ["Named Entity"]
         self.set_node_properties(properties, labels)
 
-    def is_registered_interest(self):
-        labels = ["REGISTERED_INTEREST"]
-        self.set_node_properties(labels=labels)
+    def link_funding_category(self, category):
+        self.create_relationship(
+            self.vertex, "FUNDING_RELATIONSHIP", category.vertex
+        )
 
-    def link_payment(self, payment):
-        self.create_relationship(self.vertex, "REMUNERATION", payment.vertex)
+
+class Donor(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Donor"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            "Named Entity", self.primary_attribute, self.name
+        )
+
+    def update_donor(self, properties=None):
+        labels = ["Donor", "Named Entity"]
+        self.set_node_properties(properties, labels)
+
+
+class FundingRelationship(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Funding Relationship"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def update_category_details(self, properties=None):
+        self.set_node_properties(properties)
+
+    def link_donor(self, donor):
+        self.create_relationship(
+            self.vertex, "REGISTERED_DONOR", donor.vertex
+        )
+
+    def link_funding(self, funding):
+        self.create_relationship(
+            self.vertex, "FUNDING_RECEIVED", funding.vertex
+        )
 
 
 class InterestCategory(NamedEntity):
@@ -167,7 +186,8 @@ class RegisteredInterest(core.BaseDataModel):
         self.exists = True
 
     def update_interest_details(self, properties=None):
-        self.set_node_properties(properties)
+        labels = ["Named Entity"]
+        self.set_node_properties(properties, labels)
 
     def update_raw_record(self, raw_record):
         existing = self.vertex["raw_record"]
@@ -184,6 +204,44 @@ class RegisteredInterest(core.BaseDataModel):
     def set_registered_date(self, date):
         self.set_date(date, "REGISTERED")
 
+
+class RegisteredFunding(core.BaseDataModel):
+    def __init__(self, funding=None):
+        core.BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Registered Funding"
+        self.primary_attribute = "funding"
+        self.funding = funding
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.funding
+        )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.funding
+        )
+        self.exists = True
+
+    def update_funding_details(self, properties=None):
+        labels = ["Contributions"]
+        self.set_node_properties(properties, labels)
+
+    def set_dates(self, received, reported, accepted):
+        if received and len(received) > 0:
+            self._set_received_date(received)
+        if reported and len(reported) > 0:
+            self._set_reported_date(reported)
+        if accepted and len(accepted) > 0:
+            self._set_accepted_date(accepted)
+
+    def _set_received_date(self, date):
+        self.set_date(date, "RECEIVED")
+
+    def _set_reported_date(self, date):
+        self.set_date(date, "REPORTED")
+
+    def _set_accepted_date(self, date):
+        self.set_date(date, "ACCEPTED")
 
 
 class Remuneration(core.BaseDataModel):
@@ -207,13 +265,34 @@ class Remuneration(core.BaseDataModel):
         self.exists = True
 
     def update_details(self, properties=None):
-        self.set_node_properties(properties)
+        labels = ["Contributions"]
+        self.set_node_properties(properties, labels)
 
     def set_registered_date(self, date):
         self.set_date(date, "REGISTERED")
 
     def set_received_date(self, date):
         self.set_date(date, "RECEIVED")
+
+
+class GovernmentOffice(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Government Office"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def is_department(self):
+        labels = ["Named Entity", "Government Department"]
+        self.set_node_properties(labels=labels)
+
+    def is_position(self):
+        labels = ["Named Entity", "Government Position"]
+        self.set_node_properties(labels=labels)
 
 
 class TermInParliament(core.BaseDataModel):

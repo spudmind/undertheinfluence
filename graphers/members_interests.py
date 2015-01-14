@@ -30,16 +30,14 @@ class GraphMembersInterests():
         print ".................."
         #print "\n", node, "\n"
         mp = self._find_mp(node["mp"])
-        if not mp.exists:
-            mp.create()
         self.current_detail["mp"] = node["mp"]
         self._parse_categories(mp, node["interests"])
 
     def _find_mp(self, mp):
         new_mp = self.data_models.MemberOfParliament(mp)
         if not new_mp.exists:
-            #new_mp.create()
             print mp, "*not found*"
+            new_mp.create()
         return new_mp
 
     def _parse_categories(self, mp, categories):
@@ -49,56 +47,56 @@ class GraphMembersInterests():
             new_category = self._create_category(mp.name, category_name)
             mp.link_interest_category(new_category)
             if category_name == "Directorships":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated directorships":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession etc":  # done
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession, etc_":  # done
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Clients":
-                continue
+                #continue
                 print category_name
-                self._create_graph(new_category, category["category_records"])
+                #self._create_graph(new_category, category["category_records"])
             elif category_name == "Land and Property":
                 continue
-                self._create_graph(new_category, category["category_records"])
+                #self._create_graph(new_category, category["category_records"])
             elif category_name == "Shareholdings":
-                continue
+                #continue
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Registrable shareholdings":
-                continue
+                #continue
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorships":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorship or financial or material support":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Overseas visits":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Miscellaneous":
-                continue
+                #continue
                 print category_name
                 self._create_graph(new_category, category["category_records"])
             print "*"
@@ -155,12 +153,6 @@ class GraphMembersInterests():
             entry.create()
         entry.update_interest_details(props)
         entry.update_raw_record(raw_data)
-        return entry
-
-    def _create_contributor(self, name):
-        entry = self.data_models.Contributor(name)
-        if not entry.exists:
-            entry.create()
         return entry
 
     def _create_remuneration(self, payment_details):

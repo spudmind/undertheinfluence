@@ -17,13 +17,18 @@ class MpsParser():
 
     def _parse(self, node):
         found = self.resolver.find_mp(node["full_name"])
+        party = self.resolver.find_party(node["party"])
         print "\n.................."
+        #print node
         print found, "x", node["number_of_terms"]
         if node["full_name"] != found:
             print "*** also known as:", node["full_name"]
             node["also_known_as"] = found
-        print node["party"]
-        print node["constituency"]
+        if node["party"] != party:
+            print node["party"], "%", party
+            node["party"] = party
+        #print node["party"]
+        #print node["constituency"]
         print ".................."
         self._parsed_data.save(node)
         #print node["twfy_id"]

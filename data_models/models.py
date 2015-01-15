@@ -98,7 +98,7 @@ class DonationRecipient(NamedEntity):
         )
 
     def update_recipient(self, properties=None):
-        labels = ["Named Entity"]
+        labels = ["Donation Recipient", "Named Entity"]
         self.set_node_properties(properties, labels)
 
     def link_funding_category(self, category):
@@ -265,7 +265,7 @@ class Remuneration(core.BaseDataModel):
         self.exists = True
 
     def update_details(self, properties=None):
-        labels = ["Contributions"]
+        labels = ["Remuneration", "Contributions"]
         self.set_node_properties(properties, labels)
 
     def set_registered_date(self, date):

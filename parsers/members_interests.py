@@ -155,7 +155,7 @@ class MembersInterestsParser:
                         if not company_name:
                             company_name = self._split_if_colon(record[0])
                     elif "Amount of donation" in item:
-                        amount = self._find_money(item)
+                        amount = [y for x, y in self._find_money(item)]
                     elif "Destination of visit" in item:
                         destination = self.entity_resolver.get_entities(item)
                     elif "Date of visit" in item:
@@ -263,7 +263,7 @@ class MembersInterestsParser:
                         if not company_name and ":" in item:
                             company_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
-                        amount = self._find_money(item)
+                        amount = [y for x, y in self._find_money(item)]
                         nature = self._split_if_colon(item)
                     elif "Date of receipt" in item:
                         receipt = self._find_dates(item)

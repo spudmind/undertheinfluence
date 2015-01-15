@@ -68,7 +68,7 @@ class GraphPartyFunding():
         props = {
             "recipient": entry["recipient"],
             "donor_name": entry["donor_name"],
-            "amount": entry["value"],
+            "amount": self.convert_to_number(entry["value"]),
             "ec_reference": entry["ec_reference"],
             "nature": entry["nature_provision"],
             "purpose": entry["purpose"],
@@ -94,3 +94,10 @@ class GraphPartyFunding():
             entry["accepted_date"]
         )
         return new_donation
+
+    @staticmethod
+    def convert_to_number(amount):
+        if "," in amount:
+            amount = amount.replace(",", "")
+        return int(amount.split(".")[0])
+

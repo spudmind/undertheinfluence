@@ -12,7 +12,7 @@ class GraphMembersInterests():
         self.extra_details = [
             "donor_status",
             "purpose",
-            "vist_dates",
+            "visit_dates",
             "receipt",
             "accepted",
             "nature"
@@ -65,10 +65,10 @@ class GraphMembersInterests():
             elif category_name == "Clients":
                 #continue
                 print category_name
-                #self._create_graph(new_category, category["category_records"])
+                self._create_graph(new_category, category["category_records"])
             elif category_name == "Land and Property":
-                continue
-                #self._create_graph(new_category, category["category_records"])
+                #continue
+                self._create_graph(new_category, category["category_records"])
             elif category_name == "Shareholdings":
                 #continue
                 self._create_graph(new_category, category["category_records"])
@@ -102,32 +102,32 @@ class GraphMembersInterests():
             print "*"
 
     def _create_graph(self, category, records):
-        for record in records:
-            self._print_out("interest", record["interest"])
-            if record["interest"] and record["interest"] != "None":
-                self.current_detail["contributor"] = record["interest"]
-                new_interest = self._create_interest(
-                    record["interest"],
-                    record["raw_record"]
-                )
-                category.link_interest(new_interest)
-                if "renumeration" in record and len(record["renumeration"]) > 0:
-                    for payment in record["renumeration"]:
-                        new_payment = self._create_remuneration(payment)
-                        new_interest.link_payment(new_payment)
-                if "registered" in record and record["registered"]:
-                    for entry in record["registered"]:
-                        new_interest.set_registered_date(entry)
-                for detail in self.extra_details:
-                    if detail in record:
-                        new_interest.vertex[detail] = detail
-                new_interest.vertex.push()
-            else:
-                self.current_detail["contributor"] = "Unknown"
-                print "** NO CONTRIBUTOR ** "
-                print self.current_detail
-                print "** NO CONTRIBUTOR ** "
-            print "-\n"
+        if records:
+            for record in records:
+                self._print_out("interest", record["interest"])
+                if record["interest"] and record["interest"] != "None":
+                    self.current_detail["contributor"] = record["interest"]
+                    new_interest = self._create_interest(
+                        record["interest"],
+                        record["raw_record"]
+                    )
+                    category.link_interest(new_interest)
+                    if self._is_remuneration(record):
+                        for payment in record["remuneration"]:
+                            self._create_remuneration(new_interest, payment)
+                    if "registered" in record and record["registered"]:
+                        for entry in record["registered"]:
+                            new_interest.set_registered_date(entry)
+                    for detail in self.extra_details:
+                        if detail in record:
+                            new_interest.vertex[detail] = detail
+                    new_interest.vertex.push()
+                else:
+                    self.current_detail["contributor"] = "Unknown"
+                    print "** NO CONTRIBUTOR ** "
+                    print self.current_detail
+                    print "** NO CONTRIBUTOR ** "
+                print "-\n"
 
     def _create_category(self, name, category):
         props = {"mp": name, "category": category}
@@ -152,10 +152,11 @@ class GraphMembersInterests():
         if not entry.exists:
             entry.create()
         entry.update_interest_details(props)
-        entry.update_raw_record(raw_data)
+        #entry.update_raw_record(raw_data)
         return entry
 
-    def _create_remuneration(self, payment_details):
+    def _create_remuneration(self, interest, payment_details):
+        print payment_details
         context = u"{} - {} - {}".format(
             self.current_detail["contributor"],
             self.current_detail["category"],
@@ -164,16 +165,16 @@ class GraphMembersInterests():
         if isinstance(payment_details, dict):
             amount = payment_details["amount"]
             summary = u"{} - £{} - {}".format(
-                context, amount, payment_details["recieved"]
+                context, amount, payment_details["received"]
             )
             payment = self.data_models.Remuneration(summary)
             payment.create()
             payment.update_details(payment_details)
-            if payment_details["recieved"] != u"Unknown":
-                payment.set_received_date(payment_details["recieved"])
+            interest.link_payment(payment)
+            if payment_details["received"] != u"Unknown":
+                payment.set_received_date(payment_details["received"])
             if payment_details["registered"] != u"Unknown":
                 payment.set_received_date(payment_details["registered"])
-            return payment
         elif isinstance(payment_details, list):
             for payment in payment_details:
                 summary = u"{} - £{} - {}".format(
@@ -181,8 +182,24 @@ class GraphMembersInterests():
                 )
                 payment = self.data_models.Remuneration(summary)
                 payment.create()
-
+                interest.link_payment(payment)
+        else:
+            summary = u"{} - £{} - {}".format(
+                context, payment_details, u"Unknown"
+            )
+            payment = self.data_models.Remuneration(summary)
+            payment.create()
+            interest.link_payment(payment)
 
     @staticmethod
     def _print_out(key, value):
         print "  %-25s%-25s" % (key, value)
+
+    @staticmethod
+    def _is_remuneration(record):
+        result = False
+        if "remuneration" in record:
+            if record["remuneration"] and \
+                    len(record["remuneration"]) > 0:
+                    result = True
+        return result

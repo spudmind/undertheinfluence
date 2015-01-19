@@ -45,18 +45,23 @@ class MasterEntitiesResolver:
             u"Transworld Publishers",
             u"Developing Markets Associates Ltd",
             u"Democracy Forum Ltd",
-            u"Ambriel Consulting"
+            u"Ambriel Consulting",
+            u"Developing Market Associates Ltd"
         ]
         self.known_political_parties = [
             u"Labour Party",
+            u"Labour",
             u"Alliance Party of Northern Ireland"
             u"Alliance Party",
+            u"Alliance",
             u"Democratic Unionist Party",
             u"DUP",
             u"Sinn Fein",
             u"Conservative Party",
+            u"Conservative"
             u"Liberal Democrat Party",
             u"Liberal Democrats",
+            u"Liberal Democrat",
             u"Plaid Cymru",
             u"Independent",
             u"Social Democratic and Labour Party",
@@ -75,9 +80,13 @@ class MasterEntitiesResolver:
         self.known_incorrect_parties = [
             (u"DUP", u"Democratic Unionist Party"),
             (u"UKIP", u"UK Independence Party"),
+            (u"BNP", u"British National Party"),
             (u"Alliance Party", u"Alliance Party of Northern Ireland"),
-            (u"Liberal Democrats", u"Liberal Democrat Party"),
-            (u"BNP", u"British National Party")
+            (u"Alliance", u"Alliance Party of Northern Ireland"),
+            (u"Liberal Democrat Party", u"Liberal Democrats"),
+            (u"Liberal Democrat", u"Liberal Democrats"),
+            (u"Conservative", u"Conservative Party"),
+            (u"Labour", u"Labour Party")
         ]
         self.prefixes = [
             u"Sir ",

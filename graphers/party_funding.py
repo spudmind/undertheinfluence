@@ -41,7 +41,7 @@ class GraphPartyFunding():
 
     def _create_category(self, name, donor):
         props = {"recipient": name, "donor": donor}
-        category_name = u"{} and {}".format(name, donor)
+        category_name = u"{} and {}".format(donor, name)
         new_category = self.data_models.FundingRelationship(category_name)
         if not new_category.exists:
             new_category.create()

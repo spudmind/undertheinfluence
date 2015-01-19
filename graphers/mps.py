@@ -92,6 +92,7 @@ class GraphMPs():
             "left_reason": term["left_reason"]
         }
         new_term.update_details(term)
+        new_term.link_constituency(term['constituency'])
         return new_term
 
     def _create_offices(self, term, offices):

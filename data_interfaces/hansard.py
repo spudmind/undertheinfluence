@@ -18,6 +18,18 @@ class TWFYHansard:
             'iso-8859-1'
         )
 
+    def get_lords(self):
+        return simplejson.loads(
+            self.twfy.api.getLords(output='js'),
+            'iso-8859-1'
+        )
+
+    def get_lord_details(self, person_id):
+        return simplejson.loads(
+            self.twfy.api.getLord(output='js', id=person_id),
+            'iso-8859-1'
+        )
+
     def get_mp_debates(self, debate_type, person):
         return simplejson.loads(
             self.twfy.api.getDebates(output='js', type=debate_type, person=person),

@@ -7,11 +7,13 @@ class CentralNodes(DataProfiler):
         self.node_types = [
             ("Named Entity", "name"),
             ("Member of Parliament", "name"),
-            ("Contributor", "name"),
-            ("Government Department", "name"),
-            ("Government Position", "name"),
+            ("Donor", "name"),
+            ("Donation Recipient", "name"),
+            ("Government Office", "name"),
             ("Political Party", "name"),
             ("Interest Category", "name"),
+            ("Funding Category", "name"),
+            ("Registered Funding", "funding"),
             ("Registered Interest", "summary"),
             ("Remuneration", "summary")
         ]

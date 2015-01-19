@@ -137,15 +137,32 @@ class FundingRelationship(NamedEntity):
     def update_category_details(self, properties=None):
         self.set_node_properties(properties)
 
+    def update_raw_record(self, raw_record):
+        existing = self.vertex["raw_record"]
+        if existing and len(existing) > 0:
+            new = u"{}\n---\n\n{}".format(existing, raw_record)
+        else:
+            new = raw_record
+        self.vertex["raw_record"] = new
+        self.vertex.push()
+
     def link_donor(self, donor):
         self.create_relationship(
-            self.vertex, "REGISTERED_DONOR", donor.vertex
+            self.vertex, "REGISTERED_CONTRIBUTOR", donor.vertex
         )
 
     def link_funding(self, funding):
         self.create_relationship(
-            self.vertex, "FUNDING_RECEIVED", funding.vertex
+            self.vertex, "DONATION_RECEIVED", funding.vertex
         )
+
+    def link_payment(self, payment):
+        self.create_relationship(
+            self.vertex, "REMUNERATION_RECEIVED", payment.vertex
+        )
+
+    def set_registered_date(self, date):
+        self.set_date(date, "REGISTERED")
 
 
 class InterestCategory(NamedEntity):
@@ -162,9 +179,9 @@ class InterestCategory(NamedEntity):
     def update_category_details(self, properties=None):
         self.set_node_properties(properties)
 
-    def link_interest(self, interest):
+    def link_relationship(self, relationship):
         self.create_relationship(
-            self.vertex, "REGISTERED_INTEREST", interest.vertex
+            self.vertex, "INTEREST_RELATIONSHIP", relationship.vertex
         )
 
 
@@ -188,21 +205,6 @@ class RegisteredInterest(core.BaseDataModel):
     def update_interest_details(self, properties=None):
         labels = ["Named Entity"]
         self.set_node_properties(properties, labels)
-
-    def update_raw_record(self, raw_record):
-        existing = self.vertex["raw_record"]
-        if existing and len(existing) > 0:
-            new = u"{}\n---\n\n{}".format(existing, raw_record)
-        else:
-            new = raw_record
-        self.vertex["raw_record"] = new
-        self.vertex.push()
-
-    def link_payment(self, payment):
-        self.create_relationship(self.vertex, "REMUNERATION", payment.vertex)
-
-    def set_registered_date(self, date):
-        self.set_date(date, "REGISTERED")
 
 
 class RegisteredFunding(core.BaseDataModel):
@@ -311,6 +313,12 @@ class TermInParliament(core.BaseDataModel):
             self.label, self.primary_attribute, self.term
         )
         self.exists = True
+
+    def link_constituency(self, constituency):
+        new_constituency = self.create_vertex(
+            "Constituency", "name", constituency
+        )
+        self.create_relationship(self.vertex, "REPRESENTING", new_constituency)
 
     def update_details(self, properties=None):
         if properties["entered_house"]:

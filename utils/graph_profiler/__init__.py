@@ -9,10 +9,14 @@ class DataProfiler:
         self.node_types = [
             "Named Entity",
             "Member of Parliament",
-            "Contributor",
+            "Donor",
+            "Donation Recipient",
             "Elected Term",
-            "Government Department",
-            "Government Position",
+            "Government Office",
             "Political Party",
-
+            "Interest Category",
+            "Funding Relationship",
+            "Registered Funding",
+            "Registered Interest",
+            "Remuneration",
         ]

@@ -107,21 +107,24 @@ class GraphMembersInterests():
                 self._print_out("interest", record["interest"])
                 if record["interest"] and record["interest"] != "None":
                     self.current_detail["contributor"] = record["interest"]
-                    new_interest = self._create_interest(
-                        record["interest"],
-                        record["raw_record"]
+                    funding_relationship = self._create_relationship(
+                        self.current_detail["mp"],
+                        record["interest"]
                     )
-                    category.link_interest(new_interest)
+                    new_interest = self._create_interest(record["interest"])
+                    category.link_relationship(funding_relationship)
+                    funding_relationship.link_donor(new_interest)
+                    funding_relationship.update_raw_record(record["raw_record"])
                     if self._is_remuneration(record):
                         for payment in record["remuneration"]:
-                            self._create_remuneration(new_interest, payment)
+                            self._create_remuneration(funding_relationship, payment)
                     if "registered" in record and record["registered"]:
                         for entry in record["registered"]:
-                            new_interest.set_registered_date(entry)
+                            funding_relationship.set_registered_date(entry)
                     for detail in self.extra_details:
                         if detail in record:
-                            new_interest.vertex[detail] = detail
-                    new_interest.vertex.push()
+                            funding_relationship.vertex[detail] = record[detail]
+                    funding_relationship.vertex.push()
                 else:
                     self.current_detail["contributor"] = "Unknown"
                     print "** NO CONTRIBUTOR ** "
@@ -138,25 +141,23 @@ class GraphMembersInterests():
         new_category.update_category_details(props)
         return new_category
 
-    def _create_interest(self, interest, raw_data):
-        summary = u"{} - {} - {}".format(
-            self.current_detail["category"],
-            self.current_detail["contributor"],
-            self.current_detail["mp"]
-        )
-        props = {
-            "interest_type": self.current_detail["category"],
-            "summary": summary
-        }
+    def _create_relationship(self, name, donor):
+        props = {"recipient": name, "donor": donor}
+        category_name = u"{} and {}".format(donor, name)
+        new_relationship = self.data_models.FundingRelationship(category_name)
+        if not new_relationship.exists:
+            new_relationship.create()
+        new_relationship.update_category_details(props)
+        return new_relationship
+
+    def _create_interest(self, interest):
         entry = self.data_models.RegisteredInterest(interest)
         if not entry.exists:
             entry.create()
-        entry.update_interest_details(props)
         #entry.update_raw_record(raw_data)
         return entry
 
-    def _create_remuneration(self, interest, payment_details):
-        print payment_details
+    def _create_remuneration(self, relationship, payment_details):
         context = u"{} - {} - {}".format(
             self.current_detail["contributor"],
             self.current_detail["category"],
@@ -164,13 +165,15 @@ class GraphMembersInterests():
         )
         if isinstance(payment_details, dict):
             amount = payment_details["amount"]
+            int_amount = self.convert_to_number(amount)
             summary = u"{} - £{} - {}".format(
                 context, amount, payment_details["received"]
             )
             payment = self.data_models.Remuneration(summary)
             payment.create()
             payment.update_details(payment_details)
-            interest.link_payment(payment)
+            payment.update_details({"amount": int_amount})
+            relationship.link_payment(payment)
             if payment_details["received"] != u"Unknown":
                 payment.set_received_date(payment_details["received"])
             if payment_details["registered"] != u"Unknown":
@@ -180,16 +183,20 @@ class GraphMembersInterests():
                 summary = u"{} - £{} - {}".format(
                     context, payment, u"Unknown"
                 )
+                int_amount = self.convert_to_number(payment)
                 payment = self.data_models.Remuneration(summary)
                 payment.create()
-                interest.link_payment(payment)
+                relationship.link_payment(payment)
+                payment.update_details({"amount": int_amount})
         else:
             summary = u"{} - £{} - {}".format(
                 context, payment_details, u"Unknown"
             )
+            int_amount = self.convert_to_number(payment_details)
             payment = self.data_models.Remuneration(summary)
             payment.create()
-            interest.link_payment(payment)
+            relationship.link_payment(payment)
+            payment.update_details({"amount": int_amount})
 
     @staticmethod
     def _print_out(key, value):
@@ -203,3 +210,9 @@ class GraphMembersInterests():
                     len(record["remuneration"]) > 0:
                     result = True
         return result
+
+    @staticmethod
+    def convert_to_number(amount):
+        if "," in amount:
+            amount = amount.replace(",", "")
+        return int(amount.split(".")[0])

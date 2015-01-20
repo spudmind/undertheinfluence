@@ -151,6 +151,8 @@ class GraphMembersInterests():
         return new_relationship
 
     def _create_interest(self, interest):
+        if isinstance(interest, list):
+            interest = interest[0]
         entry = self.data_models.RegisteredInterest(interest)
         if not entry.exists:
             entry.create()

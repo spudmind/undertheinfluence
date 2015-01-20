@@ -89,9 +89,10 @@ class GraphMPs():
             "constituency": term['constituency'],
             "left_house": term["left_house"],
             "entered_house": term["entered_house"],
-            "left_reason": term["left_reason"]
+            "left_reason": term["left_reason"],
+            "type": "Elected"
         }
-        new_term.update_details(term)
+        new_term.update_details(properties=term)
         new_term.link_constituency(term['constituency'])
         return new_term
 

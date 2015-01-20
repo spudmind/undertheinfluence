@@ -22,9 +22,7 @@ class LordsInfoScaper():
         self.all_lords = None
 
     def run(self):
-        #self._get_twfy_data()
-        self._get_guardian_data()
-        #self._get_publicwhip_data()
+        self._get_twfy_data()
 
     def _get_twfy_data(self):
         print "Getting Lords from TWFY"
@@ -68,62 +66,6 @@ class LordsInfoScaper():
             #self._report(node)
             self.cache_data.save(node)
             print "\n\n---"
-
-    def _get_guardian_data(self):
-        print "Updating Guardian data"
-        self.all_lords = [
-            #doc["full_name"] for doc in self.cache_data.find()
-            u"{} {} {}".format(doc["title"], doc["first_name"], doc["last_name"])
-            for doc in self.cache_data.find()
-        ]
-        for person in self._iterate_guardian_api():
-            url = person["aristotle-url"]
-            cached = self._find_cached_lord(person["name"])
-            if cached:
-                self._update_cached_mp(cached["_id"], "guardian_url", url)
-                if "image" in person:
-                    self._update_cached_mp(
-                        cached["_id"], "guardian_image", person["image"]
-                    )
-                self._print_out(cached["full_name"], url)
-
-    def _get_publicwhip_data(self):
-        with open(LordsInfoScaper.VOTE_MATRIX) as fin:
-            rows = (line.split('\t') for line in fin)
-            for row in rows:
-                name, id = u'{0} {1}'.format(row[1], row[2]), row[0]
-                url = u"http://publicwhip.com/mp.php?mpid={0}".format(id)
-                result = self._find_cached_lord(name)
-                self._update_cached_mp(result["_id"], "publicwhip_id", id)
-                self._update_cached_mp(result["_id"], "publicwhip_url", url)
-                self._print_out(name, url)
-
-    def _iterate_guardian_api(self):
-        r = self.requests.get(LordsInfoScaper.ALL_PARTIES_API)
-        parties = r.json()["parties"]
-        for party in parties:
-            party_uri = party["json-url"]
-            r = self.requests.get(party_uri)
-            if not r.status_code == 404:
-                people = r.json()["party"]["mps"]
-                for person in people:
-                    person_uri = person["json-url"]
-                    r = self.requests.get(person_uri)
-                    if not r.status_code == 404:
-                        yield r.json()["person"]
-
-    def _find_cached_lord(self, search):
-        if self.all_lords:
-            cand = self.fuzzy_match.extractOne(search, self.all_lords)
-            print search, cand
-            name = cand[0]
-        else:
-            name = search
-        result = self.cache_data.find({"full_name": name}).limit(1)
-        try:
-            return result[0]
-        except IndexError:
-            return None
 
     def _update_cached_mp(self, id, key, value):
         self.cache_data.update({"_id": id}, {"$set": {key: value}})

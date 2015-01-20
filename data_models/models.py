@@ -86,6 +86,41 @@ class MemberOfParliament(NamedEntity):
         )
 
 
+class Lord(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.label = "Lord"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def update_lord_details(self, properties=None):
+        labels = ["Named Entity", "Lord"]
+        self.set_node_properties(properties, labels)
+
+    def link_interest_category(self, category):
+        self.create_relationship(
+            self.vertex, "INTERESTS_REGISTERED_IN", category.vertex
+        )
+
+    def link_party(self, party):
+        party = NamedEntity(party)
+        party_labels = ["Political Party"]
+        if not party.exists:
+            party.create()
+        party.set_node_properties(labels=party_labels)
+        self.create_relationship(
+            self.vertex, "MEMBER_OF", party.vertex
+        )
+
+    def link_peerage(self, peerage):
+        self.create_relationship(
+            self.vertex, "PEERAGE", peerage.vertex
+        )
+
+
 class DonationRecipient(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
@@ -320,11 +355,12 @@ class TermInParliament(core.BaseDataModel):
         )
         self.create_relationship(self.vertex, "REPRESENTING", new_constituency)
 
-    def update_details(self, properties=None):
+    def update_details(self, labels=None, properties=None):
         if properties["entered_house"]:
             self.set_date(properties["entered_house"], "ENTERED_HOUSE")
         if properties["left_reason"]:
             self.set_date(properties["left_house"], "LEFT_HOUSE")
+        self.set_node_properties(properties, labels)
 
     def link_position(self, position):
         self.create_relationship(self.vertex, "SERVED_IN", position.vertex)

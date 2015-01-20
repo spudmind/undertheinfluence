@@ -1,5 +1,6 @@
 from fuzzywuzzy import process
 from utils import mongo
+from utils import config
 from utils import entity_extraction
 import re
 
@@ -9,90 +10,17 @@ class MasterEntitiesResolver:
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
-        self.master_data = self.cache.db.master_mps
+        self.master_mps = self.cache.db.master_mps
+        self.master_lords = self.cache.db.master_lords
         self.return_first_entity = True
-        self.master_mps = [
-            x["name"] for x in list(self.master_data.find())
-        ]
-        self.known_incorrect_mps = [
-            (u"Ian Paisley Jnr", u"Ian Paisley"),
-            (u"Nicholas Boles", u"Nick Boles"),
-            (u"Nicholas Clegg", u"Nick Clegg"),
-            (u"Vincent Cable", u"Vince Cable"),
-            (u"Brian H Donohoe", u"Brian Donohoe"),
-            (u"Susan Elan Jones", u"Susan Jones"),
-            (u"Jeffrey M Donaldson", u"Jeffrey Donaldson"),
-            (u"Edward Miliband", u"Ed Miliband"),
-            (u"Edward Balls", u"Ed Balls"),
-            (u"Guardian News", u"Guardian News and Media Ltd"),
-            (u"Guardian", u"Guardian News and Media Ltd"),
-            (u"YouGov", u"YouGov PLC")
-        ]
-        self.known_missing_companies = [
-            u"IPSOS Mori",
-            u"Ipsos MORI",
-            u"Ipsos Mori",
-            u"YouGov",
-            u"ComRes",
-            u"Social Investment Business Group",
-            u"Mansfeider Kupfer Und Messing GMBH",
-            u"Pembroke VCT plc",
-            u"Woodlands Schools Ltd",
-            u"Making It (UK) Ltd",
-            u"Phoenix Life Assurance Ltd",
-            u"Office of Gordon and Sarah Brown",
-            u"The Independent",
-            u"Transworld Publishers",
-            u"Developing Markets Associates Ltd",
-            u"Democracy Forum Ltd",
-            u"Ambriel Consulting",
-            u"Developing Market Associates Ltd"
-        ]
-        self.known_political_parties = [
-            u"Labour Party",
-            u"Labour",
-            u"Alliance Party of Northern Ireland"
-            u"Alliance Party",
-            u"Alliance",
-            u"Democratic Unionist Party",
-            u"DUP",
-            u"Sinn Fein",
-            u"Conservative Party",
-            u"Conservative"
-            u"Liberal Democrat Party",
-            u"Liberal Democrats",
-            u"Liberal Democrat",
-            u"Plaid Cymru",
-            u"Independent",
-            u"Social Democratic and Labour Party",
-            u"Scottish National Party",
-            u"Green Party",
-            u"Speaker",
-            u"UK Independence Party",
-            u"UKIP",
-            u"Co-operative Party",
-            u"We Demand A Referendum Now",
-            u"BNP",
-            u"British National Party",
-            u"NO2EU",
-            u"English Democrats"
-        ]
-        self.known_incorrect_parties = [
-            (u"DUP", u"Democratic Unionist Party"),
-            (u"UKIP", u"UK Independence Party"),
-            (u"BNP", u"British National Party"),
-            (u"Alliance Party", u"Alliance Party of Northern Ireland"),
-            (u"Alliance", u"Alliance Party of Northern Ireland"),
-            (u"Liberal Democrat Party", u"Liberal Democrats"),
-            (u"Liberal Democrat", u"Liberal Democrats"),
-            (u"Conservative", u"Conservative Party"),
-            (u"Labour", u"Labour Party")
-        ]
-        self.prefixes = [
-            u"Sir ",
-            u"Mr ",
-            u"Ms "
-        ]
+        self.master_mps = list(self.cache.db.master_mps.find({"name": 1}))
+        self.master_lords = list(self.cache.db.master_lords.find({"name": 1}))
+        self.mapped_mps = config.mapped_mps
+        self.mapped_lords = config.mapped_lords
+        self.company_entities = config.company_entities
+        self.party_entities = config.party_entities
+        self.mapped_parties = config.mapped_parties
+        self.prefixes = config.prefixes
 
     def get_entities(self, search_string):
         entities = self.entity_extractor.get_entities(search_string)
@@ -104,7 +32,7 @@ class MasterEntitiesResolver:
 
     def find_mp(self, search):
         name = search
-        for incorrect, correct in self.known_incorrect_mps:
+        for incorrect, correct in self.mapped_mps:
             if incorrect in search:
                 name = correct
         for p in self.prefixes:
@@ -116,18 +44,31 @@ class MasterEntitiesResolver:
                 name = cand[0]
         return name
 
+    def find_lord(self, search):
+        name = search
+        for incorrect, correct in self.mapped_lords:
+            if incorrect in search:
+                name = correct
+        if self.master_lords:
+            cand = self.fuzzy_match.extractOne(name, self.master_lords)
+            print name
+            print cand
+            if cand[1] > 80:
+                name = cand[0]
+        return name
+
     def find_party(self, search_string):
         name = None
-        for entry in self.known_political_parties:
+        for entry in self.party_entities:
             if entry in search_string:
                 name = entry
-        for incorrect, correct in self.known_incorrect_parties:
+        for incorrect, correct in self.mapped_parties:
             if incorrect in search_string or incorrect == name:
                 name = correct
         if not name:
-            if self.known_political_parties:
+            if self.party_entities:
                 cand = self.fuzzy_match.extractOne(
-                    name, self.known_political_parties
+                    name, self.party_entities
                 )
                 if cand[1] > 80:
                     name = cand[0]
@@ -135,7 +76,7 @@ class MasterEntitiesResolver:
 
     def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):
         name = None
-        for entry in self.known_missing_companies:
+        for entry in self.company_entities:
             if entry in search_string:
                 name = entry
         if not name:
@@ -158,7 +99,7 @@ class MasterEntitiesResolver:
         if not name:
             name = self._parse_donor(search_string)
         if name:
-            for incorrect, correct in self.known_incorrect_mps:
+            for incorrect, correct in self.mapped_mps:
                 if incorrect in name:
                     name = correct
         return name

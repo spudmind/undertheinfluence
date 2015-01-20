@@ -56,7 +56,7 @@ target/
 
 # warren test code and data
 members_test.py
-test_test.py
+#test_test.py
 scrapers/data/regmem/*.*
 utils/MITIE-models/
 .idea/

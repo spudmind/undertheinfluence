@@ -1,4 +1,6 @@
 from scrapers import mps as fetch_mps
+from scrapers import members_interests
+from scrapers import lords_interests
 from scrapers import party_funding
 from scrapers import lords
 from parsers import master_entities
@@ -11,9 +13,13 @@ from graphers import party_funding
 from graphers import lords as lords_graph
 
 
+#get_members_interests = members_interests.MembersInterestsScraper()
+#get_lords_interests = lords_interests.LordsInterestsScraper()
 #get_lords = lords.LordsInfoScaper()
 #get_funding = party_funding.PartyFundingScaper()
 #get_mps = mps.MpInfoScaper()
+#get_members_interests.run()
+#get_lords_interests.run()
 #get_lords.run()
 #get_funding.run()
 #get_mps.run()

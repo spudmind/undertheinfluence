@@ -83,5 +83,3 @@ class LordsInterestsScraper():
             "contents": contents,
         }
         self.mongo_db.save(data)
-
-LordsInterestsScraper().run()

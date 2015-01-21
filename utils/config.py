@@ -4,6 +4,19 @@ prefixes = [
     u"Ms "
 ]
 
+lords_titles = [
+    u"Lady",
+    u"Lord",
+    u"Earl",
+    u"Baroness",
+    u"Viscount",
+    u"Bishop",
+    u"Countess",
+    u"Archbishop",
+    u"Duke",
+    u"Marquess"
+]
+
 company_entities = [
     u"IPSOS Mori",
     u"Ipsos MORI",
@@ -59,8 +72,15 @@ company_entities = [
     u"Construction Industry Council",
     u"Keltbray Group (Holdings) Ltd",
     u"GR Software and Research Ltd",
-    u"LEK Advisory Board"
+    u"LEK Advisory Board",
+    u"United & Cecil Club,"
 ]
+
+mapped_companies = [
+    (u"United & Cecil Club,", u"United and Cecil Club")
+]
+
+
 party_entities = [
     u"Labour Party",
     u"Labour",

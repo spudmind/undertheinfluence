@@ -16,6 +16,7 @@ class MasterEntitiesResolver:
         self.master_mps = list(self.cache.db.master_mps.find({"name": 1}))
         self.master_lords = list(self.cache.db.master_lords.find({"name": 1}))
         self.mapped_mps = config.mapped_mps
+        self.mapped_companies = config.mapped_companies
         self.mapped_lords = config.mapped_lords
         self.company_entities = config.company_entities
         self.party_entities = config.party_entities
@@ -24,8 +25,8 @@ class MasterEntitiesResolver:
 
     def get_entities(self, search_string):
         entities = self.entity_extractor.get_entities(search_string)
-        if entities and len(entities) > 1:
-            if self.return_first_entity:
+        if self.return_first_entity:
+            if entities and isinstance(entities, list):
                 return entities[0]
         else:
             return entities
@@ -99,7 +100,7 @@ class MasterEntitiesResolver:
         if not name:
             name = self._parse_donor(search_string)
         if name:
-            for incorrect, correct in self.mapped_mps:
+            for incorrect, correct in self.mapped_companies:
                 if incorrect in name:
                     name = correct
         return name

@@ -59,6 +59,7 @@ members_test.py
 #test_test.py
 scrapers/data/regmem/
 scrapers/data/reglords/
+scrapers/data/EC-Export*.csv
 utils/MITIE-models/
 .idea/
 .~lock.*

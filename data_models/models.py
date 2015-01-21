@@ -86,6 +86,32 @@ class MemberOfParliament(NamedEntity):
         )
 
 
+class MembersOfParliament(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self.get_mp_count()
+
+    def get_mp_count(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament`)
+            RETURN count(mp)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+    def get_all_mps(self, page_size, skip_to):
+        if skip_to < (self.count - page_size):
+            search_string = u"""
+                MATCH (mp:`Member of Parliament`) with mp
+                MATCH (mp)-[r]-() with mp,  r
+                RETURN mp.name, mp.party, mp.guardian_image, count(r) as weight
+                ORDER BY weight DESC
+                SKIP {0} LIMIT {1}
+            """.format(skip_to, page_size)
+            search_result = self.query(search_string)
+            return search_result
+
+
 class Lord(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)

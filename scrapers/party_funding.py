@@ -10,7 +10,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 class PartyFundingScaper:
     def __init__(self):
         self.csv = text_io.CsvInput()
-        self.file_name = current_path + '/data/EC-Export-20141215-1737.csv'
+        self.file_name = current_path + '/data/EC-Export-20150121-1556.csv'
         self.csv.open(self.file_name)
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_party_funding

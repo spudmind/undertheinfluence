@@ -51,6 +51,7 @@ class PartyFundingParser():
                 self._parsed_data.save(parsed)
 
     def _parse_recipient(self, entry, entry_type, recipient_type):
+        result = self._remove_illegal_chars(entry)
         if entry_type == "MP - Member of Parliament":
             result = self.resolver.find_mp(entry)
         elif entry_type == "Political Party" or \
@@ -60,12 +61,10 @@ class PartyFundingParser():
             result = self.resolver.get_entities(entry)
             if result and isinstance(result, list):
                 result = result[0]
-            else:
-                result = entry
         return result
 
     def _parse_donor(self, entry, entry_type):
-        result = entry
+        result = self._remove_illegal_chars(entry)
         if entry_type == "Individual":
             title = entry.split(" ")[0]
             if title in self.lords_tiles:
@@ -80,6 +79,11 @@ class PartyFundingParser():
             return result[0]
         else:
             return result
+
+    @staticmethod
+    def _remove_illegal_chars(text):
+        text = text.replace("\\", " ")
+        return text
 
     @staticmethod
     def _print_out(key, value):

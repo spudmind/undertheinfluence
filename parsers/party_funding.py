@@ -16,10 +16,10 @@ class PartyFundingParser():
         self._all_entries = list(self._cache_data.find())
         for doc in self._all_entries:
             parsed = {}
-            parsed["recipient"] = self._parse_recipient(
+            parsed["recipient"] = self._get_recipient(
                 doc["recipient"], doc["donee_type"], doc["recipient_type"]
             )
-            parsed["donor_name"] = self._parse_donor(
+            parsed["donor_name"] = self._get_donor(
                 doc["donor_name"], doc["donor_type"]
             )
             parsed["donor_type"] = doc["donor_type"]
@@ -50,33 +50,38 @@ class PartyFundingParser():
                 print "---\n"
                 self._parsed_data.save(parsed)
 
-    def _parse_recipient(self, entry, entry_type, recipient_type):
+    def _get_recipient(self, entry, entry_type, recipient_type):
         result = self._remove_illegal_chars(entry)
         if entry_type == "MP - Member of Parliament":
-            result = self.resolver.find_mp(entry)
+            result = self.resolver.find_mp(result)
         elif entry_type == "Political Party" or \
                 recipient_type == "Political Party":
-            result = self.resolver.find_party(entry)
+            result = self.resolver.find_party(result)
         else:
-            result = self.resolver.get_entities(entry)
+            result = self.resolver.get_entities(result)
             if result and isinstance(result, list):
                 result = result[0]
-        return result
+        if not result:
+            return entry
+        else:
+            return result
 
-    def _parse_donor(self, entry, entry_type):
+    def _get_donor(self, entry, entry_type):
         result = self._remove_illegal_chars(entry)
         if entry_type == "Individual":
             title = entry.split(" ")[0]
             if title in self.lords_tiles:
-                result = self.resolver.find_lord(entry)
+                result = self.resolver.find_lord(result)
             else:
-                result = self.resolver.get_entities(entry)
+                result = self.resolver.get_entities(result)
         else:
             result = self.resolver.find_donor(
                 entry, delimiter=",", fuzzy_delimit=False
             )
-        if isinstance(result, list):
-            return result[0]
+        if result and isinstance(result, list):
+            result = result[0]
+        if not result:
+            return entry
         else:
             return result
 

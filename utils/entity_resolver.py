@@ -35,12 +35,12 @@ class MasterEntitiesResolver:
 
     def find_mp(self, search):
         name = None
-        for incorrect, correct in self.mapped_mps:
-            if incorrect in search:
-                name = correct
         for p in self.prefixes:
             if p in search:
                 search = search.lstrip(p)
+        for incorrect, correct in self.mapped_mps:
+            if incorrect in search:
+                name = correct
         if not name:
             cand = self.fuzzy_match.extractOne(search, self.master_mps)
             if cand[1] > 80:
@@ -48,33 +48,28 @@ class MasterEntitiesResolver:
         return name
 
     def find_lord(self, search):
-        name = search
+        name = None
         for incorrect, correct in self.mapped_lords:
             if incorrect in search:
                 name = correct
-        if self.master_lords:
-            cand = self.fuzzy_match.extractOne(name, self.master_lords)
-            print name
-            print cand
+        if not name:
+            cand = self.fuzzy_match.extractOne(search, self.master_lords)
             if cand[1] > 80:
                 name = cand[0]
         return name
 
-    def find_party(self, search_string):
+    def find_party(self, search):
         name = None
         for entry in self.party_entities:
-            if entry in search_string:
+            if entry in search:
                 name = entry
         for incorrect, correct in self.mapped_parties:
-            if incorrect in search_string or incorrect == name:
+            if incorrect in search or incorrect == name:
                 name = correct
         if not name:
-            if self.party_entities:
-                cand = self.fuzzy_match.extractOne(
-                    name, self.party_entities
-                )
-                if cand[1] > 80:
-                    name = cand[0]
+            cand = self.fuzzy_match.extractOne(search, self.party_entities)
+            if cand[1] > 80:
+                name = cand[0]
         return name
 
     def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):

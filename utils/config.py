@@ -1,8 +1,7 @@
 prefixes = [
     u"Sir ",
     u"Mr ",
-    u"Ms ",
-    u"na "
+    u"Ms "
 ]
 
 lords_titles = [
@@ -54,7 +53,7 @@ donor_entities = [
     u"JTI UK",
     u"VSO UK",
     u"Conservative Friends of Israel",
-    u"Labour Friends of Israel"
+    u"Labour Friends of Israel",
     u"Liberal Democrat Friends of Israel",
     u"Connexall",
     u"Lord Sugar of Clapton",
@@ -126,7 +125,17 @@ donor_entities = [
     u"International Fund for Animal Welfare",
     u"Friends of the Earth",
     u"Coventry Building Society",
-    u"Daily Mail and Mail on Sunday"
+    u"Daily Mail and Mail on Sunday",
+    u"Sensortec",
+    u"Saliston Ltd",
+    u"Gazprom",
+    u"Maloja Ltd",
+    u"Thermal Engineering Holding Ltd",
+    u"AFC Energy",
+    u"Mr and Mrs D Wall"
+    u"Communication Workers Union",
+    u"UNISON",
+    u"Ministry of Sound"
 ]
 
 mapped_donors = [
@@ -158,7 +167,10 @@ mapped_donors = [
     (u"Populus", u"Populus Ltd"),
     (u"Populus Limited", u"Populus Ltd"),
     (u"Perseus books LL", u"Perseus Books, LLC"),
-    (u"BASF", u"BASF PLC")
+    (u"BASF", u"BASF PLC"),
+    (u"Shura Council of Kingdom Saudi Arabia", u"Shura Council of the Kingdom of Saudi Arabia"),
+    (u"ResultsUK", u"Results UK"),
+    (u"RESULTS UK", u"Results UK"),
 ]
 
 

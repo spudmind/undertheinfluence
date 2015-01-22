@@ -10,8 +10,8 @@ class MasterEntitiesResolver:
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
-        self.master_mps = self.cache.db.master_mps
-        self.master_lords = self.cache.db.master_lords
+        #self.master_mps = self.cache.db.master_mps
+        #self.master_lords = self.cache.db.master_lords
         self.return_first_entity = True
         self.master_mps = list(self.cache.db.master_mps.find({"name": 1}))
         self.master_lords = list(self.cache.db.master_lords.find({"name": 1}))

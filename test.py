@@ -3,11 +3,12 @@ from scrapers import party_funding
 from scrapers import lords
 from parsers import master_entities
 from parsers import mps as parse_mp_info
-from parsers import members_interests
+from parsers import members_interests as interests_parse
+from parsers import party_funding as funding_parse
 from parsers import lords as lords_parse
 from graphers import mps as mp_import
-from graphers import members_interests as members_import
-from graphers import party_funding
+from graphers import members_interests as interests_graph
+from graphers import party_funding as funding_graph
 from graphers import lords as lords_graph
 
 
@@ -18,22 +19,23 @@ from graphers import lords as lords_graph
 #get_funding.run()
 #get_mps.run()
 
+
+#parse_master = master_entities.MasterEntitiesParser()
 #parse_mps = parse_mp_info.MpsParser()
 #parse_lords = lords_parse.LordsParser()
-#parse_interests = members_interests.MembersInterestsParser()
-#parse_master = master_entities.MasterEntitiesParser()
-#party_parse = party_funding.PartyFundingParser()
+#parse_interests = interests_parse.MembersInterestsParser()
+#party_parse = funding_parse.PartyFundingParser()
+#parse_master.create_lords()
 #parse_mps.run()
 #parse_lords.run()
-#parse_master.create_lords()
 #parse_interests.run()
 #party_parse.run()
 
 #graph_mps = mp_import.GraphMPs()
-graph_lords = lords_graph.GraphLords()
-#graph_interests = members_import.GraphMembersInterests()
-#graph_party_funding = party_funding.GraphPartyFunding()
+#graph_lords = lords_graph.GraphLords()
+#graph_interests = interests_graph.GraphMembersInterests()
+graph_party_funding = funding_graph.GraphPartyFunding()
 #graph_mps.run()
-graph_lords.run()
+#graph_lords.run()
 #graph_interests.run()
-#graph_party_funding.run()
+graph_party_funding.run()

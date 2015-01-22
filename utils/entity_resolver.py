@@ -10,11 +10,13 @@ class MasterEntitiesResolver:
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
-        self.master_mps = self.cache.db.master_mps
-        self.master_lords = self.cache.db.master_lords
         self.return_first_entity = True
-        self.master_mps = list(self.cache.db.master_mps.find({"name": 1}))
-        self.master_lords = list(self.cache.db.master_lords.find({"name": 1}))
+        self.master_mps = [
+            x["name"] for x in list(self.cache.db.master_mps.find())
+        ]
+        self.master_lords = [
+            x["name"] for x in list(self.cache.db.master_lords.find())
+        ]
         self.mapped_mps = config.mapped_mps
         self.mapped_lords = config.mapped_lords
         self.company_entities = config.company_entities
@@ -31,15 +33,16 @@ class MasterEntitiesResolver:
             return entities
 
     def find_mp(self, search):
-        name = search
+        name = None
         for incorrect, correct in self.mapped_mps:
             if incorrect in search:
                 name = correct
         for p in self.prefixes:
-            if p in name:
-                name = name.lstrip(p)
+            if p in search:
+                search = search.lstrip(p)
         if self.master_mps:
-            cand = self.fuzzy_match.extractOne(name, self.master_mps)
+            cand = self.fuzzy_match.extractOne(search, self.master_mps)
+            print cand
             if cand[1] > 80:
                 name = cand[0]
         return name

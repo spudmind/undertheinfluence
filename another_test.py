@@ -2,7 +2,7 @@ from utils import entity_resolver
 
 resolver = entity_resolver.MasterEntitiesResolver()
 
-test_entry = "Nigel Evans"
+test_entry = "Mr David Warburton"
 test_type = "MP - Member of Parliament"
 test_recipient = None
 

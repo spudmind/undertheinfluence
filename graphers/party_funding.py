@@ -55,7 +55,6 @@ class GraphPartyFunding():
         }
         new_donor = self.data_models.Donor(name)
         if not new_donor.exists:
-            print new_donor, "*not found*"
             new_donor.create()
         new_donor.update_donor(props)
         return new_donor
@@ -99,5 +98,10 @@ class GraphPartyFunding():
     def convert_to_number(amount):
         if "," in amount:
             amount = amount.replace(",", "")
-        return int(amount.split(".")[0])
+        if "." in amount:
+            amount = amount.split(".")[0]
+        if amount.isdigit():
+            return int(amount)
+        else:
+            return 0
 

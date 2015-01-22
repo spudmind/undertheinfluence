@@ -217,4 +217,9 @@ class GraphMembersInterests():
     def convert_to_number(amount):
         if "," in amount:
             amount = amount.replace(",", "")
-        return int(amount.split(".")[0])
+        if "." in amount:
+            amount = amount.split(".")[0]
+        if amount.isdigit():
+            return int(amount)
+        else:
+            return 0

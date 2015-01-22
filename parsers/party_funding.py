@@ -1,4 +1,5 @@
 from utils import mongo
+from utils import config
 from utils import entity_resolver
 
 
@@ -8,6 +9,7 @@ class PartyFundingParser():
         self._cache_data = self._cache.db.scraped_party_funding
         self._parsed_data = self._cache.db.parsed_party_funding
         self.resolver = entity_resolver.MasterEntitiesResolver()
+        self.lords_tiles = config.lords_titles
         self._all_entries = []
 
     def run(self):
@@ -17,8 +19,8 @@ class PartyFundingParser():
             parsed["recipient"] = self._parse_recipient(
                 doc["recipient"], doc["donee_type"], doc["recipient_type"]
             )
-            parsed["donor_name"] = self.resolver.find_donor(
-                doc["donor_name"], delimiter=",", fuzzy_delimit=False
+            parsed["donor_name"] = self._parse_donor(
+                doc["donor_name"], doc["donor_type"]
             )
             parsed["donor_type"] = doc["donor_type"]
             parsed["donee_type"] = doc["donee_type"]
@@ -39,15 +41,17 @@ class PartyFundingParser():
                 self._print_dic(parsed)
                 print "---\n"
             else:
-                #self._print_out("recipient", parsed["recipient"])
-                #self._print_out("donee_type", parsed["donee_type"])
-                #self._print_out("donor_name", parsed["donor_name"])
-                #self._print_out("donor_type", parsed["donor_type"])
-                #self._print_out("value", parsed["value"])
-                #print "---\n"
+                self._print_out("recipient", parsed["recipient"])
+                self._print_out("donee_type", parsed["donee_type"])
+                self._print_out("donor_name", doc["donor_name"])
+                self._print_out("found_name", parsed["donor_name"])
+                self._print_out("donor_type", parsed["donor_type"])
+                self._print_out("value", parsed["value"])
+                print "---\n"
                 self._parsed_data.save(parsed)
 
     def _parse_recipient(self, entry, entry_type, recipient_type):
+        result = self._remove_illegal_chars(entry)
         if entry_type == "MP - Member of Parliament":
             result = self.resolver.find_mp(entry)
         elif entry_type == "Political Party" or \
@@ -57,9 +61,29 @@ class PartyFundingParser():
             result = self.resolver.get_entities(entry)
             if result and isinstance(result, list):
                 result = result[0]
-            else:
-                result = entry
         return result
+
+    def _parse_donor(self, entry, entry_type):
+        result = self._remove_illegal_chars(entry)
+        if entry_type == "Individual":
+            title = entry.split(" ")[0]
+            if title in self.lords_tiles:
+                result = self.resolver.find_lord(entry)
+            else:
+                result = self.resolver.get_entities(entry)
+        else:
+            result = self.resolver.find_donor(
+                entry, delimiter=",", fuzzy_delimit=False
+            )
+        if isinstance(result, list):
+            return result[0]
+        else:
+            return result
+
+    @staticmethod
+    def _remove_illegal_chars(text):
+        text = text.replace("\\", " ")
+        return text
 
     @staticmethod
     def _print_out(key, value):

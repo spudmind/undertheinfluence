@@ -4,12 +4,26 @@ prefixes = [
     u"Ms "
 ]
 
-company_entities = [
+lords_titles = [
+    u"Lady",
+    u"Lord",
+    u"Earl",
+    u"Baroness",
+    u"Viscount",
+    u"Bishop",
+    u"Countess",
+    u"Archbishop",
+    u"Duke",
+    u"Marquess"
+]
+
+donor_entities = [
     u"IPSOS Mori",
     u"Ipsos MORI",
     u"Ipsos Mori",
     u"YouGov",
     u"ComRes",
+    u"Guardian Media Group"
     u"Social Investment Business Group",
     u"Mansfeider Kupfer Und Messing GMBH",
     u"Pembroke VCT plc",
@@ -28,6 +42,7 @@ company_entities = [
     u"Abu Dhabi",
     u"Government of Mauritius",
     u"United and Cecil Club",
+    u"United and Cecil"
     u"Morley and Outwood CLP",
     u"Policy Connect",
     u"RESULTS UK",
@@ -38,7 +53,7 @@ company_entities = [
     u"JTI UK",
     u"VSO UK",
     u"Conservative Friends of Israel",
-    u"Labour Friends of Israel"
+    u"Labour Friends of Israel",
     u"Liberal Democrat Friends of Israel",
     u"Connexall",
     u"Lord Sugar of Clapton",
@@ -59,8 +74,106 @@ company_entities = [
     u"Construction Industry Council",
     u"Keltbray Group (Holdings) Ltd",
     u"GR Software and Research Ltd",
-    u"LEK Advisory Board"
+    u"LEK Advisory Board",
+    u"United & Cecil Club",
+    u"Evercore Pan-Asset Capital Management Ltd",
+    u"Bar of England and Wales",
+    u"Pan Asset Capital Management Ltd",
+    u"Taipei Representative Office",
+    u"Government of the United Arab Emirates",
+    u"Simon and Schuster UK Ltd",
+    u"Groupe Eurotunnel",
+    u"UCATT",
+    u"Government Summit, Dubai",
+    u"Huatuo CEO Business Consultant",
+    u"Ministry of Foreign Affairs (Saudi Arabia)",
+    u"Ministry of Foreign Affairs in Bahrain",
+    u"Ministry of Foreign Affairs, Bahrain",
+    u"Ministry of Foreign Affairs, Vietnam",
+    u"13th Doha Forum",
+    u"Ministry of Foreign Affairs, Government of Barbados",
+    u"JCB Research",
+    u"Press TV",
+    u"Garstangs",
+    u"R K Harrison",
+    u"Perseus books LL",
+    u"JCB research",
+    u"British-Turkish Tatlidil",
+    u"Big Society Capital Bank",
+    u"Brenthurst Foundation",
+    u"EPIC Private Equity",
+    u"NDI",
+    u"Electric Infrastructure Security Council",
+    u"Hashoo Group",
+    u"GovernUp",
+    u"Big Society Capital Bank",
+    u"Chinese for Labour",
+    u"Veolia Environmental Services",
+    u"Jamaica Tourist Board",
+    u"Government of Taiwan",
+    u"Mail on Sunday",
+    u"British Transport Police",
+    u"British-Spanish Tertulias",
+    u"American International University in London",
+    u"Medical Aid for Palestinians",
+    u"Telegraph Media Group Limited"
+    u"Telegraph Media group",
+    u"Biteback Publishing Ltd",
+    u"Total Politics magazine",
+    u"Dods",
+    u"Government Knowledge",
+    u"International Fund for Animal Welfare",
+    u"Friends of the Earth",
+    u"Coventry Building Society",
+    u"Daily Mail and Mail on Sunday",
+    u"Sensortec",
+    u"Saliston Ltd",
+    u"Gazprom",
+    u"Maloja Ltd",
+    u"Thermal Engineering Holding Ltd",
+    u"AFC Energy",
+    u"Mr and Mrs D Wall"
+    u"Communication Workers Union",
+    u"UNISON",
+    u"Ministry of Sound"
 ]
+
+mapped_donors = [
+    (u"United & Cecil Club", u"United and Cecil Club"),
+    (u"Guardian News & Media Group", u"Guardian News and Media Ltd"),
+    (u"Guardian News", u"Guardian News and Media Ltd"),
+    (u"Guardian Media Group", u"Guardian News and Media Ltd"),
+    (u"Guardian", u"Guardian News and Media Ltd"),
+    (u"Telegraph Media Group Limited", u"Telegraph Media Group Ltd"),
+    (u"Telegraph Media group", u"Telegraph Media Group Ltd"),
+    (u"Telegraph", u"Telegraph Media Group Ltd"),
+    (u"Dods", u"Dods Parliamentary Communications Ltd"),
+    (u"IPSOS Mori", u"Ipsos Mori"),
+    (u"Ipsos MORI", u"Ipsos Mori"),
+    (u"Comres", u"ComRes"),
+    (u"Pricewaterhouse Coopers", u"PriceWaterhouse Coopers LLP"),
+    (u"PricewaterhouseCoopers", u"PriceWaterhouse Coopers LLP"),
+    (u"JCB Research", u"JCB Research Ltd"),
+    (u"J C B Research Ltd", u"JCB Research Ltd"),
+    (u"J C B Research", u"JCB Research Ltd"),
+    (u"JCB Research Limited", u"JCB Research Ltd"),
+    (u"JCB research", u"JCB Research Ltd"),
+    (u"UCATT", u"Union of Construction, Allied Trades and Technicians"),
+    (u"YouGov", u"YouGov PLC"),
+    (u"Ministry of Foreign Affairs in Bahrain", u"Ministry of Foreign Affairs, Bahrain"),
+    (u"Ministry of Foreign Affairs (Saudi Arabia)", u"Ministry of Foreign Affairs, Saudi Arabia"),
+    (u"Suddhir Chowdhrie", u"Sudhir Choudhrie"),
+    (u"Garstangs", u"Garstangs Burrows Bussin"),
+    (u"Populus", u"Populus Ltd"),
+    (u"Populus Limited", u"Populus Ltd"),
+    (u"Perseus books LL", u"Perseus Books, LLC"),
+    (u"BASF", u"BASF PLC"),
+    (u"Shura Council of Kingdom Saudi Arabia", u"Shura Council of the Kingdom of Saudi Arabia"),
+    (u"ResultsUK", u"Results UK"),
+    (u"RESULTS UK", u"Results UK"),
+]
+
+
 party_entities = [
     u"Labour Party",
     u"Labour",
@@ -104,9 +217,7 @@ mapped_mps = [
     (u"Jeffrey M Donaldson", u"Jeffrey Donaldson"),
     (u"Edward Miliband", u"Ed Miliband"),
     (u"Edward Balls", u"Ed Balls"),
-    (u"Guardian News", u"Guardian News and Media Ltd"),
-    (u"Guardian", u"Guardian News and Media Ltd"),
-    (u"YouGov", u"YouGov PLC")
+    (u"The Rt Hon Dr Liam Fox MP", u"Liam Fox")
 ]
 mapped_parties = [
     (u"DUP", u"Democratic Unionist Party"),

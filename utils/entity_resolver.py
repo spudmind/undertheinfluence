@@ -18,16 +18,17 @@ class MasterEntitiesResolver:
             x["name"] for x in list(self.cache.db.master_lords.find())
         ]
         self.mapped_mps = config.mapped_mps
+        self.mapped_donors = config.mapped_donors
         self.mapped_lords = config.mapped_lords
-        self.company_entities = config.company_entities
+        self.donor_entities = config.donor_entities
         self.party_entities = config.party_entities
         self.mapped_parties = config.mapped_parties
         self.prefixes = config.prefixes
 
     def get_entities(self, search_string):
         entities = self.entity_extractor.get_entities(search_string)
-        if entities and len(entities) > 1:
-            if self.return_first_entity:
+        if self.return_first_entity:
+            if entities and isinstance(entities, list):
                 return entities[0]
         else:
             return entities
@@ -40,9 +41,8 @@ class MasterEntitiesResolver:
         for p in self.prefixes:
             if p in search:
                 search = search.lstrip(p)
-        if self.master_mps:
+        if not name:
             cand = self.fuzzy_match.extractOne(search, self.master_mps)
-            print cand
             if cand[1] > 80:
                 name = cand[0]
         return name
@@ -79,7 +79,7 @@ class MasterEntitiesResolver:
 
     def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):
         name = None
-        for entry in self.company_entities:
+        for entry in self.donor_entities:
             if entry in search_string:
                 name = entry
         if not name:
@@ -102,7 +102,7 @@ class MasterEntitiesResolver:
         if not name:
             name = self._parse_donor(search_string)
         if name:
-            for incorrect, correct in self.mapped_mps:
+            for incorrect, correct in self.mapped_donors:
                 if incorrect in name:
                     name = correct
         return name

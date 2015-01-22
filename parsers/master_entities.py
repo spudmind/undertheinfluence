@@ -38,15 +38,15 @@ class MasterEntitiesParser:
             if full_name != title_last:
                 if doc["title"] in self._titles:
                     #pass
-                    #print full_name
+                    print full_name
                     self.master_lords.save({"name": full_name})
                 else:
                     print title_last, "->", full_name
-                    #self.master_lords.save({"name": title_first_last})
+                    self.master_lords.save({"name": title_last})
                     self.master_lords.save({"name": full_name})
             else:
                 #pass
-                #print full_name
+                print full_name
                 self.master_lords.save({"name": full_name})
 
 

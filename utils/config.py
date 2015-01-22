@@ -135,7 +135,8 @@ donor_entities = [
     u"Mr and Mrs D Wall"
     u"Communication Workers Union",
     u"UNISON",
-    u"Ministry of Sound"
+    u"Ministry of Sound",
+    u"Northampton Lib Dem Council Group"
 ]
 
 mapped_donors = [

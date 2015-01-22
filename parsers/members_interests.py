@@ -120,7 +120,7 @@ class MembersInterestsParser:
                 else:
                     print "########", record
                 print " ---> donor:", company_name
-                print " ---> remuneration:", remuneration
+                #print " ---> remuneration:", remuneration
                 #print " ---> full record:", full_record
                 print "-"
                 entry = {

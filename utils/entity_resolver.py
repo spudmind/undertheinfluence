@@ -16,9 +16,9 @@ class MasterEntitiesResolver:
         self.master_mps = list(self.cache.db.master_mps.find({"name": 1}))
         self.master_lords = list(self.cache.db.master_lords.find({"name": 1}))
         self.mapped_mps = config.mapped_mps
-        self.mapped_companies = config.mapped_companies
+        self.mapped_donors = config.mapped_donors
         self.mapped_lords = config.mapped_lords
-        self.company_entities = config.company_entities
+        self.donor_entities = config.donor_entities
         self.party_entities = config.party_entities
         self.mapped_parties = config.mapped_parties
         self.prefixes = config.prefixes
@@ -77,7 +77,7 @@ class MasterEntitiesResolver:
 
     def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):
         name = None
-        for entry in self.company_entities:
+        for entry in self.donor_entities:
             if entry in search_string:
                 name = entry
         if not name:
@@ -100,7 +100,7 @@ class MasterEntitiesResolver:
         if not name:
             name = self._parse_donor(search_string)
         if name:
-            for incorrect, correct in self.mapped_companies:
+            for incorrect, correct in self.mapped_donors:
                 if incorrect in name:
                     name = correct
         return name

@@ -350,10 +350,7 @@ class TermInParliament(core.BaseDataModel):
         self.exists = True
 
     def link_constituency(self, constituency):
-        new_constituency = self.create_vertex(
-            "Constituency", "name", constituency
-        )
-        self.create_relationship(self.vertex, "REPRESENTING", new_constituency)
+        self.create_relationship(self.vertex, "REPRESENTING", constituency.vertex)
 
     def update_details(self, labels=None, properties=None):
         if properties["entered_house"]:
@@ -364,3 +361,21 @@ class TermInParliament(core.BaseDataModel):
 
     def link_position(self, position):
         self.create_relationship(self.vertex, "SERVED_IN", position.vertex)
+
+
+class Constituency(core.BaseDataModel):
+    def __init__(self, name=None):
+        core.BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Constituency"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.name
+        )
+        self.exists = True

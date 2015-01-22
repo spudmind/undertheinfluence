@@ -82,9 +82,10 @@ class GraphMPs():
             term["left_house"]
         )
         new_term = self.data_models.TermInParliament(session)
-        if not new_term.exists:
-            new_term.create()
-        term = {
+        new_constituency = self.data_models.Constituency(term['constituency'])
+        new_term.create()
+        new_constituency.create()
+        term_details = {
             "party": term["party"],
             "constituency": term['constituency'],
             "left_house": term["left_house"],
@@ -92,8 +93,8 @@ class GraphMPs():
             "left_reason": term["left_reason"],
             "type": "Elected"
         }
-        new_term.update_details(properties=term)
-        new_term.link_constituency(term['constituency'])
+        new_term.update_details(properties=term_details)
+        new_term.link_constituency(new_constituency)
         return new_term
 
     def _create_offices(self, term, offices):

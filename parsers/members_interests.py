@@ -294,6 +294,8 @@ class MembersInterestsParser:
             full_record = u"\n".join([item for item in record])
             for item in record:
                 locations = self.resolver.get_entities(item)
+                if isinstance(locations, list):
+                    locations = locations[0]
                 dates = self._find_dates(item)
                 if locations:
                     print "---->", locations, dates

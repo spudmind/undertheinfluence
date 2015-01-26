@@ -49,7 +49,7 @@ class GraphLords():
 
     def import_terms(self, lord, terms):
         for term in terms:
-            print term["constituency"], term["party"]
+            print term["constituency"], "-", term["party"]
             print term["entered_house"], "to", term["left_house"]
             print term["left_reason"]
             new_term = self._create_term(term)
@@ -76,7 +76,11 @@ class GraphLords():
             "type": "Peerage",
         }
         new_term.update_details(labels=label, properties=term)
-        new_term.link_constituency(term['constituency'])
+        if term['constituency']:
+            #print "-->", term['constituency']
+            new_constituency = self.data_models.Constituency(term['constituency'])
+            new_constituency.create()
+            new_term.link_constituency(new_constituency)
         return new_term
 
     @staticmethod

@@ -11,7 +11,7 @@ class LordsInfoScraper():
     VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'
     TEST = None
 
-    def __init__(self):
+    def run(self):
         print "Importing Lords"
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
@@ -21,7 +21,6 @@ class LordsInfoScraper():
         self.lords = self.hansard.get_lords()
         self.all_lords = None
 
-    def run(self):
         self._get_twfy_data()
 
     def _get_twfy_data(self):

@@ -11,7 +11,7 @@ class MPsInfoScraper():
     VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'
     TEST = None
 
-    def __init__(self):
+    def run(self):
         print "Importing MPs"
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
@@ -21,7 +21,6 @@ class MPsInfoScraper():
         self.mps = self.hansard.get_mps()
         self.all_mps = None
 
-    def run(self):
         self._get_twfy_data()
         self._get_guardian_data()
         self._get_publicwhip_data()

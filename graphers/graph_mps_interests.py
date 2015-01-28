@@ -4,11 +4,10 @@ from data_models import models
 
 
 class GraphMPsInterests():
-    def __init__(self):
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_mps_interests
         self.data_models = models
-        self.all_mps = []
         self.extra_details = [
             "donor_status",
             "purpose",
@@ -18,7 +17,6 @@ class GraphMPsInterests():
             "nature"
         ]
 
-    def run(self):
         self.all_mps = list(self.cache_data.find())
         for doc in self.all_mps:
             self._graph_interests(doc)

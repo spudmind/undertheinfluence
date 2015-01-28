@@ -3,14 +3,13 @@ from utils import entity_resolver
 
 
 class LordsParser():
-    def __init__(self):
+    def run(self):
         self._cache = mongo.MongoInterface()
         self._cache_data = self._cache.db.scraped_lords_info
         self._parsed_data = self._cache.db.parsed_lords_info
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self._all_lords = []
 
-    def run(self):
         self._all_lords = list(self._cache_data.find().sort("full_name", 1))
         for doc in self._all_lords:
             self._parse(doc)

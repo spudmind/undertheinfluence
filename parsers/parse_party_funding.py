@@ -5,15 +5,13 @@ from utils import entity_resolver
 
 
 class PartyFundingParser():
-    def __init__(self):
+    def run(self):
         self._cache = mongo.MongoInterface()
         self._cache_data = self._cache.db.scraped_party_funding
         self._parsed_data = self._cache.db.parsed_party_funding
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.lords_tiles = config.lords_titles
-        self._all_entries = []
 
-    def run(self):
         self._all_entries = list(self._cache_data.find())
         for doc in self._all_entries:
             parsed = {}

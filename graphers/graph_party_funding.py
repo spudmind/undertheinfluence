@@ -4,13 +4,11 @@ from data_models import models
 
 
 class GraphPartyFunding():
-    def __init__(self):
+    def run(self):
         self.data_models = models
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_party_funding
-        self.all_mps = []
 
-    def run(self):
         self.all_mps = list(self.cache_data.find())
         for doc in self.all_mps:
             name = doc["recipient"]

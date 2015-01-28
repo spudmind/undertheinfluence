@@ -3,14 +3,12 @@ from data_models import models
 
 
 class GraphLords():
-    def __init__(self):
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_lords_info
         self.data_models = models
         self.full_update = True
-        self.all_lords = []
 
-    def run(self):
         self.all_lords = list(self.cache_data.find())
         for doc in self.all_lords:
             self._import(doc)

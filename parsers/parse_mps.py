@@ -3,14 +3,12 @@ from utils import entity_resolver
 
 
 class MPsParser():
-    def __init__(self):
+    def run(self):
         self._cache = mongo.MongoInterface()
         self._cache_data = self._cache.db.scraped_mp_info
         self._parsed_data = self._cache.db.parsed_mp_info
         self.resolver = entity_resolver.MasterEntitiesResolver()
-        self._all_mps = []
 
-    def run(self):
         self._all_mps = list(self._cache_data.find())
         for doc in self._all_mps:
             self._parse(doc)

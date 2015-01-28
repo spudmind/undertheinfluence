@@ -6,7 +6,7 @@ from utils import entity_resolver
 
 
 class MPsInterestsParser:
-    def __init__(self):
+    def run(self):
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.cache = mongo.MongoInterface()
@@ -15,7 +15,6 @@ class MPsInterestsParser:
         self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
         self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
 
-    def run(self):
         self.all_interests = list(self.cache_data.find())
         for documents in self.all_interests:
             file_name = documents["file_name"]

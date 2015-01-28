@@ -7,12 +7,11 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class MPsInterestsScraper():
-    def __init__(self):
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_mps_interests
         self.data = '/data/regmem'
 
-    def run(self):
         xml_data = current_path + self.data + "/"
         for f in os.listdir(xml_data):
             self.scrape_xml(xml_data, f)

@@ -15,6 +15,11 @@ app.config.from_object(__name__)
 api = Api(app)
 
 
+@app.route('/mps')
+def show_mps():
+    return render_template('show_mps.html', entity=None)
+
+
 class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()

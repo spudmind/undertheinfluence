@@ -49,7 +49,7 @@ if args.scrape is not None:
         'lords': scrape_lords.LordsInfoScraper(),
         'mps_interests': scrape_mps_interests.MPsInterestsScraper(),
         'lords_interests': scrape_lords_interests.LordsInterestsScraper(),
-        'party_funding': scrape_party_funding.PartyFundingScaper(),
+        'party_funding': scrape_party_funding.PartyFundingScraper(),
     }
     for scraper in args.scrape:
         exec_scraper[scraper].run()

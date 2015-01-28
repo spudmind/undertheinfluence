@@ -6,7 +6,7 @@ from utils import mongo
 current_path = os.path.dirname(os.path.abspath(__file__))
 
 
-class MembersInterestsScraper():
+class MPsInterestsScraper():
     def __init__(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_mps_interests

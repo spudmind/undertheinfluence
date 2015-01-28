@@ -3,7 +3,7 @@ from utils import mongo
 from data_models import models
 
 
-class GraphMembersInterests():
+class GraphMPsInterests():
     def __init__(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_mps_interests

@@ -5,7 +5,7 @@ from utils import entity_extraction
 from utils import entity_resolver
 
 
-class MembersInterestsParser:
+class MPsInterestsParser:
     def __init__(self):
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.resolver = entity_resolver.MasterEntitiesResolver()

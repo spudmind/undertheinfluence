@@ -2,7 +2,7 @@ from utils import mongo
 from utils import entity_resolver
 
 
-class MpsParser():
+class MPsParser():
     def __init__(self):
         self._cache = mongo.MongoInterface()
         self._cache_data = self._cache.db.scraped_mp_info

@@ -112,6 +112,7 @@ class GraphMPsInterests():
                         record["interest"]
                     )
                     new_interest = self._create_interest(record["interest"])
+                    new_interest.update_interest_details()
                     category.link_relationship(funding_relationship)
                     funding_relationship.link_donor(new_interest)
                     funding_relationship.update_raw_record(record["raw_record"])

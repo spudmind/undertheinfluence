@@ -96,6 +96,9 @@ class GraphPartyFunding():
 
     @staticmethod
     def convert_to_number(amount):
+        amount = amount.replace("£", "")
+        if ",00" == amount[-3:]:
+            amount = amount.replace(",00", "")
         if "," in amount:
             amount = amount.replace(",", "")
         if "." in amount:

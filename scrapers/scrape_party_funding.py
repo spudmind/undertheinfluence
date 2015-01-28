@@ -39,12 +39,12 @@ class PartyFundingScraper:
             "donation_type": row[11].strip(),
             "nature_provision": self.make_utf(row[12].strip()),
             "purpose": self.make_utf(row[13].strip()),
-            "value": value,
+            "value": self.make_utf(value),
             "received_date": row[16].strip(),
             "accepted_date": row[17].strip(),
             "reported_date": row[18].strip()
         }
-        #self.print_dic(data)
+        self.print_dic(data)
         print "\n\n"
         self.cache_data.save(data)
 

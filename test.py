@@ -19,8 +19,8 @@ from graphers import graph_party_funding
 from data_interfaces import api
 from data_models import core
 
-dump = core.BaseDataModel()
-dump.named_entity_export()
+# dump = core.BaseDataModel()
+# dump.named_entity_export()
 
 #mps_api = api.PopulateMpsApi()
 #mps_api.run()
@@ -29,7 +29,7 @@ dump.named_entity_export()
 # scrape_lords.LordsInfoScraper().run()
 # scrape_mps_interests.MPsInterestsScraper().run()
 # scrape_lords_interests.LordsInterestsScraper().run()
-# scrape_party_funding.PartyFundingScraper().run()
+scrape_party_funding.PartyFundingScraper().run()
 
 # master_entities.MasterEntitiesParser().create_mps()
 # master_entities.MasterEntitiesParser().create_lords()
@@ -37,9 +37,9 @@ dump.named_entity_export()
 # parse_lords.LordsParser().run()
 # parse_mps_interests.MPsInterestsParser().run()
 # parse_lords_interests.LordsInterestsParser().run()
-# parse_party_funding.PartyFundingParser().run()
+parse_party_funding.PartyFundingParser().run()
 
-# graph_mps.GraphMPs().run()
+graph_mps.GraphMPs().run()
 # graph_lords.GraphLords().run()
 # graph_mps_interests.GraphMPsInterests().run()
-# graph_party_funding.GraphPartyFunding().run()
+graph_party_funding.GraphPartyFunding().run()

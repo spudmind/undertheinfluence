@@ -26,7 +26,7 @@ class PartyFundingParser():
             parsed["donee_type"] = doc["donee_type"]
             parsed["recipient_type"] = doc["recipient_type"]
             parsed["donation_type"] = doc["donation_type"]
-            parsed["value"] = doc["value"]
+            parsed["value"] = self._remove_broken_pound(doc["value"])
             parsed["purpose"] = doc["purpose"]
             parsed["nature_provision"] = doc["nature_provision"]
             parsed["ec_reference"] = doc["ec_reference"]
@@ -84,6 +84,10 @@ class PartyFundingParser():
             return entry
         else:
             return result
+
+    @staticmethod
+    def _remove_broken_pound(text):
+        return text.replace("��", "£")
 
     @staticmethod
     def _remove_illegal_chars(text):

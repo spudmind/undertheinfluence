@@ -54,7 +54,6 @@ class MasterEntitiesResolver:
                 name = correct
         if not name:
             cand = self.fuzzy_match.extractOne(search, self.master_lords)
-            print cand
             if cand[1] > 80:
                 name = cand[0]
         return name

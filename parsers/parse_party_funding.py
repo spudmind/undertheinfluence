@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from utils import mongo
 from utils import config
 from utils import entity_resolver

@@ -88,7 +88,7 @@ class PartyFundingParser():
 
     @staticmethod
     def _remove_broken_pound(text):
-        return text.replace("��", "£")
+        return text.replace(u"��", u"£")
 
     @staticmethod
     def _remove_illegal_chars(text):

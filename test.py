@@ -29,13 +29,13 @@ from data_models import core
 # scrape_lords.LordsInfoScraper().run()
 # scrape_mps_interests.MPsInterestsScraper().run()
 # scrape_lords_interests.LordsInterestsScraper().run()
-scrape_party_funding.PartyFundingScraper().run()
+# scrape_party_funding.PartyFundingScraper().run()
 
 # master_entities.MasterEntitiesParser().create_mps()
 # master_entities.MasterEntitiesParser().create_lords()
 # parse_mps.MPsParser().run()
 # parse_lords.LordsParser().run()
-parse_mps_interests.MPsInterestsParser().run()
+# parse_mps_interests.MPsInterestsParser().run()
 # parse_lords_interests.LordsInterestsParser().run()
 parse_party_funding.PartyFundingParser().run()
 

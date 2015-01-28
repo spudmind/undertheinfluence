@@ -37,9 +37,9 @@ from data_models import core
 # parse_lords.LordsParser().run()
 # parse_mps_interests.MPsInterestsParser().run()
 # parse_lords_interests.LordsInterestsParser().run()
-parse_party_funding.PartyFundingParser().run()
+# parse_party_funding.PartyFundingParser().run()
 
-graph_mps.GraphMPs().run()
-graph_lords.GraphLords().run()
-graph_mps_interests.GraphMPsInterests().run()
+# graph_mps.GraphMPs().run()
+# graph_lords.GraphLords().run()
+# graph_mps_interests.GraphMPsInterests().run()
 graph_party_funding.GraphPartyFunding().run()

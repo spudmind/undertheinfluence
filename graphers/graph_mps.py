@@ -101,21 +101,21 @@ class GraphMPs():
         print "*"
         if len(offices) > 1 and offices != "none":
             for office in offices:
-                if "department" in office:
+                if "department" in office and office["department"]:
                     self._create_office(
                         term, "department", office["department"]
                     )
-                if "position" in office:
+                if "position" in office and office["position"]:
                     self._create_office(
                         term, "position", office["position"]
                     )
         else:
             if not offices == "none":
-                if "department" in offices[0]:
+                if "department" in offices[0] and offices[0]["department"]:
                     self._create_office(
                         term, "department", offices[0]["department"]
                     )
-                if "position" in offices[0]:
+                if "position" in offices[0] and offices[0]["position"]:
                     self._create_office(
                         term, "position", offices[0]["position"]
                     )

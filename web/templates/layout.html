@@ -1,0 +1,121 @@
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Under The Influence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-responsive.css') }}" rel="stylesheet"> -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='material/css-compiled/ripples.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='material/css-compiled/material-wfont.min.css') }}" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        hr {
+            display: block;
+            position: relative;
+            padding: 0;
+            margin: 8px auto;
+            height: 0;
+            width: 100%;
+            max-height: 0;
+            font-size: 1px;
+            line-height: 0;
+            clear: both;
+            border: none;
+            border-top: 1px solid #aaaaaa;
+            border-bottom: 1px solid #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Delve. Politics</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="{{ url_for('show_mps')}}">Members Of Parliament</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+
+<div class="container">
+
+    {% for message in get_flashed_messages() %}
+        <div class=flash>{{ message }}</div>
+    {% endfor %}
+    <body class="container">
+    {% block body %}{% endblock %}
+    {% block article %}{% endblock %}
+    <footer>
+        <p>&copy; Built by Warren Ali</p>
+    </footer>
+
+</div> <!-- /container -->
+
+<!-- Le javascript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<!--
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script> -->
+
+<script id="mpTemplate" type="text/template">
+    <div class="list-group-item" >
+        <div class="row-picture">
+            <img class="circle" src="<%= image %>" alt="icon">
+        </div>
+        <div class="row-content">
+            <div class="least-content">
+                <a href="#" > more </a>
+            </div>
+            <h4 class="list-group-item-heading"><%= name %></h4>
+            <%= party%>
+        </div>
+    </div>
+    <div class="list-group-separator"></div>
+</script>
+
+
+<script src="{{ url_for('static', filename='js/lib/jquery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/underscore-min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/backbone-min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/models/mp.js') }}"></script>
+<script src="{{ url_for('static', filename='js/collections/mps.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/government.js') }}"></script>
+<script src="{{ url_for('static', filename='js/models/mp.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("[data-toggle=tooltip]").tooltip();
+    });
+</script>
+<script src="{{ url_for('static', filename='js/lib/d3/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='material/scripts/ripples.js') }}"></script>
+<script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
+
+</body>
+</html>

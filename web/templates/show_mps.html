@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block article %}
+    {% from "macros.html" import show_mp %}
+
+    <div class="row">
+        <div class="col-md-6" >
+            <h1>Government</h1>
+            <hr>
+        </div >
+        <div class="col-md-6" >
+            <h1>Opposition</h1>
+            <hr>
+        </div >
+    </div>
+
+    <div class="row">
+    <div class="col-md-6 ">
+        <div class="list-group">
+        <div id="government-container"></div>
+        <div id="mp-container"></div>
+        </div>
+    </div>
+
+{% endblock article %}

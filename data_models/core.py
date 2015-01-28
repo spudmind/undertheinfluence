@@ -98,6 +98,19 @@ class BaseDataModel:
             self.g.calendar.date(year, month, day).day
         )
 
+    def named_entity_export(self):
+        search_query = u"""
+                MATCH (n:`Named Entity`)
+                RETURN n.name, labels(n)
+            """
+        output = self.query(search_query)
+        if output:
+            for result in output:
+                try:
+                    print result[0], result[1]
+                except UnicodeEncodeError:
+                    pass
+
     @staticmethod
     def _format_content(string):
         old_content = string.split("\n\n")

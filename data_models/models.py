@@ -89,27 +89,25 @@ class MemberOfParliament(NamedEntity):
 class MembersOfParliament(core.BaseDataModel):
     def __init__(self):
         core.BaseDataModel.__init__(self)
-        self.count = self.get_mp_count()
+        self.count = self._get_mp_count()
 
-    def get_mp_count(self):
+    def get_all_mps(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament`) with mp
+            MATCH (mp)-[r]-() with mp,  r
+            RETURN mp.name, mp.party, mp.twfy_id, mp.guardian_image as image_ul, count(r) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_mp_count(self):
         search_string = u"""
             MATCH (mp:`Member of Parliament`)
             RETURN count(mp)
         """
         search_result = self.query(search_string)
         return search_result[0][0]
-
-    def get_all_mps(self, page_size, skip_to):
-        if skip_to < (self.count - page_size):
-            search_string = u"""
-                MATCH (mp:`Member of Parliament`) with mp
-                MATCH (mp)-[r]-() with mp,  r
-                RETURN mp.name, mp.party, mp.guardian_image, count(r) as weight
-                ORDER BY weight DESC
-                SKIP {0} LIMIT {1}
-            """.format(skip_to, page_size)
-            search_result = self.query(search_string)
-            return search_result
 
 
 class Lord(NamedEntity):
@@ -264,7 +262,7 @@ class RegisteredInterest(core.BaseDataModel):
         self.exists = True
 
     def update_interest_details(self, properties=None):
-        labels = ["Named Entity"]
+        labels = ["Named Entity", "Registered Interest"]
         self.set_node_properties(properties, labels)
 
 

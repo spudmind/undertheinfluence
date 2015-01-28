@@ -178,14 +178,15 @@ mapped_donors = [
 party_entities = [
     u"Labour Party",
     u"Labour",
-    u"Alliance Party of Northern Ireland"
+    u"Green Party",
+    u"Alliance Party of Northern Ireland",
     u"Alliance Party",
     u"Alliance",
     u"Democratic Unionist Party",
     u"DUP",
     u"Sinn Fein",
     u"Conservative Party",
-    u"Conservative"
+    u"Conservative",
     u"Liberal Democrat Party",
     u"Liberal Democrats",
     u"Liberal Democrat",

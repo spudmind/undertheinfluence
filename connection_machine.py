@@ -1,9 +1,7 @@
 from flask import Flask, url_for, render_template, abort
 from flask.ext.restful import Api, Resource, reqparse
-from web.controllers import documents
 from web.controllers import mps
-from web.controllers import named_entities
-from web.api import mps_api
+from web.api import get_mps_function
 import os
 
 template_dir = os.path.join(
@@ -17,24 +15,22 @@ app.config.from_object(__name__)
 api = Api(app)
 
 
-class MpsList(Resource):
+class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('type', type=str)
-        super(MpsList, self).__init__()
+        self.reqparse.add_argument('party', type=str)
+        self.reqparse.add_argument('interests_gt', type=int)
+        self.reqparse.add_argument('interests_lt', type=int)
+        self.reqparse.add_argument('donations_gt', type=int)
+        self.reqparse.add_argument('donations_lt', type=int)
+        super(GetMps, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
-        mps = mps_api.MpsApi()
-        if args["type"] == "government":
-            all = mps.get_government()
-        if args["type"] == "opposition":
-            all = mps.get_opposition()
-        else:
-            all = mps.get_all()
-        return all
+        get_mps = get_mps_function.MpsApi()
+        return get_mps.request(args)
 
-api.add_resource(MpsList, '/api/v0.1/mps', endpoint='mps')
+api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 
 if __name__ == '__main__':
     app.debug = True

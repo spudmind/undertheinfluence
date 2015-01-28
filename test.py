@@ -16,6 +16,14 @@ from graphers import graph_lords
 from graphers import graph_mps_interests
 from graphers import graph_party_funding
 
+from data_interfaces import api
+from data_models import core
+
+dump = core.BaseDataModel()
+dump.named_entity_export()
+
+#mps_api = api.PopulateMpsApi()
+#mps_api.run()
 
 # scrape_mps.MPsInfoScaper().run()
 # scrape_lords.LordsInfoScaper().run()

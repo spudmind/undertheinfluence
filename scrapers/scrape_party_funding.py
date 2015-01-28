@@ -7,7 +7,7 @@ from utils import text_io, mongo
 current_path = os.path.dirname(os.path.abspath(__file__))
 
 
-class PartyFundingScaper:
+class PartyFundingScraper:
     def __init__(self):
         self.csv = text_io.CsvInput()
         self.file_name = current_path + '/data/EC-Export-20150121-1556.csv'

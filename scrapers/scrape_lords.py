@@ -5,7 +5,7 @@ import requests
 import os
 
 
-class LordsInfoScaper():
+class LordsInfoScraper():
     current_path = os.path.dirname(os.path.abspath(__file__))
     ALL_PARTIES_API = 'http://www.theguardian.com/politics/api/party/all/json'
     VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'

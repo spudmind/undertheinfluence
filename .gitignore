@@ -56,11 +56,13 @@ target/
 
 # warren test code and data
 members_test.py
+dump.txt
 #test_test.py
 scrapers/data/regmem/
 scrapers/data/reglords/
 scrapers/data/EC-Export*.csv
 utils/MITIE-models/
+utils/mitie/MITIE-models/
 .idea/
 .~lock.*
 

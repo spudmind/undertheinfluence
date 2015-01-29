@@ -1,4 +1,3 @@
-from data_models import models
 from utils import mongo
 
 
@@ -6,7 +5,6 @@ class MpsApi:
     def __init__(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.api_mps
-        self.mps = models.MembersOfParliament()
         self._remuneration = "influences.register_of_interests.remuneration_total"
         self._funding = "influences.electoral_commision.donation_total"
         self._remuneration_search = None

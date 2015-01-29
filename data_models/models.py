@@ -28,6 +28,8 @@ class MemberOfParliament(NamedEntity):
         if self.exists:
             self.positions = self._get_positions()
             self.departments = self._get_departments()
+            self.interests = self._get_interests()
+            self.donations = self._get_donations()
 
     def _get_positions(self):
         return self._get_government_positions("Government Position")
@@ -36,15 +38,61 @@ class MemberOfParliament(NamedEntity):
         return self._get_government_positions("Government Department")
 
     def _get_government_positions(self, pos_type):
+        results = []
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
-            MATCH (mp)-[:REPRESENTATIVE_FOR]-(const)
+            MATCH (mp)-[:ELECTED_FOR]-(const)
             WHERE const.left_reason = "still_in_office" with const
-            MATCH (const)-[:SERVED_IN]-(p:`{1}`) with COLLECT(p.name) AS positions
-            RETURN positions
+            MATCH (const)-[:SERVED_IN]-(p:`Government Position`) with p.name AS position
+            RETURN position
         """.format(self.vertex["name"], pos_type)
         output = self.query(search_string)
-        return output[0][0]
+        for entry in output:
+            results.append(entry[0])
+        return results
+
+    def _get_interests(self):
+        results = []
+        search_string = u"""
+            MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
+            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
+            RETURN cat.category, int.interest, p.amount, p.received, p.registered
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "category": entry["cat.category"],
+                "interest": entry["int.interest"],
+                "amount": entry["p.amount"],
+                "received": entry["p.received"],
+                "registered": entry["p.registered"]
+            }
+            results.append(detail)
+        return results
+
+    def _get_donations(self):
+        results = []
+        search_string = u"""
+            MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
+            MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
+            MATCH (rel)-[y:DONATION_RECEIVED]-(x)
+            RETURN rel.donor, x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "donor": entry["rel.donor"],
+                "amount": entry["x.amount"],
+                "reported": entry["x.reported_date"],
+                "received": entry["x.received_date"],
+                "nature": entry["x.nature"],
+                "purpose": entry["x.purpose"]
+            }
+            results.append(detail)
+        return results
 
     def update_mp_details(self, properties=None):
         labels = ["Named Entity", "Member of Parliament"]

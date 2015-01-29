@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from data_interfaces import hansard
 from utils import mongo
 from fuzzywuzzy import process
 import requests
 import os
+import logging
 
 
 class LordsInfoScraper():
@@ -11,8 +13,11 @@ class LordsInfoScraper():
     VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'
     TEST = None
 
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
-        print "Importing Lords"
+        self._logger.info("Importing Lords")
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_lords_info
@@ -24,7 +29,7 @@ class LordsInfoScraper():
         self._get_twfy_data()
 
     def _get_twfy_data(self):
-        print "Getting Lords from TWFY"
+        self._logger.info("Getting Lords from TWFY")
         for lord in self.lords:
             self._print_out("Lord", lord["name"])
             self._print_out("Party", lord["party"])
@@ -38,7 +43,7 @@ class LordsInfoScraper():
                 "publicwhip_url": None,
                 "guardian_image": None
             }
-            #print "\n"
+            # self._logger.debug("\n")
             details = self.hansard.get_lord_details(lord["person_id"])
             if details:
                 node["first_name"] = details[0]["first_name"]
@@ -64,7 +69,7 @@ class LordsInfoScraper():
             node["terms"] = terms
             #self._report(node)
             self.cache_data.save(node)
-            print "\n\n---"
+            # self._logger.debug("\n\n---")
 
     def _update_cached_mp(self, id, key, value):
         self.cache_data.update({"_id": id}, {"$set": {key: value}})
@@ -95,7 +100,7 @@ class LordsInfoScraper():
         for x in node:
                 if x == "terms":
                     for term in node["terms"]:
-                        print "-"
+                        self._logger.debug("-")
                         for y in term:
                             if y == "offices_held":
                                 offices = term["offices_held"]
@@ -112,6 +117,5 @@ class LordsInfoScraper():
                 else:
                     self._print_out(x, node[x])
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-35s%-25s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-35s%-25s" % (key, value))

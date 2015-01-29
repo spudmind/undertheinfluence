@@ -1,5 +1,5 @@
 import csv
-
+import logging
 
 class MetricsOutput:
     def __init__(self):
@@ -39,7 +39,8 @@ class MetricsOutput:
 
 class CsvInput:
     def __init__(self):
-        print 'inputting'
+        self._logger = logging.getLogger('')
+        self._logger.info('inputting')
 
     def open(self, file_name):
         self.file = open(file_name)

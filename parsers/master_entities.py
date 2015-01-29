@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from utils import entity_resolver
 
 
 class MasterEntitiesParser:
     def __init__(self, bootstrap=False):
+        self._logger = logging.getLogger('')
         self.boot = bootstrap
         self._resolver = entity_resolver.MasterEntitiesResolver()
         self._cache = mongo.MongoInterface()
@@ -38,18 +41,16 @@ class MasterEntitiesParser:
             if full_name != title_last:
                 if doc["title"] in self._titles:
                     #pass
-                    print full_name
+                    self._logger.debug(full_name)
                     self.master_lords.save({"name": full_name})
                 else:
-                    print title_last, "->", full_name
+                    self._logger.debug("%s -> %s" % (title_last, full_name))
                     self.master_lords.save({"name": title_last})
                     self.master_lords.save({"name": full_name})
             else:
                 #pass
-                print full_name
+                self._logger.debug(full_name)
                 self.master_lords.save({"name": full_name})
 
-
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-30s%-20s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-30s%-20s" % (key, value))

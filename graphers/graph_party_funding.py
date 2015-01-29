@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from data_models import models
 
 
 class GraphPartyFunding():
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
         self.data_models = models
         self.cache = mongo.MongoInterface()
@@ -13,9 +17,9 @@ class GraphPartyFunding():
         for doc in self.all_mps:
             name = doc["recipient"]
             donor = doc["donor_name"]
-            print "\n.................."
-            print "recipient:", name
-            #print doc
+            self._logger.debug("\n..................")
+            self._logger.debug("recipient: %s" % name)
+            # self._logger.debug(doc)
             recipient = self._get_recipient(name, doc)
             category = self._create_category(name, donor)
             donor = self._get_donor(donor, doc)
@@ -23,7 +27,7 @@ class GraphPartyFunding():
             recipient.link_funding_category(category)
             category.link_donor(donor)
             category.link_funding(donation)
-            print ".................."
+            self._logger.debug("..................")
 
     def _get_recipient(self, name, entry):
         props = {
@@ -32,7 +36,7 @@ class GraphPartyFunding():
         }
         new_recipient = self.data_models.DonationRecipient(name)
         if not new_recipient.exists:
-            print "*not found*"
+            self._logger.debug("*not found*")
             new_recipient.create()
         new_recipient.update_recipient(props)
         return new_recipient
@@ -81,7 +85,7 @@ class GraphPartyFunding():
             received_date,
             entry["value"]
         )
-        print summary
+        self._logger.debug(summary)
         new_donation = self.data_models.RegisteredFunding(summary)
         new_donation.create()
         new_donation.update_funding_details(props)

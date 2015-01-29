@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 import re
+import logging
 from utils import mongo
 from utils import entity_extraction
 from utils import entity_resolver
 
 
 class LordsInterestsParser:
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.entity_resolver = entity_resolver.MasterEntitiesResolver()
@@ -20,7 +24,7 @@ class LordsInterestsParser:
             file_name = documents["file_name"]
             for lord in documents["contents"]:
                 resolved_name = self.entity_resolver.find_lord(lord["name"])
-                print "\n", resolved_name
+                self._logger.debug("\n%s" % resolved_name)
                 categories = self._get_category_data(lord["interests"])
                 lord_data = {
                     "lord": resolved_name,
@@ -36,7 +40,7 @@ class LordsInterestsParser:
                 "category_name": category["category_name"],
                 "category_records": self._parse_category(category)
             }
-            #print "\n", cat_data, "\n"
+            # self._logger.debug("\n%s\n" % cat_data)
             categories_data.append(cat_data)
         return categories_data
 
@@ -98,7 +102,7 @@ class LordsInterestsParser:
             return self._parse_miscellaneous_record(data)
             #pass
         else:
-            print "   *", category_name
+            self._logger.debug("   * \s" % category_name)
 
     def _parse_list_record(self, data):
         company_name, remuneration = None, None
@@ -110,11 +114,11 @@ class LordsInterestsParser:
                 date = self._find_dates(record)
                 remuneration = zip([payment], [date])
             else:
-                print "########", record
-            print " ---> donor:", company_name
-            print " ---> remuneration:", remuneration
-            #print " ---> full record:", record
-            print "-"
+                self._logger.debug("######## %s" % record)
+            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> remuneration: %s" % remuneration)
+            # self._logger.debug(" ---> full record: %s" % record)
+            self._logger.debug("-")
             entry = {
                 "interest": company_name,
                 "remuneration": self._cleanup_remuneration(remuneration),
@@ -143,9 +147,9 @@ class LordsInterestsParser:
                 purpose = self._split_if_colon(item)
             elif "Registered" in item:
                 registered = self._find_dates(item)
-            print " ---> donor:", company_name
-            print " ---> dest/cost:", destination, amount
-            print "-"
+            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> dest/cost: %s %s" % (destination, amount))
+            self._logger.debug("-")
             entry = {
                 "interest": company_name,
                 "remuneration": amount,
@@ -167,7 +171,7 @@ class LordsInterestsParser:
                 company_name = self.entity_resolver.find_donor(item)
                 dates = self._find_dates(item)
                 if company_name:
-                    print "---->", company_name, dates
+                    self._logger.debug("----> %s %s" % (company_name, dates))
                 entry = {
                     "interest": company_name,
                     "registered": dates,
@@ -200,9 +204,9 @@ class LordsInterestsParser:
                 donor_status = self._split_if_colon(item)
             elif "Registered" in item:
                 registered = self._find_dates(item)
-            print " ---> donor:", company_name
-            print " ---> status/cost:", donor_status, amount
-            print "-"
+            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> status/cost: %s %s" % (donor_status, amount))
+            self._logger.debug("-")
             entry = {
                 "interest": company_name,
                 "remuneration": amount,
@@ -221,7 +225,7 @@ class LordsInterestsParser:
             locations = self.entity_resolver.get_entities(item)
             dates = self._find_dates(item)
             if locations:
-                print "---->", locations, dates
+                self._logger.debug("----> %s %s" % (locations, dates))
             entry = {
                 "interest": locations,
                 "raw_record": item
@@ -241,7 +245,7 @@ class LordsInterestsParser:
             company_name = self.entity_resolver.find_donor(item)
             dates = self._find_dates(item)
             if company_name:
-                print "---->", company_name, dates
+                self._logger.debug("----> %s %s" % (company_name, dates))
                 entry = {
                     "interest": company_name,
                     "registered": dates,
@@ -264,17 +268,17 @@ class LordsInterestsParser:
 
     @staticmethod
     def _show_record(data):
-        print "   *", data["category_name"]
+        self._logger.debug("   * %s" % data["category_name"])
         for item in data["records"]:
-            print "     ", item
-        print "---"
+            self._logger.debug("     %s" % item)
+        self._logger.debug("---")
 
     @staticmethod
     def _cleanup_remuneration(entry):
         new_list = []
         if entry != [([], None)]:
             if len(entry[0]) > 0:
-                #print entry[0][0][1], entry[1]
+                # self._logger.debug("%s %s" % (entry[0][0][1], entry[1]))
                 if entry[1] and len(entry[1]) > 1:
                     received = entry[1][0]
                     registered = entry[1][1]
@@ -298,6 +302,5 @@ class LordsInterestsParser:
             result = text.split(":")[1].strip()
         return result
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-30s%-20s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-30s%-20s" % (key, value))

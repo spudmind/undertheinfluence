@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import logging
 
 from utils import text_io, mongo
 
@@ -8,6 +9,9 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class PartyFundingScraper:
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
         self.csv = text_io.CsvInput()
         self.file_name = current_path + '/data/EC-Export-20150121-1556.csv'
@@ -44,17 +48,16 @@ class PartyFundingScraper:
             "reported_date": row[18].strip()
         }
         self.print_dic(data)
-        print "\n\n"
+        self._logger.debug("\n\n")
         self.cache_data.save(data)
 
-    @staticmethod
-    def print_dic(dictionary):
+    def print_dic(self, dictionary):
         for keys, values in dictionary.items():
-            print " %-20s:%-25s" % (keys, values)
+            self._logger.debug(" %-20s:%-25s" % (keys, values))
 
     @staticmethod
     def make_utf(field):
         try:
             return u"{0}".format(field.decode('utf-8', "replace"))
         except UnicodeDecodeError, e:
-            print "*******", field
+            self._logger.error("******* %s" % field)

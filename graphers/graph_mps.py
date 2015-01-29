@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from data_models import models
 
 
 class GraphMPs():
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_mp_info
@@ -20,13 +25,13 @@ class GraphMPs():
                 self.import_terms(mp, node["terms"])
 
     def graph_mp(self, node):
-        print "\n.................."
-        print node["full_name"], "x", node["number_of_terms"]
+        self._logger.debug("\n..................")
+        self._logger.debug("%s x %s" % (node["full_name"], node["number_of_terms"]))
         if "also_known_as" in node:
-            print "AKA:", node["full_name"]
-        print node["party"]
-        print ".................."
-        #print node["twfy_id"]
+            self._logger.debug("AKA: %s" % node["full_name"])
+        self._logger.debug(node["party"])
+        self._logger.debug("..................")
+        # self._logger.debug(node["twfy_id"])
         return self._create_mp(node)
 
     def _create_mp(self, mp):
@@ -63,14 +68,14 @@ class GraphMPs():
 
     def import_terms(self, mp, terms):
         for term in terms:
-            print term["constituency"], term["party"]
-            print term["entered_house"], "to", term["left_house"]
-            print term["left_reason"]
+            self._logger.debug('%s %s' % (term["constituency"], term["party"]))
+            self._logger.debug('%s to %s' % (term["entered_house"], term["left_house"]))
+            self._logger.debug(term["left_reason"])
             new_term = self._create_term(term)
             mp.link_elected_term(new_term)
             if "offices_held" in term:
                 self._create_offices(new_term, term["offices_held"])
-            print "-"
+            self._logger.debug("-")
 
     def _create_term(self, term):
         session = u"{0} {1} {2} to {3}".format(
@@ -96,7 +101,7 @@ class GraphMPs():
         return new_term
 
     def _create_offices(self, term, offices):
-        print "*"
+        self._logger.debug("*")
         if len(offices) > 1 and offices != "none":
             for office in offices:
                 if "department" in office:
@@ -119,7 +124,7 @@ class GraphMPs():
                     )
 
     def _create_office(self, term, create_as, office):
-        print office
+        self._logger.debug(office)
         new_office = None
         if create_as == "department":
             new_office = self.data_models.GovernmentOffice(office)
@@ -134,4 +139,4 @@ class GraphMPs():
 
     @staticmethod
     def _print_out(key, value):
-        print "  %-20s%-15s" % (key, value)
+        self._logger.debug("  %-20s%-15s" % (key, value))

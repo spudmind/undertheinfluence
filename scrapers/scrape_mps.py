@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from data_interfaces import hansard
 from utils import mongo
 from fuzzywuzzy import process
 import requests
 import os
+import logging
 
 
 class MPsInfoScraper():
@@ -11,12 +13,14 @@ class MPsInfoScraper():
     VOTE_MATRIX = current_path + '/data/votematrix-2010.csv'
     TEST = None
 
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
-        print "Importing MPs"
+        self._logger.info("Importing MPs")
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_mp_info
-        self.requests = requests
         self.hansard = hansard.TWFYHansard()
         self.mps = self.hansard.get_mps()
         self.all_mps = None
@@ -26,8 +30,8 @@ class MPsInfoScraper():
         self._get_publicwhip_data()
 
     def _get_twfy_data(self):
-        print "Getting Mps from TWFY"
-        print self.mps
+        self._logger.info("Getting MPs from TWFY")
+        self._logger.debug(self.mps)
         for mp in self.mps:
             self._print_out("MP", mp["name"])
             self._print_out("Party", mp["party"])
@@ -41,7 +45,7 @@ class MPsInfoScraper():
                 "publicwhip_url": None,
                 "guardian_image": None
             }
-            print "\n"
+            self._logger.debug("\n")
             details = self.hansard.get_mp_details(mp["person_id"])
             if details:
                 node["first_name"] = details[0]["first_name"]
@@ -64,10 +68,10 @@ class MPsInfoScraper():
             node["terms"] = terms
             self._report(node)
             self.cache_data.save(node)
-            print "---"
+            self._logger.debug("---")
 
     def _get_guardian_data(self):
-        print "Updating Guardian data"
+        self._logger.info("Updating Guardian data")
         self.all_mps = [
             doc["full_name"] for doc in self.cache_data.find()
         ]
@@ -149,7 +153,7 @@ class MPsInfoScraper():
         for x in node:
                 if x == "terms":
                     for term in node["terms"]:
-                        print "-"
+                        self._logger.debug("-")
                         for y in term:
                             if y == "offices_held":
                                 offices = term["offices_held"]
@@ -166,6 +170,5 @@ class MPsInfoScraper():
                 else:
                     self._print_out(x, node[x])
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-25s%-15s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-25s%-15s" % (key, value))

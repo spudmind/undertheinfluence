@@ -1,3 +1,4 @@
+import logging
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 from pymongo.errors import OperationFailure
@@ -5,6 +6,7 @@ from pymongo.errors import OperationFailure
 
 class MongoInterface:
     def __init__(self):
+        self._logger = logging.getLogger('')
         self.client = MongoClient()
         self.db = self.client.spud
         self._collections()
@@ -12,6 +14,6 @@ class MongoInterface:
         self.index_error = OperationFailure
 
     def _collections(self):
-        print self.db.collection_names()
+        self._logger.debug(self.db.collection_names())
 
 

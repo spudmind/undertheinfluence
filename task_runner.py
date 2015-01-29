@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from scrapers import scrape_mps
 from scrapers import scrape_lords
@@ -29,6 +30,7 @@ from graphers import graph_party_funding
 
 choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding']
 arg_parser = argparse.ArgumentParser(description='Task runner for spud.')
+arg_parser.add_argument('--verbose', '-v', action='store_true', help='Noisy output')
 arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify the scraper(s) to run')
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
@@ -39,6 +41,13 @@ if (args.scrape, args.master, args.parse, args.graph) == (None, None, None, None
     print 'Nothing to do!'
     arg_parser.print_help()
     exit()
+
+logger = logging.getLogger('')
+logger.addHandler(logging.StreamHandler())
+if args.verbose:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.ERROR)
 
 # run scrapers
 if args.scrape is not None:

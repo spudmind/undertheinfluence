@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
 import json
 import requests
 import sys
 import os.path
 import re
+import logging
 
 from lxml import etree
 
@@ -17,6 +17,9 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class LordsInterestsScraper():
+    def __init__(self):
+        self._logger = logging.getLogger('')
+
     def run(self):
         self.mongo = mongo.MongoInterface()
         self.mongo_db = self.mongo.db.scraped_lords_interests
@@ -64,7 +67,7 @@ class LordsInterestsScraper():
                 cat_name = re.search('Category \d+: (.*)', category_tree.get("Name")).group(1)
 
                 for interest_tree in interests_tree:
-                    # print interest_tree.find("Created").text
+                    self._logger.debug(interest_tree.find("Created").text)
                     records.append(interest_tree.find("RegisteredInterest").text)
                 interests.append({
                     "records": records,

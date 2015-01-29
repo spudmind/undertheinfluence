@@ -2,6 +2,7 @@ from flask import Flask, url_for, render_template, abort
 from flask.ext.restful import Api, Resource, reqparse
 from web.controllers import mps
 from web.api import get_mps_function
+from web.api import get_mp_function
 import os
 
 template_dir = os.path.join(
@@ -32,10 +33,22 @@ class GetMps(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        get_mps = get_mps_function.MpsApi()
-        return get_mps.request(args)
+        return get_mps_function.MpsApi().request(args)
+
+
+class GetMp(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetMp, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_mp_function.MpApi().request(args)
+
 
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
+api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 
 if __name__ == '__main__':
     app.debug = True

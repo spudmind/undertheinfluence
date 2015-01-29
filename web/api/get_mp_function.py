@@ -12,5 +12,27 @@ class MpApi:
         return self._fetch(args)
 
     def _fetch(self, args):
-        response_data = []
+        api_query = {}
+        response_data = {}
         name = args["name"]
+        api_query["name"] = name
+        api_entry = list(self.cache.db.api_mps.find(api_query))
+        if len(api_entry) == 1:
+            mp = self.data_models.MemberOfParliament(name)
+            detail = {
+                "register_of_interests": mp.interests,
+                "electoral_commision": mp.donations
+            }
+            response_data = {
+                "name": api_entry[0]["name"],
+                "party": api_entry[0]["party"],
+                "twfy_id": api_entry[0]["twfy_id"],
+                "image_url": api_entry[0]["image_url"],
+                "government_positions": api_entry[0]["government_positions"],
+                "influences_summary": api_entry[0]["influences"],
+                "influences_detail": detail
+            }
+        return response_data
+
+
+

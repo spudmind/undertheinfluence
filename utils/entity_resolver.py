@@ -1,6 +1,6 @@
 import re
 import logging
-from fuzzywuzzy import process
+from fuzzywuzzy import process as fuzzy_match
 from utils import mongo
 from utils import config
 from utils import entity_extraction
@@ -9,7 +9,6 @@ from utils import entity_extraction
 class MasterEntitiesResolver:
     def __init__(self):
         self._logger = logging.getLogger('')
-        self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.return_first_entity = True
@@ -41,7 +40,7 @@ class MasterEntitiesResolver:
             if p in search:
                 search = search.lstrip(p)
         if self.master_mps != []:
-            guess, accuracy = self.fuzzy_match.extractOne(search, self.master_mps)
+            guess, accuracy = fuzzy_match.extractOne(search, self.master_mps)
             if accuracy > 80:
                 found = True
                 search = guess
@@ -54,7 +53,7 @@ class MasterEntitiesResolver:
     def find_lord(self, search):
         found = False
         if self.master_lords != []:
-            guess, accuracy = self.fuzzy_match.extractOne(search, self.master_lords)
+            guess, accuracy = fuzzy_match.extractOne(search, self.master_lords)
             if accuracy > 80:
                 found = True
                 search = guess
@@ -73,7 +72,7 @@ class MasterEntitiesResolver:
             if incorrect in search or incorrect == name:
                 name = correct
         if not name:
-            cand = self.fuzzy_match.extractOne(search, self.party_entities)
+            cand = fuzzy_match.extractOne(search, self.party_entities)
             if cand[1] > 80:
                 name = cand[0]
         return name

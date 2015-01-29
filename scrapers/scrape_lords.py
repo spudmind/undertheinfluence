@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from data_interfaces import hansard
 from utils import mongo
-from fuzzywuzzy import process
 import requests
 import os
 import logging
@@ -18,7 +17,6 @@ class LordsInfoScraper():
 
     def run(self):
         self._logger.info("Importing Lords")
-        self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_lords_info
         self.requests = requests

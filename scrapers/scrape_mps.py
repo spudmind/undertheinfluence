@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from data_interfaces import hansard
 from utils import mongo
-from fuzzywuzzy import process
+from fuzzywuzzy import process as fuzzy_match
 import requests
 import os
 import logging
@@ -18,7 +18,6 @@ class MPsInfoScraper():
 
     def run(self):
         self._logger.info("Importing MPs")
-        self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_mp_info
         self.hansard = hansard.TWFYHansard()
@@ -114,7 +113,7 @@ class MPsInfoScraper():
 
     def _find_cached_mp(self, search):
         if self.all_mps:
-            cand = self.fuzzy_match.extractOne(search, self.all_mps)
+            cand = fuzzy_match.extractOne(search, self.all_mps)
             name = cand[0]
         else:
             name = search

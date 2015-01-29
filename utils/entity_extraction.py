@@ -6,6 +6,7 @@ parent = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(parent + '/../../mitielib')
 from mitie.mit_ie_interface import *
 
+
 class NamedEntityExtractor:
     SYSTEM_PATH = os.path.dirname(os.path.realpath(__file__))
     MIT_NLP = '/mitie/'

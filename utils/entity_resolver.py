@@ -36,31 +36,33 @@ class MasterEntitiesResolver:
             return entities
 
     def find_mp(self, search):
-        name = None
+        found = False
         for p in self.prefixes:
             if p in search:
                 search = search.lstrip(p)
+        if self.master_mps != []:
+            guess, accuracy = self.fuzzy_match.extractOne(search, self.master_mps)
+            if accuracy > 80:
+                found = True
+                search = guess
         for incorrect, correct in self.mapped_mps:
             if incorrect in search:
-                name = correct
-        if not name:
-            if len(self.master_mps) > 0:
-                cand = self.fuzzy_match.extractOne(search, self.master_mps)
-                if cand[1] > 80:
-                    name = cand[0]
-        return name
+                found = True
+                search = correct
+        return search if found else None
 
     def find_lord(self, search):
-        name = None
+        found = False
+        if self.master_lords != []:
+            guess, accuracy = self.fuzzy_match.extractOne(search, self.master_lords)
+            if accuracy > 80:
+                found = True
+                search = guess
         for incorrect, correct in self.mapped_lords:
             if incorrect in search:
-                name = correct
-        if not name:
-            if len(self.master_lords) > 0:
-                cand = self.fuzzy_match.extractOne(search, self.master_lords)
-                if cand[1] > 80:
-                    name = cand[0]
-        return name
+                found = True
+                search = correct
+        return search if found else None
 
     def find_party(self, search):
         name = None

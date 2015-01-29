@@ -137,6 +137,5 @@ class GraphMPs():
         if new_office.exists:
             term.link_position(new_office)
 
-    @staticmethod
-    def _print_out(key, value):
+    def _print_out(self, key, value):
         self._logger.debug("  %-20s%-15s" % (key, value))

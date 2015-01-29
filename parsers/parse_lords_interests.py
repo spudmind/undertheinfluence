@@ -266,15 +266,13 @@ class LordsInterestsParser:
         money = re.findall(self.money_search, data)
         return money
 
-    @staticmethod
-    def _show_record(data):
+    def _show_record(self, data):
         self._logger.debug("   * %s" % data["category_name"])
         for item in data["records"]:
             self._logger.debug("     %s" % item)
         self._logger.debug("---")
 
-    @staticmethod
-    def _cleanup_remuneration(entry):
+    def _cleanup_remuneration(self, entry):
         new_list = []
         if entry != [([], None)]:
             if len(entry[0]) > 0:

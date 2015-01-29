@@ -356,16 +356,14 @@ class MPsInterestsParser:
         else:
             return result
 
-    @staticmethod
-    def _show_record(data):
+    def _show_record(self, data):
         self._logger.debug("   * %s" % data["category_name"])
         for record in data["records"]:
             for item in record:
                 self._logger.debug("     %s" % item)
             self._logger.debug("---")
 
-    @staticmethod
-    def _cleanup_remuneration(data):
+    def _cleanup_remuneration(self, data):
         new_list = []
         if data:
             for entry in data:
@@ -394,6 +392,5 @@ class MPsInterestsParser:
             result = text.split(":")[1].strip()
         return result
 
-    @staticmethod
-    def _print_out(key, value):
+    def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))

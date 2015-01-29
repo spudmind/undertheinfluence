@@ -203,8 +203,7 @@ class GraphMPsInterests():
             relationship.link_payment(payment)
             payment.update_details({"amount": int_amount})
 
-    @staticmethod
-    def _print_out(key, value):
+    def _print_out(self, key, value):
         self._logger.debug("  %-25s%-25s" % (key, value))
 
     @staticmethod

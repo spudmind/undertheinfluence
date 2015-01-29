@@ -42,9 +42,10 @@ class MasterEntitiesResolver:
             if incorrect in search:
                 name = correct
         if not name:
-            cand = self.fuzzy_match.extractOne(search, self.master_mps)
-            if cand[1] > 80:
-                name = cand[0]
+            if len(self.master_mps) > 0:
+                cand = self.fuzzy_match.extractOne(search, self.master_mps)
+                if cand[1] > 80:
+                    name = cand[0]
         return name
 
     def find_lord(self, search):
@@ -53,9 +54,10 @@ class MasterEntitiesResolver:
             if incorrect in search:
                 name = correct
         if not name:
-            cand = self.fuzzy_match.extractOne(search, self.master_lords)
-            if cand[1] > 80:
-                name = cand[0]
+            if len(self.master_lords) > 0:
+                cand = self.fuzzy_match.extractOne(search, self.master_lords)
+                if cand[1] > 80:
+                    name = cand[0]
         return name
 
     def find_party(self, search):

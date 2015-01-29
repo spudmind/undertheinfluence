@@ -82,7 +82,7 @@ class MPsInfoScraper():
             self._print_out(cached["full_name"], url)
 
     def _get_publicwhip_data(self):
-        with open(MpInfoScaper.VOTE_MATRIX) as fin:
+        with open(MPsInfoScraper.VOTE_MATRIX) as fin:
             rows = (line.split('\t') for line in fin)
             for row in rows:
                 name, id = u'{0} {1}'.format(row[1], row[2]), row[0]
@@ -93,19 +93,20 @@ class MPsInfoScraper():
                 self._print_out(name, url)
 
     def _iterate_guardian_api(self):
-        r = self.requests.get(MpInfoScaper.ALL_PARTIES_API)
-        parties = r.json()["parties"]
-        for party in parties:
-            party_uri = party["json-url"]
-            r = self.requests.get(party_uri)
-            if not r.status_code == 404:
-                mps = r.json()["party"]["mps"]
-                for mp in mps:
-                    mp_uri = mp["json-url"]
-                    r = self.requests.get(mp_uri)
-                    if not r.status_code == 404:
-                        person = r.json()["person"]
-                        yield person
+        r = requests.get(MPsInfoScraper.ALL_PARTIES_API)
+        if r.status_code != 404:
+            parties = r.json()["parties"]
+            for party in parties:
+                party_uri = party["json-url"]
+                r = requests.get(party_uri)
+                if r.status_code != 404:
+                    mps = r.json()["party"]["mps"]
+                    for mp in mps:
+                        mp_uri = mp["json-url"]
+                        r = requests.get(mp_uri)
+                        if r.status_code != 404:
+                            person = r.json()["person"]
+                            yield person
 
     def _find_cached_mp(self, search):
         if self.all_mps:

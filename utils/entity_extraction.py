@@ -2,9 +2,9 @@
 import sys
 import os
 parent = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(parent, 'mitie', 'mitielib'))
-from mitie import named_entity_extractor, tokenize
 
+sys.path.append(parent + '/../../mitielib')
+from mitie.mit_ie_interface import *
 
 class NamedEntityExtractor:
     SYSTEM_PATH = os.path.dirname(os.path.realpath(__file__))

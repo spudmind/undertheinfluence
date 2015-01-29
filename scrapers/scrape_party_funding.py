@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import os
+import os.path
 import logging
+
+import mechanize
 
 from utils import text_io, mongo
 
@@ -13,14 +15,30 @@ class PartyFundingScraper:
         self._logger = logging.getLogger('')
 
     def run(self):
+        file_name = os.path.join(current_path, 'data', 'EC-Export.csv')
+        if not os.path.exists(file_name):
+            self.scrape(file_name)
         self.csv = text_io.CsvInput()
-        self.file_name = current_path + '/data/EC-Export-20150121-1556.csv'
-        self.csv.open(self.file_name)
+        self.csv.open(file_name)
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_party_funding
 
         for row in self.csv.all_rows:
             self.extract(row)
+
+    def scrape(self, file_name):
+        br = mechanize.Browser()
+        # load the search page
+        _ = br.open("https://pefonline.electoralcommission.org.uk/Search/SearchIntro.aspx")
+        br.select_form(name="aspnetForm")
+        # click to view "Basic donation search"
+        _ = br.submit(name="ctl00$ctl05$ctl01")
+        br.select_form(name="aspnetForm")
+        # click to export results to CSV file
+        csv_gen = br.submit(name="ctl00$ContentPlaceHolder1$searchControl1$btnExportAllResults")
+        with open(file_name, 'w+') as f:
+            for csv_line in csv_gen:
+                f.write(csv_line)
 
     def extract(self, row):
         value = row[15][1:].strip()

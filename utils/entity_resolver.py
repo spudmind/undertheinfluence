@@ -1,12 +1,14 @@
+import re
+import logging
 from fuzzywuzzy import process
 from utils import mongo
 from utils import config
 from utils import entity_extraction
-import re
 
 
 class MasterEntitiesResolver:
-    def __init__(self, ):
+    def __init__(self):
+        self._logger = logging.getLogger('')
         self.fuzzy_match = process
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
@@ -120,8 +122,8 @@ class MasterEntitiesResolver:
         if candidates:
             for guess in candidates:
                 if len(guess) < 3:
-                    print guess
-                    print len(guess)
+                    self._logger.debug(guess)
+                    self._logger.debug(len(guess))
                     continue
                 elif guess == "Sole":
                     continue

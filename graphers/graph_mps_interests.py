@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from data_models import models
 
 
 class GraphMPsInterests():
     def __init__(self):
+        self._logger = logging.getLogger('')
+
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_mps_interests
         self.data_models = models
-        self.all_mps = []
         self.extra_details = [
             "donor_status",
             "purpose",
@@ -18,17 +21,16 @@ class GraphMPsInterests():
             "nature"
         ]
 
-    def run(self):
         self.all_mps = list(self.cache_data.find())
         for doc in self.all_mps:
             self._graph_interests(doc)
 
     def _graph_interests(self, node):
         self.current_detail = {}
-        print "\n.................."
-        print node["mp"]
-        print ".................."
-        #print "\n", node, "\n"
+        self._logger.debug("\n..................")
+        self._logger.debug(node["mp"])
+        self._logger.debug("..................")
+        # self._logger.debug("\n%s\n" % node)
         mp = self._find_mp(node["mp"])
         self.current_detail["mp"] = node["mp"]
         self._parse_categories(mp, node["interests"])
@@ -36,7 +38,7 @@ class GraphMPsInterests():
     def _find_mp(self, mp):
         new_mp = self.data_models.MemberOfParliament(mp)
         if not new_mp.exists:
-            print mp, "*not found*"
+            self._logger.debug("%s *not found*" % mp)
             new_mp.create()
         return new_mp
 
@@ -48,23 +50,23 @@ class GraphMPsInterests():
             mp.link_interest_category(new_category)
             if category_name == "Directorships":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated directorships":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession etc":  # done
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession, etc_":  # done
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Clients":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Land and Property":
                 #continue
@@ -77,29 +79,29 @@ class GraphMPsInterests():
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorships":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorship or financial or material support":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Overseas visits":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
             elif category_name == "Miscellaneous":
                 #continue
-                print category_name
+                self._logger.debug(category_name)
                 self._create_graph(new_category, category["category_records"])
-            print "*"
+            self._logger.debug("*")
 
     def _create_graph(self, category, records):
         if records:
@@ -128,10 +130,10 @@ class GraphMPsInterests():
                     funding_relationship.vertex.push()
                 else:
                     self.current_detail["contributor"] = "Unknown"
-                    print "** NO CONTRIBUTOR ** "
-                    print self.current_detail
-                    print "** NO CONTRIBUTOR ** "
-                print "-\n"
+                    self._logger.debug("** NO CONTRIBUTOR ** ")
+                    self._logger.debug(self.current_detail)
+                    self._logger.debug("** NO CONTRIBUTOR ** ")
+                self._logger.debug("-\n")
 
     def _create_category(self, name, category):
         props = {"mp": name, "category": category}
@@ -201,9 +203,8 @@ class GraphMPsInterests():
             relationship.link_payment(payment)
             payment.update_details({"amount": int_amount})
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-25s%-25s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-25s%-25s" % (key, value))
 
     @staticmethod
     def _is_remuneration(record):

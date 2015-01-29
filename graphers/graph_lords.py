@@ -1,16 +1,19 @@
+# -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from data_models import models
 
 
 class GraphLords():
     def __init__(self):
+        self._logger = logging.getLogger('')
+
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.parsed_lords_info
         self.data_models = models
         self.full_update = True
-        self.all_lords = []
 
-    def run(self):
         self.all_lords = list(self.cache_data.find())
         for doc in self.all_lords:
             self._import(doc)
@@ -22,13 +25,13 @@ class GraphLords():
                 self.import_terms(lord, node["terms"])
 
     def graph_lord(self, node):
-        print "\n.................."
-        print node["full_name"], "x", node["number_of_terms"]
+        self._logger.debug("\n..................")
+        self._logger.debug("%s x %s" % (node["full_name"], node["number_of_terms"]))
         if "also_known_as" in node:
-            print "AKA:", node["full_name"]
-        print node["party"]
-        print ".................."
-        #print node["twfy_id"]
+            self._logger.debug("AKA: %s" % node["full_name"])
+        self._logger.debug(node["party"])
+        self._logger.debug("..................")
+        # self._logger.debug(node["twfy_id"])
         return self._create_lord(node)
 
     def _create_lord(self, lord):
@@ -49,12 +52,12 @@ class GraphLords():
 
     def import_terms(self, lord, terms):
         for term in terms:
-            print term["constituency"], "-", term["party"]
-            print term["entered_house"], "to", term["left_house"]
-            print term["left_reason"]
+            self._logger.debug("%s - %s" % (term["constituency"], term["party"]))
+            self._logger.debug("%s to %s" % (term["entered_house"], term["left_house"]))
+            self._logger.debug(term["left_reason"])
             new_term = self._create_term(term)
             lord.link_peerage(new_term)
-            print "-"
+            self._logger.debug("-")
 
     def _create_term(self, term):
         session = u"{0} {1} {2} to {3}".format(
@@ -77,12 +80,11 @@ class GraphLords():
         }
         new_term.update_details(labels=label, properties=term)
         if term['constituency']:
-            #print "-->", term['constituency']
+            # self._logger.debug("--> %s" % term['constituency'])
             new_constituency = self.data_models.Constituency(term['constituency'])
             new_constituency.create()
             new_term.link_constituency(new_constituency)
         return new_term
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-20s%-15s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-20s%-15s" % (key, value))

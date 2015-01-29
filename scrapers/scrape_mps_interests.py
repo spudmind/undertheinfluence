@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import os
+import logging
 from lxml import objectify
 from utils import mongo
 
@@ -8,11 +10,13 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 class MPsInterestsScraper():
     def __init__(self):
+        self._logger = logging.getLogger('')
+
+    def run(self):
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_mps_interests
         self.data = '/data/regmem'
 
-    def run(self):
         xml_data = current_path + self.data + "/"
         for f in os.listdir(xml_data):
             self.scrape_xml(xml_data, f)
@@ -23,7 +27,7 @@ class MPsInterestsScraper():
         root = objectify.fromstring(xml)
         contents = []
         for mp in root.getchildren():
-            print mp.attrib["membername"]
+            self._logger.debug(mp.attrib["membername"])
             categories = []
             for category in mp.getchildren():
                 if "name" in category.attrib:
@@ -36,7 +40,7 @@ class MPsInterestsScraper():
                         "records": self.scrape_category(category)
                     }
                     categories.append(cat_data)
-            print "\n---"
+            self._logger.debug("\n---")
             mp_data = {
                 "mp": mp.attrib["membername"],
                 "interests": categories
@@ -49,7 +53,7 @@ class MPsInterestsScraper():
         self.cache_data.save(data)
 
     def scrape_category(self, category):
-        print "\t *%s" % category.attrib["name"].strip()
+        self._logger.debug("\t *%s" % category.attrib["name"].strip())
         records = []
         for record in category.getchildren():
             items = []
@@ -60,8 +64,8 @@ class MPsInterestsScraper():
                 if item.getchildren():
                     text += self.scrape_item(item)
                 items.append(text)
-                print "\t\t", text.strip()
-            print "\t\t---"
+                self._logger.debug("\t\t%s" % text.strip())
+            self._logger.debug("\t\t---")
             records.append(items)
         return records
 

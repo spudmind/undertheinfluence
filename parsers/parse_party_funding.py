@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from utils import mongo
 from utils import config
 from utils import entity_resolver
@@ -6,14 +8,15 @@ from utils import entity_resolver
 
 class PartyFundingParser():
     def __init__(self):
+        self._logger = logging.getLogger('')
+
+    def run(self):
         self._cache = mongo.MongoInterface()
         self._cache_data = self._cache.db.scraped_party_funding
         self._parsed_data = self._cache.db.parsed_party_funding
         self.resolver = entity_resolver.MasterEntitiesResolver()
-        self.lords_tiles = config.lords_titles
-        self._all_entries = []
+        self.lords_titles = config.lords_titles
 
-    def run(self):
         self._all_entries = list(self._cache_data.find())
         for doc in self._all_entries:
             parsed = {}
@@ -40,7 +43,7 @@ class PartyFundingParser():
             parsed["accepted_date"] = doc["accepted_date"]
             if not parsed["recipient"]:
                 self._print_dic(parsed)
-                print "---\n"
+                self._logger.debug("---\n")
             else:
                 self._print_out("recipient", parsed["recipient"])
                 self._print_out("donee_type", parsed["donee_type"])
@@ -48,7 +51,7 @@ class PartyFundingParser():
                 self._print_out("found_name", parsed["donor_name"])
                 self._print_out("donor_type", parsed["donor_type"])
                 self._print_out("value", parsed["value"])
-                print "---\n"
+                self._logger.debug("---\n")
                 self._parsed_data.save(parsed)
 
     def _get_recipient(self, entry, entry_type, recipient_type):
@@ -71,7 +74,7 @@ class PartyFundingParser():
         result = self._remove_illegal_chars(entry)
         if entry_type == "Individual":
             title = entry.split(" ")[0]
-            if title in self.lords_tiles:
+            if title in self.lords_titles:
                 result = self.resolver.find_lord(result)
             else:
                 result = self.resolver.get_entities(result)
@@ -95,11 +98,9 @@ class PartyFundingParser():
         text = text.replace("\\", " ")
         return text
 
-    @staticmethod
-    def _print_out(key, value):
-        print "  %-30s%-20s" % (key, value)
+    def _print_out(self, key, value):
+        self._logger.debug("  %-30s%-20s" % (key, value))
 
-    @staticmethod
-    def _print_dic(dictionary):
+    def _print_dic(self, dictionary):
         for keys, values in dictionary.items():
-            print " %-20s:%-25s" % (keys, values)
+            self._logger.debug(" %-20s:%-25s" % (keys, values))

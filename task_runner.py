@@ -1,3 +1,4 @@
+import sys
 import argparse
 import logging
 
@@ -43,7 +44,7 @@ if (args.scrape, args.master, args.parse, args.graph) == (None, None, None, None
     exit()
 
 logger = logging.getLogger('')
-logger.addHandler(logging.StreamHandler())
+logger.addHandler(logging.StreamHandler(sys.stdout))
 if args.verbose:
     logger.setLevel(logging.DEBUG)
 else:

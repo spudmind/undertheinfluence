@@ -1,3 +1,4 @@
+import logging
 from data_interfaces import graph_database
 import calendar
 import re
@@ -6,6 +7,7 @@ import re
 class BaseDataModel:
     def __init__(self):
         self.g = graph_database.GraphInterface()
+        self._logger = logging.getLogger('')
         self.vertex = None
         self.label = None
         self.document_label = 'Document'
@@ -107,7 +109,8 @@ class BaseDataModel:
         if output:
             for result in output:
                 try:
-                    print result[0], result[1]
+                    #self._logger.debug("%s\t%s" % (result[0], result[1]))
+                    print "%s\t%s" % (result[0], result[1])
                 except UnicodeEncodeError:
                     pass
 

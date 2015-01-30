@@ -13,7 +13,7 @@ class LordsInfoScraper():
     TEST = None
 
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
 
     def run(self):
         self._logger.info("Importing Lords")

@@ -8,7 +8,7 @@ from utils import entity_extraction
 
 class MasterEntitiesResolver:
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
         self.cache = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.return_first_entity = True

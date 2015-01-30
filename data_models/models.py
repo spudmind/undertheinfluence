@@ -241,6 +241,12 @@ class FundingRelationship(core.BaseDataModel):
             self.label, self.primary_attribute, self.relationship
         )
 
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.relationship
+        )
+        self.exists = True
+
     def update_category_details(self, properties=None):
         self.set_node_properties(properties)
 

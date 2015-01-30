@@ -230,15 +230,15 @@ class Donor(NamedEntity):
         self.set_node_properties(properties, labels)
 
 
-class FundingRelationship(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
+class FundingRelationship(core.BaseDataModel):
+    def __init__(self, relationship=None):
+        core.BaseDataModel.__init__(self)
         self.exists = False
         self.label = "Funding Relationship"
-        self.primary_attribute = "name"
-        self.name = name
+        self.primary_attribute = "relationship"
+        self.relationship = relationship
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
+            self.label, self.primary_attribute, self.relationship
         )
 
     def update_category_details(self, properties=None):
@@ -292,47 +292,41 @@ class InterestCategory(NamedEntity):
         )
 
 
-class RegisteredInterest(core.BaseDataModel):
-    def __init__(self, interest=None):
-        core.BaseDataModel.__init__(self)
+class RegisteredInterest(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
         self.exists = False
         self.label = "Registered Interest"
-        self.primary_attribute = "interest"
-        self.interest = interest
+        self.primary_attribute = "name"
+        self.name = name
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.interest
+            "Named Entity", self.primary_attribute, self.name
         )
-
-    def create(self):
-        self.vertex = self.create_vertex(
-            self.label, self.primary_attribute, self.interest
-        )
-        self.exists = True
 
     def update_interest_details(self, properties=None):
         labels = ["Named Entity", "Registered Interest"]
         self.set_node_properties(properties, labels)
 
 
-class RegisteredFunding(core.BaseDataModel):
-    def __init__(self, funding=None):
+class RegisteredDonation(core.BaseDataModel):
+    def __init__(self, donation=None):
         core.BaseDataModel.__init__(self)
         self.exists = False
-        self.label = "Registered Funding"
-        self.primary_attribute = "funding"
-        self.funding = funding
+        self.label = "Donation"
+        self.primary_attribute = "donation"
+        self.donation = donation
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.funding
+            self.label, self.primary_attribute, self.donation
         )
 
     def create(self):
         self.vertex = self.create_vertex(
-            self.label, self.primary_attribute, self.funding
+            self.label, self.primary_attribute, self.donation
         )
         self.exists = True
 
     def update_funding_details(self, properties=None):
-        labels = ["Contributions"]
+        labels = ["Donation", "Contributions"]
         self.set_node_properties(properties, labels)
 
     def set_dates(self, received, reported, accepted):

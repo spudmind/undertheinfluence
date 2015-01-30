@@ -12,7 +12,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 class PartyFundingScraper:
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
 
     def run(self):
         file_name = os.path.join(current_path, 'data', 'EC-Export.csv')

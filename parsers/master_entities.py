@@ -6,7 +6,7 @@ from utils import entity_resolver
 
 class MasterEntitiesParser:
     def __init__(self, bootstrap=False):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
         self.boot = bootstrap
         self._resolver = entity_resolver.MasterEntitiesResolver()
         self._cache = mongo.MongoInterface()

@@ -18,7 +18,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 
 class LordsInterestsScraper():
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
 
     def run(self):
         self.mongo = mongo.MongoInterface()

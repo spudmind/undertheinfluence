@@ -39,7 +39,7 @@ class MetricsOutput:
 
 class CsvInput:
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
         self._logger.info('inputting')
 
     def open(self, file_name):

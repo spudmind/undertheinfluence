@@ -7,7 +7,7 @@ import re
 class BaseDataModel:
     def __init__(self):
         self.g = graph_database.GraphInterface()
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
         self.vertex = None
         self.label = None
         self.document_label = 'Document'

@@ -40,9 +40,8 @@ if (args.scrape, args.master, args.parse, args.graph, args.export) == (None, Non
     arg_parser.print_help()
     exit()
 
-
 logger = logging.getLogger('spud')
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.addHandler(logging.StreamHandler())
 if args.verbose:
     logger.setLevel(logging.DEBUG)
 else:

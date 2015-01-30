@@ -6,7 +6,7 @@ from pymongo.errors import OperationFailure
 
 class MongoInterface:
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
         self.client = MongoClient()
         self.db = self.client.spud
         self._collections()

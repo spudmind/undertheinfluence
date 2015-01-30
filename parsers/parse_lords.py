@@ -6,7 +6,7 @@ from utils import entity_resolver
 
 class LordsParser():
     def __init__(self):
-        self._logger = logging.getLogger('')
+        self._logger = logging.getLogger('spud')
 
     def run(self):
         self._cache = mongo.MongoInterface()

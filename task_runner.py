@@ -21,10 +21,8 @@ from graphers import graph_mps_interests
 from graphers import graph_party_funding
 
 from data_interfaces import api
-# from data_models import core
+from data_models import core
 
-# dump = core.BaseDataModel()
-# dump.named_entity_export()
 
 choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding']
 arg_parser = argparse.ArgumentParser(description='Task runner for spud.')
@@ -34,9 +32,16 @@ arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='P
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
 arg_parser.add_argument('--api_gen', nargs='+', choices=['mps', 'lords'], help='Create mongo database for API')
+arg_parser.add_argument('--export', nargs='+', choices=['named_entities'], help='Specify the export to run')
 args = arg_parser.parse_args()
 
-logger = logging.getLogger('')
+if (args.scrape, args.master, args.parse, args.graph, args.export) == (None, None, None, None):
+    print 'Nothing to do!'
+    arg_parser.print_help()
+    exit()
+
+
+logger = logging.getLogger('spud')
 logger.addHandler(logging.StreamHandler(sys.stdout))
 if args.verbose:
     logger.setLevel(logging.DEBUG)
@@ -87,8 +92,16 @@ if args.graph is not None:
     for grapher in args.graph:
         exec_grapher[grapher]().run()
 
+# populate node stat lists for api
 if args.api_gen is not None:
     if "mps" in args.api_gen:
         api.PopulateMpsApi().run()
     # if "lords" in args.api_gen:
     #     api.PopulateLordsApi().run()
+
+# run export
+if args.export is not None:
+    model = core.BaseDataModel()
+    if "named_entities" in args.export:
+        model.named_entity_export()
+

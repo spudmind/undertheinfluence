@@ -38,11 +38,6 @@ arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
 args = arg_parser.parse_args()
 
-if (args.scrape, args.master, args.parse, args.graph) == (None, None, None, None):
-    print 'Nothing to do!'
-    arg_parser.print_help()
-    exit()
-
 logger = logging.getLogger('')
 logger.addHandler(logging.StreamHandler(sys.stdout))
 if args.verbose:

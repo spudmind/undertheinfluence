@@ -86,7 +86,7 @@ class GraphPartyFunding():
             entry["value"]
         )
         self._logger.debug(summary)
-        new_donation = self.data_models.RegisteredFunding(summary)
+        new_donation = self.data_models.RegisteredDonation(summary)
         new_donation.create()
         new_donation.update_funding_details(props)
         new_donation.set_dates(

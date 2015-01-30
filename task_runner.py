@@ -20,7 +20,7 @@ from graphers import graph_mps_interests
 from graphers import graph_party_funding
 
 # from data_interfaces import api
-# from data_models import core
+from data_models import core
 
 # dump = core.BaseDataModel()
 # dump.named_entity_export()
@@ -35,9 +35,10 @@ arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify th
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
+arg_parser.add_argument('--export', nargs='+', choices=['named_entities'], help='Specify the export to run')
 args = arg_parser.parse_args()
 
-if (args.scrape, args.master, args.parse, args.graph) == (None, None, None, None):
+if (args.scrape, args.master, args.parse, args.graph, args.export) == (None, None, None, None):
     print 'Nothing to do!'
     arg_parser.print_help()
     exit()
@@ -92,3 +93,9 @@ if args.graph is not None:
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()
+
+# run export
+if args.export is not None:
+    model = core.BaseDataModel()
+    if "named_entities" in args.export:
+        model.named_entity_export()

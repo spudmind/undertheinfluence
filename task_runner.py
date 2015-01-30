@@ -20,14 +20,11 @@ from graphers import graph_lords
 from graphers import graph_mps_interests
 from graphers import graph_party_funding
 
-# from data_interfaces import api
+from data_interfaces import api
 # from data_models import core
 
 # dump = core.BaseDataModel()
 # dump.named_entity_export()
-
-# mps_api = api.PopulateMpsApi()
-# mps_api.run()
 
 choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding']
 arg_parser = argparse.ArgumentParser(description='Task runner for spud.')
@@ -36,6 +33,7 @@ arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify th
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
+arg_parser.add_argument('--api_gen', nargs='+', choices=['mps', 'lords'], help='Create mongo database for API')
 args = arg_parser.parse_args()
 
 logger = logging.getLogger('')
@@ -88,3 +86,9 @@ if args.graph is not None:
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()
+
+if args.api_gen is not None:
+    if "mps" in args.api_gen:
+        api.PopulateMpsApi().run()
+    # if "lords" in args.api_gen:
+    #     api.PopulateLordsApi().run()

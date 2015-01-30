@@ -61,8 +61,7 @@ dump.txt
 scrapers/data/regmem/
 scrapers/data/reglords/
 scrapers/data/EC-Export*.csv
-utils/MITIE-models/
-utils/mitie/MITIE-models/
+utils/mitie/
 .idea/
 .~lock.*
 

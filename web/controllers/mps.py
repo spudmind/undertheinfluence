@@ -18,7 +18,7 @@ class MpAggregateController:
             yield mp, weight
 
     def _set_properties(self):
-        for mp in self.mps.get_all_mps(page_size=20, skip_to=0):
+        for mp in self.mps.get_all(page_size=20, skip_to=0):
             shadow, government = False, False
             mp, party, image, weight = mp[0], mp[1], mp[2], mp[3]
             mp_detail = models.MemberOfParliament(mp)

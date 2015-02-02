@@ -139,7 +139,7 @@ class MembersOfParliament(core.BaseDataModel):
         core.BaseDataModel.__init__(self)
         self.count = self._get_mp_count()
 
-    def get_all_mps(self):
+    def get_all(self):
         search_string = u"""
             MATCH (mp:`Member of Parliament`) with mp
             MATCH (mp)-[r]-() with mp,  r
@@ -312,6 +312,30 @@ class RegisteredInterest(NamedEntity):
     def update_interest_details(self, properties=None):
         labels = ["Named Entity", "Registered Interest"]
         self.set_node_properties(properties, labels)
+
+
+class Influencers(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (inf) where inf:Donor OR inf:`Registered Interest` with inf
+            MATCH (inf)-[]-(x)
+            RETURN  inf.name as influencer, inf.donor_type, labels(inf), count(x) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
+            RETURN count(inf)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
 
 
 class RegisteredDonation(core.BaseDataModel):

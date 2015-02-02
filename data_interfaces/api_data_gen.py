@@ -12,7 +12,7 @@ class PopulateMpsApi():
         self.all_mps = []
 
     def run(self):
-        self.all_mps = self.mps_graph.get_all_mps()
+        self.all_mps = self.mps_graph.get_all()
         for doc in self.all_mps:
             name = doc[0]
             print name
@@ -119,3 +119,85 @@ class PopulateMpsApi():
             return positions
         else:
             return None
+
+
+class PopulateInfluencersApi():
+    def __init__(self):
+        self.cache = mongo.MongoInterface()
+        self.cache_data = self.cache.db.api_influencers
+        self.data_models = models
+        self.core_model = core.BaseDataModel()
+        self.influencers_graph = self.data_models.Influencers()
+        self.all_influencers = []
+
+    def run(self):
+        self.all_influencers = self.influencers_graph.get_all()
+        for doc in self.all_influencers:
+            print doc[0], doc[1]
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        donor_type = record[1]
+        labels = record[2]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+        weight = record[3]
+        register = {}
+        ec = {}
+        register["remuneration_total"] = self._remuneration_total(name)
+        register["remuneration_count"] = self._remuneration_count(name)
+        ec["donation_count"] = self._donation_count(name)
+        ec["donation_total"] = self._donation_total(name)
+        ec["donor_type"] = donor_type
+        data_sources = {
+            "register_of_interests": register,
+            "electoral_commision": ec
+        }
+        influencer_data = {
+            "name": name,
+            "labels": labels,
+            "weight": weight,
+            "influences": data_sources
+        }
+        self.cache_data.save(influencer_data)
+
+    def _donation_total(self, name):
+        query = u"""
+            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(name)
+        return self.core_model.query(query)[0]["total"]
+
+    def _donation_count(self, name):
+        query = u"""
+            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
+            RETURN count(x) as count
+        """.format(name)
+        return self.core_model.query(query)[0]["count"]
+
+    def _remuneration_total(self, name):
+        query = u"""
+            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(name)
+        return self.core_model.query(query)[0]["total"]
+
+    def _remuneration_count(self, name):
+        query = u"""
+            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            RETURN count(x) as count
+        """.format(name)
+        return self.core_model.query(query)[0]["count"]
+
+

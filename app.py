@@ -1,8 +1,7 @@
 from flask import Flask, url_for, render_template, abort
 from flask.ext.restful import Api, Resource, reqparse
 from web.controllers import mps
-from web.api import get_mps_function
-from web.api import get_mp_function
+from web.api import get_mps_function, get_mp_function
 import os
 
 template_dir = os.path.join(

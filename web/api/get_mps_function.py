@@ -38,8 +38,11 @@ class MpsApi:
                 "weight": entry["weight"]
             }
             response_data.append(detail)
-        results = {"results": results.count()}
-        return [results, response_data]
+        # return {
+        #     "total": results.count(),
+        #     "results": response_data,
+        # }
+        return response_data
 
     def _filter_party(self, args):
         if args["party"]:

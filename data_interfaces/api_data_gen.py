@@ -182,7 +182,7 @@ class PopulateInfluencersApi():
 
     def _remuneration_total(self, name):
         query = u"""
-            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf:`Registered Interest` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
@@ -192,7 +192,7 @@ class PopulateInfluencersApi():
 
     def _remuneration_count(self, name):
         query = u"""
-            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf:`Registered Interest` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)

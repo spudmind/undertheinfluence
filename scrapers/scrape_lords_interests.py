@@ -52,6 +52,7 @@ class LordsInterestsScraper():
         for member in members:
             interests = []
             preferred_name = member.find("PreferredNames").find("PreferredName")
+            member_title = member.find("FullTitle").text
             member_name = "%s %s" % (preferred_name.find("Forename").text, preferred_name.find("Surname").text)
             member_id = member.get("Member_Id")
 
@@ -74,14 +75,10 @@ class LordsInterestsScraper():
                     "category_name": cat_name,
                 })
 
-            contents.append({
+            data = {
                 "member_id": member_id,
                 "name": member_name,
+                "member_title": member_title,
                 "interests": interests,
-            })
-
-        data = {
-            "file_name": file_name,
-            "contents": contents,
-        }
-        self.mongo_db.save(data)
+            }
+            self.mongo_db.save(data)

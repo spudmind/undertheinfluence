@@ -17,11 +17,22 @@ class MPsInterestsScraper():
         self.cache_data = self.cache.db.scraped_mps_interests
         self.data = '/data/regmem'
 
+        # regmem data is produced by the parlparse project which dumps
+        # http://www.publications.parliament.uk/pa/cm/cmregmem/memi0910.htm
+        # into an xml file. Each file stored one day's recorded interests
+
         xml_data = current_path + self.data + "/"
         for f in os.listdir(xml_data):
+            # scrape each file for interests data
             self.scrape_xml(xml_data, f)
 
     def scrape_xml(self, xml_path, file_name):
+        # the hierarchy of the file to be scraped is:
+        # regmem /member name > category > record > items
+        # regmem contains 1 or more categories
+        # category contains one or more records
+        # record is the registered interest & is comprised of many items
+
         with open(xml_path + file_name) as f:
                 xml = f.read()
         root = objectify.fromstring(xml)
@@ -56,6 +67,7 @@ class MPsInterestsScraper():
         self._logger.debug("\t *%s" % category.attrib["name"].strip())
         records = []
         for record in category.getchildren():
+            # combine multiple items into a single record
             items = []
             for item in record.getchildren():
                 text = u""

@@ -21,6 +21,13 @@ class MPsInterestsParser:
 
         self.all_interests = list(self.cache_data.find())
         for documents in self.all_interests:
+
+            # each document contains one days recorded interests
+            # document structure is:
+            #   contents > mp > interests / categories > interest
+            # parsed output is a document per mp structured:
+            #   mp > interests / categories > interest
+
             file_name = documents["file_name"]
             for entry in documents["contents"]:
                 resolved_name = self._get_mp(entry["mp"])
@@ -45,19 +52,24 @@ class MPsInterestsParser:
         return categories_data
 
     def _parse_category(self, data):
+
+        # parse all interests in category
+        # interest information is not structure and record as free text
+        # individual categories to conform to specific conventions
+
         category_name = data["category_name"]
-        if category_name == "Directorships":  # done
+        if category_name == "Directorships":
             self._show_record(data)
             return self._parse_list_record(data)
-        elif category_name == "Remunerated directorships":  # done
-            self._show_record(data)
-            return self._parse_list_record(data)
-            #pass
-        elif category_name == "Remunerated employment, office, profession etc":  # done
+        elif category_name == "Remunerated directorships":
             self._show_record(data)
             return self._parse_list_record(data)
             #pass
-        elif category_name == "Remunerated employment, office, profession, etc_":  # done
+        elif category_name == "Remunerated employment, office, profession etc":
+            self._show_record(data)
+            return self._parse_list_record(data)
+            #pass
+        elif category_name == "Remunerated employment, office, profession, etc_":
             self._show_record(data)
             return self._parse_list_record(data)
             #pass
@@ -111,6 +123,7 @@ class MPsInterestsParser:
             full_record = u"\n".join([item for item in record])
             if len(record) > 0:
                 first = record[0]
+
                 if "(of " == first[:4].lower() or "of " == first[:3].lower() or \
                         "  of " == first[:5].lower():
                     if len(record) > 1:
@@ -138,7 +151,6 @@ class MPsInterestsParser:
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
-            clean_parse = False
             company_name, amount, destination = None, None, None
             visit_dates, purpose, registered = None, None, None
             if len(record) == 7:
@@ -150,7 +162,6 @@ class MPsInterestsParser:
                 visit_dates = self._split_if_colon(record[4])
                 purpose = self._split_if_colon(record[5])
                 registered = self._find_dates(record[6])
-                clean_parse = True
             elif len(record) != 7:
                 for item in record:
                     if "Name of donor" in item:

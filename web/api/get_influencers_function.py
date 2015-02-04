@@ -40,11 +40,12 @@ class InfluencersApi:
         return [results, response_data]
 
     def _filter_labels(self, args):
-        label_args = [x.strip() for x in args["labels"].split(",")]
-        label_query = []
-        for label in label_args:
-            label_query.append({"labels": {"$in": [label]}})
-        self.query["$and"] = label_query
+        if args["labels"]:
+            label_args = [x.strip() for x in args["labels"].split(",")]
+            label_query = []
+            for label in label_args:
+                label_query.append({"labels": {"$in": [label]}})
+            self.query["$and"] = label_query
 
     def _filter_interests(self, args):
         self._remuneration_search = {}

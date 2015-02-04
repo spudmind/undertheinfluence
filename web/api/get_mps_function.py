@@ -29,11 +29,18 @@ class MpsApi:
         else:
             results = self.cache_data.find().skip(skip_to).limit(page_size)
         for entry in results:
+            register = entry["influences"]["register_of_interests"]
+            ec = entry["influences"]["electoral_commision"]
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],
                 "image": entry["image_url"],
-                "influences": entry["influences"],
+                "register_of_interests_categories": register["interest_categories"],
+                "register_of_interests_relationships": register["interest_relationships"],
+                "register_of_interests_count": register["remuneration_count"],
+                "register_of_interests_total": register["remuneration_total"],
+                "electoral_commission_total": ec["donation_total"],
+                "electoral_commission_count": ec["donor_count"],
                 "positions": entry["government_positions"],
                 "weight": entry["weight"]
             }

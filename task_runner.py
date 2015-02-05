@@ -18,6 +18,7 @@ from parsers import parse_party_funding
 from graphers import graph_mps
 from graphers import graph_lords
 from graphers import graph_mps_interests
+from graphers import graph_lords_interests
 from graphers import graph_party_funding
 
 from data_interfaces import api_data_gen
@@ -85,7 +86,7 @@ if args.graph is not None:
         'mps': graph_mps.GraphMPs,
         'lords': graph_lords.GraphLords,
         'mps_interests': graph_mps_interests.GraphMPsInterests,
-        # 'lords_interests': graph_lords_interests.GraphLordsInterests,
+        'lords_interests': graph_lords_interests.GraphLordsInterests,
         'party_funding': graph_party_funding.GraphPartyFunding,
     }
     for grapher in args.graph:

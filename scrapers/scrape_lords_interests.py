@@ -45,10 +45,9 @@ class LordsInterestsScraper():
         root = etree.fromstring(xml)
         members = root.findall("Member")
 
-        self.scrape_xml(members, file_name)
+        self.scrape_xml(members)
 
-    def scrape_xml(self, members, file_name):
-        contents = []
+    def scrape_xml(self, members):
         for member in members:
             interests = []
             preferred_name = member.find("PreferredNames").find("PreferredName")
@@ -68,8 +67,16 @@ class LordsInterestsScraper():
                 cat_name = re.search('Category \d+: (.*)', category_tree.get("Name")).group(1)
 
                 for interest_tree in interests_tree:
+                    interest = interest_tree.find("RegisteredInterest").text
+                    created = interest_tree.find("Created").text
+                    amended = interest_tree.find("Amended").text
                     self._logger.debug(interest_tree.find("Created").text)
-                    records.append(interest_tree.find("RegisteredInterest").text)
+                    data = {
+                        "interest": interest,
+                        "created": created,
+                        "amended": amended
+                    }
+                    records.append(data)
                 interests.append({
                     "records": records,
                     "category_name": cat_name,

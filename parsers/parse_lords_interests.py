@@ -11,22 +11,22 @@ class LordsInterestsParser:
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        # # Unused
-        # self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.entity_resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
 
         all_interests = self.db.fetch_all('scraped_lords_interests')
-        for lord in all_lord_interests:
+        for lord in all_interests:
             lord_name = lord["member_title"]
             resolved_name = self.entity_resolver.find_lord(lord_name)
             self._logger.debug("\n%s / %s" % (resolved_name, lord_name))
-            categories = self._get_category_data(lord["interests"])
-            lord_data = {
-                "lord": resolved_name,
-                "interests": categories
-            }
-            self.db.save('parsed_lords_interests', lord_data)
+            if len(lord["interests"]) > 0:
+                # skip Lords who do not have any interests
+                categories = self._get_category_data(lord["interests"])
+                lord_data = {
+                    "lord": resolved_name,
+                    "interests": categories
+                }
+                self.db.save('parsed_lords_interests', lord_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -72,26 +72,28 @@ class LordsInterestsParser:
             interest_name = None
             position = None
             # remove (extraneous interest / company descriptions)
-            parsed_interest = self._remove_extraneous(record)
+            parsed_interest = self._remove_extraneous(record["interest"])
             parsed_interest = parsed_interest.split(",")
             if len(parsed_interest) == 1:
-                interest_name = parsed_interest[0]
+                interest_name = parsed_interest[0].strip()
             if len(parsed_interest) == 2:
                 position = parsed_interest[0].strip()
                 interest_name = parsed_interest[1].strip()
             if len(parsed_interest) > 2:
                 position = parsed_interest[0].strip()
-                interest_name = parsed_interest[1]
+                interest_name = parsed_interest[1].strip()
                 if "speaking engagement" in parsed_interest[0].lower():
-                    interest_name = parsed_interest[2]
+                    interest_name = parsed_interest[2].strip()
                 if "board" in interest_name.lower():
-                    interest_name = parsed_interest[2]
+                    interest_name = parsed_interest[2].strip()
             self._logger.debug(" interest: %s" % interest_name)
             if interest_name:
                 entry = {
                     "position": position,
                     "interest": interest_name,
-                    "raw_record": record
+                    "raw_record": record["interest"],
+                    "created": self._get_date(record["created"]),
+                    "amended": self._get_date(record["amended"])
                 }
                 records.append(entry)
         return records
@@ -102,13 +104,15 @@ class LordsInterestsParser:
 
         records = []
         for record in data["records"]:
-            interest_name = self.entity_resolver.find_donor(record)
+            interest_name = self.entity_resolver.find_donor(record["interest"])
             # if no interest is found, skip record
             if interest_name:
                 self._logger.debug(" interest: %s" % interest_name)
                 entry = {
                     "interest": interest_name,
-                    "raw_record": record
+                    "raw_record": record["interest"],
+                    "created": self._get_date(record["created"]),
+                    "amended": self._get_date(record["amended"])
                 }
                 records.append(entry)
         return records
@@ -116,11 +120,22 @@ class LordsInterestsParser:
     def _show_record(self, data):
         self._logger.debug("   * %s" % data["category_name"])
         for item in data["records"]:
-            self._logger.debug("     %s" % item)
-        # self._logger.debug("---")
+            self._logger.debug("     %s" % item["interest"])
+            self._logger.debug("     %s" % item["created"])
+            self._logger.debug("     %s" % item["amended"])
+            self._logger.debug(" ")
+
+    @staticmethod
+    def _get_date(data):
+        date = None
+        if data:
+            date = data.split("T")[0]
+        return date
 
     @staticmethod
     def _remove_extraneous(data):
+        if "category 4(a)" in data:
+            data = data.strip("category 4(a)")
         try:
             return re.sub('\(.+?\)\s*', '', data)
         except TypeError:

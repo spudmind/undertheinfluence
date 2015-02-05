@@ -67,7 +67,7 @@ class MPsInterestsScraper():
         self._logger.debug("\t *%s" % category.attrib["name"].strip())
         records = []
         for record in category.getchildren():
-            # combine multiple items into a single record
+            # combine multiple items into a record list
             items = []
             for item in record.getchildren():
                 text = u""

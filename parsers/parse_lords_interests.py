@@ -16,8 +16,6 @@ class LordsInterestsParser:
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.scraped_lords_interests
         self.all_lord_interests = []
-        self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
-        self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
 
         self.all_lord_interests = list(self.cache_data.find())
         for lord in self.all_lord_interests:
@@ -29,7 +27,7 @@ class LordsInterestsParser:
                 "lord": resolved_name,
                 "interests": categories
             }
-            #self.cache.db.parsed_lords_interests.save(lord_data)
+            self.cache.db.parsed_lords_interests.save(lord_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -44,28 +42,77 @@ class LordsInterestsParser:
         return categories_data
 
     def _parse_category(self, data):
-        category_name = data["category_name"]
-        self._show_record(data)
-        self._parse_standard(data)
 
-    def _parse_standard(self, data):
+        # individual categories to conform to fit one of two parsers
+        # this function picks the appropriate parser for each category
+
+        category_name = data["category_name"].lower()
+        self._show_record(data)
+        if "non-financial interests" in category_name:
+            #pass
+            return self._parse_simple(data)
+        elif "remunerated employment" in category_name:
+            #pass
+            return self._parse_simple(data)
+        elif "directorships" in category_name:
+            #pass
+            return self._parse_simple(data)
+        else:
+            #pass
+            return self._parse_standard(data)
+
+    def _parse_simple(self, data):
+
+        # these interests mostly follow the following format:
+        # Job Title, Interest or
+        # Board Position, Board, Interest
+        # Speaking Engagement, Date, Interest, Location
+
         records = []
         for record in data["records"]:
-            company_name = self.entity_resolver.find_donor(record)
-            self._logger.debug(" ---> donor: %s" % company_name)
-            entry = {
-                "interest": company_name,
-                "raw_record": record
-            }
-            records.append(entry)
+            interest_name = None
+            position = None
+            # remove (extraneous interest / company descriptions)
+            parsed_interest = self._remove_extraneous(record)
+            parsed_interest = parsed_interest.split(",")
+            if len(parsed_interest) == 1:
+                interest_name = parsed_interest[0]
+            if len(parsed_interest) == 2:
+                position = parsed_interest[0].strip()
+                interest_name = parsed_interest[1].strip()
+            if len(parsed_interest) > 2:
+                position = parsed_interest[0].strip()
+                interest_name = parsed_interest[1]
+                if "speaking engagement" in parsed_interest[0].lower():
+                    interest_name = parsed_interest[2]
+                if "board" in interest_name.lower():
+                    interest_name = parsed_interest[2]
+            self._logger.debug(" interest: %s" % interest_name)
+            if interest_name:
+                entry = {
+                    "position": position,
+                    "interest": interest_name,
+                    "raw_record": record
+                }
+                records.append(entry)
         return records
 
-    def _find_dates(self, data):
-        dates = re.findall(self.date_search, data)
-        if dates:
-            return dates
-        else:
-            return None
+    def _parse_standard(self, data):
+
+        # extract interest names using donor entity resolver
+
+        records = []
+        for record in data["records"]:
+            interest_name = self.entity_resolver.find_donor(record)
+            # if no interest is found, skip record
+            if interest_name:
+                self._logger.debug(" interest: %s" % interest_name)
+                entry = {
+                    "interest": interest_name,
+                    "raw_record": record
+                }
+                records.append(entry)
+        return records
 
     def _show_record(self, data):
         self._logger.debug("   * %s" % data["category_name"])
@@ -74,11 +121,11 @@ class LordsInterestsParser:
         # self._logger.debug("---")
 
     @staticmethod
-    def _split_if_colon(text):
-        result = text.strip()
-        if len(text.split(":")) > 1:
-            result = text.split(":")[1].strip()
-        return result
+    def _remove_extraneous(data):
+        try:
+            return re.sub('\(.+?\)\s*', '', data)
+        except TypeError:
+            print "Error", data
 
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))

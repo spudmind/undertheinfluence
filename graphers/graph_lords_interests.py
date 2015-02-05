@@ -18,14 +18,15 @@ class GraphLordsInterests():
     def _graph_interests(self, node):
         self._logger.debug("\n..................")
         self._logger.debug(node["lord"])
-        self._logger.debug("..................")
         # self._logger.debug("\n%s\n" % node)
         lord = self._find_lord(node["lord"])
         self._parse_categories(lord, node["interests"])
+        self._logger.debug("..................")
 
     def _parse_categories(self, lord, categories):
         for category in categories:
             category_name = category["category_name"]
+            self._logger.debug(category_name)
             new_category = self._create_category(lord.name, category_name)
             lord.link_interest_category(new_category)
             self._logger.debug("*")
@@ -34,7 +35,7 @@ class GraphLordsInterests():
     def _create_graph(self, lord, category, records):
         if records:
             for record in records:
-                #self._print_out("interest", record["interest"])
+                self._print_out("interest", record["interest"])
                 if record["interest"] and record["interest"] != "None":
                     funding_relationship = self._create_relationship(
                         lord.name,

@@ -134,6 +134,7 @@ class LordsInterestsParser:
 
     @staticmethod
     def _remove_extraneous(data):
+        data = data.replace('"', "", 5)
         if "category 4(a)" in data:
             data = data.strip("category 4(a)")
         try:

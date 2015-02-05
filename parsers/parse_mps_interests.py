@@ -51,123 +51,138 @@ class MPsInterestsParser:
             categories_data.append(cat_data)
         return categories_data
 
-    def _parse_category(self, data):
+    def _parse_category(self, record):
 
-        # parse all interests in category
-        # interest information is not structure and record as free text
+        # members interests are not structured at source &
+        # each entry captured in free text
+        # the record is a python list, with each line from the free text
+        # stored as a list item
+
         # individual categories to conform to specific conventions
+        # this function picks the appropriate parser for each convention
 
-        category_name = data["category_name"]
+        self._show_record(record)
+        category_name = record["category_name"]
         if category_name == "Directorships":
-            self._show_record(data)
-            return self._parse_list_record(data)
+
+            return self._parse_list_record(record)
         elif category_name == "Remunerated directorships":
-            self._show_record(data)
-            return self._parse_list_record(data)
+            return self._parse_list_record(record)
             #pass
         elif category_name == "Remunerated employment, office, profession etc":
-            self._show_record(data)
-            return self._parse_list_record(data)
+            return self._parse_list_record(record)
             #pass
         elif category_name == "Remunerated employment, office, profession, etc_":
-            self._show_record(data)
-            return self._parse_list_record(data)
+            return self._parse_list_record(record)
             #pass
         elif category_name == "Clients":
-            self._show_record(data)
-            return self._parse_clients(data)
+            return self._parse_clients(record)
             #pass
         elif category_name == "Land and Property":
-            self._show_record(data)
-            return self._parse_land_ownership(data)
+            return self._parse_land_ownership(record)
             #pass
         elif category_name == "Shareholdings":
-            self._show_record(data)
-            return self._parse_unstructured_record(data)
+            return self._parse_unstructured_record(record)
             #pass
         elif category_name == "Registrable shareholdings":
-            self._show_record(data)
-            return self._parse_unstructured_record(data)
+            return self._parse_unstructured_record(record)
             #pass
         elif category_name == "Sponsorships":
-            self._show_record(data)
-            return self._parse_sponsorships(data)
+            return self._parse_sponsorships(record)
             #pass
         elif category_name == "Sponsorship or financial or material support":
-            self._show_record(data)
-            return self._parse_sponsorships(data)
+            return self._parse_sponsorships(record)
             #pass
         elif category_name == "Overseas visits":
-            self._show_record(data)
-            return self._parse_structured_record(data)
+            return self._parse_travel_record(record)
             #pass
         elif category_name == "Gifts, benefits and hospitality (UK)":
-            self._show_record(data)
-            return self._parse_gifts(data)
+            return self._parse_gifts(record)
             #pass
         elif category_name == "Overseas benefits and gifts":
-            self._show_record(data)
-            return self._parse_gifts(data)
+            return self._parse_gifts(record)
             #pass
         elif category_name == "Miscellaneous":
-            self._show_record(data)
-            return self._parse_miscellaneous_record(data)
+            return self._parse_unstructured_record(record)
             #pass
         else:
             self._logger.debug("   * %s" % category_name)
 
     def _parse_list_record(self, data):
-        company_name, remuneration = None, None
+
+        # this interest record follows the following format:
+        # record[0] = interest name, with one exception
+        # record[1:] remuneration & date details related to that interest
+
+        interest_name, remuneration = None, None
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
             if len(record) > 0:
                 first = record[0]
+                test = record[0].lower()
 
-                if "(of " == first[:4].lower() or "of " == first[:3].lower() or \
-                        "  of " == first[:5].lower():
+                # record[0] may not contain the interest name
+                # e.g. in the Clients category members with multiple
+                # directorships will entry which company the interests
+                # are clients of.
+
+                if "(of " == test[:4] or "of " == test[:3] or "  of " == test[:5]:
                     if len(record) > 1:
+                        # if record[0] use next line as first record
                         first = record[1]
-                company_name = self.resolver.find_donor(first)
-                if company_name:
+                interest_name = self.resolver.find_donor(first)
+                if interest_name:
+                    # if no interest is found, skip record
                     payments = [self._find_money(item) for item in record]
                     dates = [self._find_dates(item) for item in record]
                     remuneration = zip(payments, dates)
+                    entry = {
+                        "interest": interest_name,
+                        "remuneration": self._cleanup_remuneration(remuneration),
+                        "raw_record": full_record
+                    }
+                    records.append(entry)
+                    self._logger.debug(" ---> donor: %s" % interest_name)
+                    # self._logger.debug(" ---> remuneration: %s" % remuneration)
+                    # self._logger.debug(" ---> full record: %s" % full_record)
                 else:
                     self._logger.debug("######## %s" % record)
-                self._logger.debug(" ---> donor: %s" % company_name)
-                # self._logger.debug(" ---> remuneration: %s" % remuneration)
-                # self._logger.debug(" ---> full record: %s" % full_record)
                 self._logger.debug("-")
-                entry = {
-                    "interest": company_name,
-                    "remuneration": self._cleanup_remuneration(remuneration),
-                    "raw_record": full_record
-                }
-                records.append(entry)
         return records
 
-    def _parse_structured_record(self, data):
+    def _parse_travel_record(self, data):
+
+        # this interest record follows the following format:
+        # record[0] = interest name
+        # record[2] = remuneration
+        # record[3] = destination
+        # record[4] = visit dates
+        # record[5] = purpose
+        # record[6] = date interest was registered
+
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
-            company_name, amount, destination = None, None, None
+            interest_name, amount, destination = None, None, None
             visit_dates, purpose, registered = None, None, None
             if len(record) == 7:
-                company_name = self.resolver.find_donor(record[0])
-                if not company_name:
-                    company_name = self._split_if_colon(record[0])
+                interest_name = self.resolver.find_donor(record[0])
+                if not interest_name:
+                    interest_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
                 destination = self.resolver.get_entities(record[3])
                 visit_dates = self._split_if_colon(record[4])
                 purpose = self._split_if_colon(record[5])
                 registered = self._find_dates(record[6])
             elif len(record) != 7:
+                # this interest record is typically 7 lines but there are exceptions
+                # parse each line for interest details when this is the case
                 for item in record:
                     if "Name of donor" in item:
-                        company_name = self.resolver.find_donor(record[0])
-                        if not company_name:
-                            company_name = self._split_if_colon(record[0])
+                        interest_name = self.resolver.find_donor(record[0])
+                        if not interest_name:
+                            interest_name = self._split_if_colon(record[0])
                     elif "Amount of donation" in item:
                         amount = [y for x, y in self._find_money(item)]
                     elif "Destination of visit" in item:
@@ -178,11 +193,11 @@ class MPsInterestsParser:
                         purpose = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> donor: %s" % interest_name)
             self._logger.debug(" ---> dest/cost: %s %s" % (destination, amount))
             self._logger.debug("-")
             entry = {
-                "interest": company_name,
+                "interest": interest_name,
                 "remuneration": amount,
                 "purpose": purpose,
                 "vist_dates": visit_dates,
@@ -193,59 +208,77 @@ class MPsInterestsParser:
         return records
 
     def _parse_unstructured_record(self, data):
+
+        # this interest record has interest information on every line
+        # record[0] may have the Clients category exception
+
         records = []
         for record in data["records"]:
             for item in record:
-                company_name = None
+                interest_name = None
+                
+                # record[0] may not contain interest data
+                # e.g. in the Clients category members with multiple
+                # directorships will entry which company the interests
+                # are clients of.
+                
                 if "(of " == item[:4].lower() or "of " == item[:3].lower():
                     continue
                 else:
-                    company_name = self.resolver.find_donor(item)
+                    interest_name = self.resolver.find_donor(item)
                     dates = self._find_dates(item)
-                    if company_name:
-                        self._logger.debug("----> %s %s" % (company_name, dates))
-                    entry = {
-                        "interest": company_name,
-                        "registered": dates,
-                        "raw_record": item
-                    }
-                    records.append(entry)
+                    if interest_name:
+                        # if no interest is found, skip record
+                        self._logger.debug("----> %s %s" % (interest_name, dates))
+                        entry = {
+                            "interest": interest_name,
+                            "registered": dates,
+                            "raw_record": item
+                        }
+                        records.append(entry)
         return records
 
     def _parse_sponsorships(self, data):
+
+        # this interest record follows the following format:
+        # record[0] = interest name
+        # record[2] = remuneration & nature of gift
+        # record[3] = donor status
+        # record[4] = date interest was registered
+
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
-            clean_parse = False
-            company_name, amount = None, None
+            interest_name, amount = None, None
             donor_status, registered = None, None
             if len(record) == 1:
                 continue
             elif len(record) == 5:
-                company_name = self.resolver.find_donor(record[0])
-                if not company_name and ":" in record[0]:
-                    company_name = self._split_if_colon(record[0])
+                interest_name = self.resolver.find_donor(record[0])
+                if not interest_name and ":" in record[0]:
+                    interest_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
                 donor_status = self._split_if_colon(record[3])
                 registered = self._find_dates(record[4])
-                clean_parse = True
             else:
                 for item in record:
+                    # this interest record is typically 5 lines but there are exceptions
+                    # parse each line for interest details when this is the case
                     if "Name of donor" in item:
-                        company_name = self.resolver.find_donor(record[0])
-                        if not company_name and ":" in item:
-                            company_name = self._split_if_colon(item)
+                        interest_name = self.resolver.find_donor(record[0])
+                        if not interest_name and ":" in item:
+                            interest_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
                         amount = [y for x, y in self._find_money(record[2])]
                     elif "Donor status" in item:
                         donor_status = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> donor: %s" % interest_name)
             self._logger.debug(" ---> status/cost: %s %s" % (donor_status, amount))
             self._logger.debug("-")
             entry = {
-                "interest": company_name,
+                "interest": interest_name,
                 "remuneration": amount,
                 "donor_status": donor_status,
                 "registered": registered,
@@ -255,27 +288,36 @@ class MPsInterestsParser:
         return records
 
     def _parse_gifts(self, data):
+
+        # this interest record follows the following format:
+        # record[0] = interest name
+        # record[2] = remuneration & nature of gift
+        # record[3] = date received
+        # record[4] = date accepted
+        # record[5] = donor status
+        # record[6] = date interest was registered
+
         records = []
         for record in data["records"]:
-            clean_parse = False
-            company_name, amount, nature, accepted = None, None, None, None
+            interest_name, amount, nature, accepted = None, None, None, None
             donor_status, registered, receipt = None, None, None
             full_record = u"\n".join([item for item in record])
             if len(record) == 7:
-                company_name = self.resolver.find_donor(record[0])
+                interest_name = self.resolver.find_donor(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
                 nature = self._split_if_colon(record[2])
                 receipt = self._find_dates(record[3])
                 accepted = self._find_dates(record[4])
                 donor_status = self._split_if_colon(record[5])
                 registered = self._find_dates(record[6])
-                clean_parse = True
             else:
                 for item in record:
+                    # this interest record is typically 7 lines but there are exceptions
+                    # parse each line for interest details when this is the case
                     if "Name of donor" in item:
-                        company_name = self.resolver.find_donor(record[0])
-                        if not company_name and ":" in item:
-                            company_name = self._split_if_colon(item)
+                        interest_name = self.resolver.find_donor(record[0])
+                        if not interest_name and ":" in item:
+                            interest_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
                         amount = [y for x, y in self._find_money(item)]
                         nature = self._split_if_colon(item)
@@ -287,11 +329,11 @@ class MPsInterestsParser:
                         donor_status = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % company_name)
+            self._logger.debug(" ---> donor: %s" % interest_name)
             self._logger.debug(" ---> status/cost: %s %s" % (donor_status, amount))
             self._logger.debug("-")
             entry = {
-                "interest": company_name,
+                "interest": interest_name,
                 "remuneration": amount,
                 "nature": nature,
                 "receipt": receipt,
@@ -303,6 +345,9 @@ class MPsInterestsParser:
         return records
 
     def _parse_land_ownership(self, data):
+
+        # this interest record has interest information on every line
+
         records = []
         for record in data["records"]:
             full_record = u"\n".join([item for item in record])
@@ -321,6 +366,11 @@ class MPsInterestsParser:
         return records
 
     def _parse_clients(self, data):
+
+        # client interests one one of two conventions,
+        # list records or unstructured records
+        # pick the appropriate one based on the full record structure
+
         for record in data["records"]:
             if len(record) == 1:
                 self._parse_unstructured_record(data)
@@ -331,22 +381,6 @@ class MPsInterestsParser:
                 else:
                     return self._parse_unstructured_record(data)
             break
-
-    def _parse_miscellaneous_record(self, data):
-        records = []
-        for record in data["records"]:
-            for item in record:
-                company_name = self.resolver.find_donor(item)
-                dates = self._find_dates(item)
-                if company_name:
-                    self._logger.debug("----> %s %s" % (company_name, dates))
-                    entry = {
-                        "interest": company_name,
-                        "registered": dates,
-                        "raw_record": item
-                    }
-                    records.append(entry)
-        return records
 
     def _find_dates(self, data):
         dates = re.findall(self.date_search, data)

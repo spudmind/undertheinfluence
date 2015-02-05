@@ -98,8 +98,8 @@ if args.api_gen is not None:
         api_data_gen.PopulateInfluencersApi().run()
     if "mps" in args.api_gen:
         api_data_gen.PopulateMpsApi().run()
-    # if "lords" in args.api_gen:
-    #     api_data_gen.PopulateLordsApi().run()
+    if "lords" in args.api_gen:
+         api_data_gen.PopulateLordsApi().run()
 
 # run export
 if args.export is not None:

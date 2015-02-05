@@ -59,13 +59,13 @@ class MemberOfParliament(NamedEntity):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
-            RETURN cat.category, int.interest, p.amount, p.received, p.registered
+            RETURN cat.category, int.name, p.amount, p.received, p.registered
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "category": entry["cat.category"],
-                "interest": entry["int.interest"],
+                "interest": entry["int.name"],
                 "amount": entry["p.amount"],
                 "received": entry["p.received"],
                 "registered": entry["p.registered"]
@@ -167,6 +167,9 @@ class Lord(NamedEntity):
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
+        if self.exists:
+            self.interests = self._get_interests()
+            self.donations = self._get_donations()
 
     def update_lord_details(self, properties=None):
         labels = ["Named Entity", "Lord"]
@@ -191,6 +194,76 @@ class Lord(NamedEntity):
         self.create_relationship(
             self.vertex, "PEERAGE", peerage.vertex
         )
+
+    def _get_interests(self):
+        results = []
+        search_string = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with lord, cat, rel
+            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with lord, cat, rel, int
+            RETURN cat.category, rel.position, int.name
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "category": entry["cat.category"],
+                "interest": entry["int.name"],
+                "position": entry["rel.position"]
+            }
+            results.append(detail)
+        return results
+
+    def _get_donations(self):
+        results = []
+        search_string = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:REGISTERED_CONTRIBUTOR]-(rel) with rel
+            MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
+            MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
+            RETURN rel.recipient, donr.donee_type, donr.recipient_type,
+                x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "recipient": entry["rel.recipient"],
+                "amount": entry["x.amount"],
+                "donee_type": entry["donr.donee_type"],
+                "recipient_type": entry["donr.recipient_type"],
+                "reported": entry["x.reported_date"],
+                "received": entry["x.received_date"],
+                "nature": entry["x.nature"],
+                "purpose": entry["x.purpose"]
+            }
+            results.append(detail)
+        return results
+
+
+class Lords(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self._get_lord_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (lord:`Lord`) with lord
+            MATCH (lord)-[r]-() with lord,  r
+            RETURN lord.name, lord.party, lord.twfy_id, count(r) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_lord_count(self):
+        search_string = u"""
+            MATCH (lord:`Lord`)
+            RETURN count(lord)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+
 
 
 class DonationRecipient(NamedEntity):

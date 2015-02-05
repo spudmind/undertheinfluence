@@ -6,6 +6,9 @@ from utils import entity_extraction
 from utils import entity_resolver
 
 
+money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
+date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
+
 class MPsInterestsParser:
     def __init__(self):
         self._logger = logging.getLogger('spud')
@@ -13,15 +16,10 @@ class MPsInterestsParser:
     def run(self):
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.resolver = entity_resolver.MasterEntitiesResolver()
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.scraped_mps_interests
-        self.all_interests = []
-        self.money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
-        self.date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
+        self.db = mongo.MongoInterface()
 
-        self.all_interests = list(self.cache_data.find())
-        for documents in self.all_interests:
-
+        all_interests = self.db.fetch_all('scraped_mps_interests')
+        for documents in all_interests:
             # each document contains one days recorded interests
             # document structure is:
             #   contents > mp > interests / categories > interest
@@ -38,7 +36,7 @@ class MPsInterestsParser:
                     "interests": categories,
                     "file_name": file_name
                 }
-                self.cache.db.parsed_mps_interests.save(mp_data)
+                self.db.save('parsed_mps_interests', mp_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -383,7 +381,7 @@ class MPsInterestsParser:
             break
 
     def _find_dates(self, data):
-        dates = re.findall(self.date_search, data)
+        dates = re.findall(date_search, data)
         if dates:
             return dates
         else:
@@ -391,7 +389,7 @@ class MPsInterestsParser:
 
     def _find_money(self, data):
         money = None
-        money = re.findall(self.money_search, data)
+        money = re.findall(money_search, data)
         return money
 
     def _get_mp(self, entry):

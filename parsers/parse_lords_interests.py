@@ -2,7 +2,7 @@
 import re
 import logging
 from utils import mongo
-from utils import entity_extraction
+# from utils import entity_extraction
 from utils import entity_resolver
 
 
@@ -11,14 +11,13 @@ class LordsInterestsParser:
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.entity_extractor = entity_extraction.NamedEntityExtractor()
+        # # Unused
+        # self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.entity_resolver = entity_resolver.MasterEntitiesResolver()
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.scraped_lords_interests
-        self.all_lord_interests = []
+        self.db = mongo.MongoInterface()
 
-        self.all_lord_interests = list(self.cache_data.find())
-        for lord in self.all_lord_interests:
+        all_interests = self.db.fetch_all('scraped_lords_interests')
+        for lord in all_lord_interests:
             lord_name = lord["member_title"]
             resolved_name = self.entity_resolver.find_lord(lord_name)
             self._logger.debug("\n%s / %s" % (resolved_name, lord_name))
@@ -27,7 +26,7 @@ class LordsInterestsParser:
                 "lord": resolved_name,
                 "interests": categories
             }
-            self.cache.db.parsed_lords_interests.save(lord_data)
+            self.db.save('parsed_lords_interests', lord_data)
 
     def _get_category_data(self, categories):
         categories_data = []

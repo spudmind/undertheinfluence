@@ -1,3 +1,5 @@
+import urllib
+from flask import url_for
 from utils import mongo
 
 
@@ -29,6 +31,7 @@ class MpsApi:
         for entry in results:
             register = entry["influences"]["register_of_interests"]
             ec = entry["influences"]["electoral_commission"]
+            detail_url = url_for('show_mp', name=urllib.quote(entry["name"]), _external=True)
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],
@@ -40,7 +43,8 @@ class MpsApi:
                 "electoral_commission_total": ec["donation_total"],
                 "electoral_commission_count": ec["donor_count"],
                 "positions": entry["government_positions"],
-                "weight": entry["weight"]
+                "weight": entry["weight"],
+                "detail_url": detail_url,
             }
             response_data.append(detail)
         # return {

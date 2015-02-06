@@ -225,7 +225,7 @@ class PopulateInfluencersApi():
         ec["donor_type"] = donor_type
         data_sources = {
             "register_of_interests": register,
-            "electoral_commision": ec
+            "electoral_commission": ec
         }
         influencer_data = {
             "name": name,

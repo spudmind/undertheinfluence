@@ -59,7 +59,6 @@ dump.txt
 scrapers/data/regmem/
 scrapers/data/reglords/
 scrapers/data/EC-Export*.csv
-utils/mitie/
 .idea/
 .~lock.*
 

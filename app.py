@@ -2,6 +2,8 @@ from flask import Flask, url_for, render_template, abort
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_mps_function
 from web.api import get_mp_function
+from web.api import get_lords_function
+from web.api import get_lord_function
 from web.api import get_influencers_function
 import os
 
@@ -55,6 +57,30 @@ class GetMp(Resource):
         return get_mp_function.MpApi().request(args)
 
 
+class GetLords(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('party', type=str)
+        self.reqparse.add_argument('donations_gt', type=int)
+        self.reqparse.add_argument('donations_lt', type=int)
+        super(GetLords, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_lords_function.MpsApi().request(args)
+
+
+class GetLord(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetLord, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_lord_function.MpApi().request(args)
+
+
 class GetInfluencers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -72,6 +98,8 @@ class GetInfluencers(Resource):
 
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
+api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')
+api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
 
 if __name__ == '__main__':

@@ -2,21 +2,49 @@
 {% block article %}
 
     <div class="row">
-        <div class="col-md-6" >
+        <div class="col-md-12">
             <h1>Members of Parliament</h1>
-            <hr>
-        </div >
-        <div class="col-md-6" >
-            <h1>t</h1>
             <hr>
         </div >
     </div>
 
     <div class="row">
-    <div class="col-md-6 ">
-        <div class="list-group">
-        <div id="government-container"></div>
-        <div id="mp-container"></div>
+        <div class="col-md-6">
+            <div class="list-group">
+                <div id="government-container">
+                {% for mp in mps %}
+                    <div id="mp-container">
+                        <div class="list-group-item" >
+                            <div class="row-picture">
+                                <img class="circle" src="{{ mp.image }}" alt="icon">
+                            </div>
+                            <div class="row-content">
+                                <div class="least-content">
+                                    <a href="/mp/{{ mp.id }}">more</a>
+                                </div>
+                                <h4 class="list-group-item-heading">{{ mp.name }}. {{ mp.party }}</h4>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="well well-sm">
+                                            <b>Register of Interests</b><br>
+                                            {{ mp.register_of_interests_total }} received from
+                                            {{ mp.register_of_interests_count }} interests across
+                                            {{ mp.register_of_interests_categories }} categories
+                                        </div>
+                                        <div class="well well-sm">
+                                            <b>Electoral Commission</b><br>
+                                            {{ mp.electoral_commission_total }} received from
+                                            {{ mp.electoral_commission_count }} donations
+                                        </div>
+                                    </div >
+                                </div >
+                            </div>
+                        </div>
+                        <div class="list-group-separator"></div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 

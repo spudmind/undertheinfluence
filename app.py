@@ -18,7 +18,8 @@ api = Api(app)
 
 @app.route('/mps')
 def show_mps():
-    return render_template('show_mps.html', entity=None)
+    mps = get_mps_function.MpsApi().request()
+    return render_template('show_mps.html', mps=mps)
 
 
 class GetMps(Resource):
@@ -33,7 +34,7 @@ class GetMps(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_mps_function.MpsApi().request(args)
+        return get_mps_function.MpsApi().request(**args)
 
 
 class GetMp(Resource):
@@ -68,6 +69,4 @@ api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInflue
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='127.0.0.1')
     app.run()
-

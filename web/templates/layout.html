@@ -47,14 +47,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Under The Influence</a>
+            <a class="navbar-brand" href="/">Under The Influence</a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="{{ url_for('show_mps')}}">Members Of Parliament</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -82,37 +82,7 @@
 <!--
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script> -->
 
-<script id="mpTemplate" type="text/template">
-    <div class="list-group-item" >
-        <div class="row-picture">
-            <img class="circle" src="<%= image %>" alt="icon">
-        </div>
-        <div class="row-content">
-            <div class="least-content">
-                <a href="#" > more </a>
-            </div>
-            <h4 class="list-group-item-heading"><%= name %>. <%= party%></h4>
-            <div class="row">
-                <div class="col-md-12" >
-                    <div class="well well-sm">
-                        <b>Register of Interests</b><br>
-                        <%= formatMoney(register_of_interests_total, "£")%> received from
-                        <%= register_of_interests_count%> interests across
-                        <%= register_of_interests_categories%> categories<br>
-                    </div>
-                    <div class="well well-sm">
-                        <b>Electoral Commission</b><br>
-                        <%= formatMoney(electoral_commission_total, "£")%> received from
-                        <%= electoral_commission_count%> donations
-                    </div>
-                </div >
-            </div >
-        </div>
-    </div>
-    <div class="list-group-separator"></div>
-</script>
-
-
+<!--
 <script src="{{ url_for('static', filename='js/lib/jquery.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lib/underscore-min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lib/backbone-min.js') }}"></script>
@@ -138,6 +108,6 @@
 <script src="{{ url_for('static', filename='js/lib/d3/d3.min.js') }}"></script>
 <script src="{{ url_for('static', filename='material/scripts/ripples.js') }}"></script>
 <script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
-
+ -->
 </body>
 </html>

@@ -5,6 +5,7 @@ from web.api import get_mp_function
 from web.api import get_lords_function
 from web.api import get_lord_function
 from web.api import get_influencers_function
+from web.api import get_influencer_function
 import os
 
 template_dir = os.path.join(
@@ -78,7 +79,7 @@ class GetLord(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_lord_function.MpApi().request(args)
+        return get_lord_function.LordApi().request(args)
 
 
 class GetInfluencers(Resource):
@@ -96,11 +97,23 @@ class GetInfluencers(Resource):
         return get_influencers_function.InfluencersApi().request(args)
 
 
+class GetInfluencer(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetInfluencer, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_influencer_function.InfluencerApi().request(args)
+
+
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')
 api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
+api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
 
 if __name__ == '__main__':
     app.debug = True

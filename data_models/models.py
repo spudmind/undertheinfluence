@@ -60,6 +60,7 @@ class MemberOfParliament(NamedEntity):
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
             RETURN cat.category, int.name, p.amount, p.received, p.registered
+            ORDER BY p.received DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
@@ -79,7 +80,8 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
             MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
             MATCH (rel)-[y:DONATION_RECEIVED]-(x)
-            RETURN rel.donor, x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose
+            ORDER BY x.received_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
@@ -223,6 +225,7 @@ class Lord(NamedEntity):
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN rel.recipient, donr.donee_type, donr.recipient_type,
                 x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+            ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
@@ -262,8 +265,6 @@ class Lords(core.BaseDataModel):
         """
         search_result = self.query(search_string)
         return search_result[0][0]
-
-
 
 
 class DonationRecipient(NamedEntity):
@@ -385,6 +386,68 @@ class RegisteredInterest(NamedEntity):
     def update_interest_details(self, properties=None):
         labels = ["Named Entity", "Registered Interest"]
         self.set_node_properties(properties, labels)
+
+
+class Influencer(core.BaseDataModel):
+    def __init__(self, name):
+        core.BaseDataModel.__init__(self)
+        self.primary_attribute = "name"
+        self.label = "Named Entity"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+        if self.exists:
+            self.interests = self._get_interests()
+            self.donations = self._get_donations()
+
+    def _get_interests(self):
+        results = []
+        search_string = u"""
+            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
+            MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            MATCH (p)-[:INTERESTS_REGISTERED_IN]-(cat)
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            RETURN p.name, p.party, cat.category, x.amount
+            ORDER by x.reported_date DESC
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "name": entry["p.name"],
+                "party": entry["p.party"],
+                "category": entry["cat.category"],
+                "amount": entry["x.amount"]
+            }
+            results.append(detail)
+        return results
+
+    def _get_donations(self):
+        results = []
+        search_string = u"""
+            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
+            MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel) with rel
+            MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
+            MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
+            RETURN rel.recipient, donr.donee_type, donr.recipient_type,
+                x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+            ORDER by x.reported_date DESC
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "recipient": entry["rel.recipient"],
+                "amount": entry["x.amount"],
+                "donee_type": entry["donr.donee_type"],
+                "recipient_type": entry["donr.recipient_type"],
+                "reported": entry["x.reported_date"],
+                "received": entry["x.received_date"],
+                "nature": entry["x.nature"],
+                "purpose": entry["x.purpose"]
+            }
+            results.append(detail)
+        return results
 
 
 class Influencers(core.BaseDataModel):

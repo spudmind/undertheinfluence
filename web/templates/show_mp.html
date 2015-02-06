@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block article %}
+
+<div class="row">
+    <div class="col-md-2">
+        <img class="circle" src="{{ mp.image_url }}" alt="icon">
+    </div >
+    <div class="col-md-9">
+        <h1> {{ mp.name }}</h1>
+        {{ mp.party }}
+    </div >
+
+</div>
+<div class="row">
+    <div class="col-md-11">
+
+    </div >
+    <hr>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="list-group">
+            <div id="government-container">
+                <div id="mp-container">
+                    {% for area in mp.influence_details %}
+                    {{ area.source }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock article %}

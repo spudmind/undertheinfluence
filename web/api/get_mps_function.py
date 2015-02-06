@@ -28,7 +28,7 @@ class MpsApi:
             results = self.cache_data.find().skip(skip_to).limit(page_size)
         for entry in results:
             register = entry["influences"]["register_of_interests"]
-            ec = entry["influences"]["electoral_commision"]
+            ec = entry["influences"]["electoral_commission"]
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],

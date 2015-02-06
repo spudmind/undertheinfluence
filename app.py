@@ -22,6 +22,13 @@ def show_mps():
     return render_template('show_mps.html', mps=mps)
 
 
+@app.route('/mp/<name>')
+def show_mp(name):
+    args = {"name": name}
+    mp = get_mp_function.MpApi().request(args)
+    return render_template('show_mp.html', mp=mp)
+
+
 class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()

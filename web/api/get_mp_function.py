@@ -21,7 +21,7 @@ class MpApi:
             mp = self.data_models.MemberOfParliament(name)
             detail = {
                 "register_of_interests": mp.interests,
-                "electoral_commision": mp.donations
+                "electoral_commission": mp.donations
             }
             response_data = {
                 "name": api_entry[0]["name"],

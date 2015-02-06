@@ -59,13 +59,13 @@ class MemberOfParliament(NamedEntity):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
-            RETURN cat.category, int.interest, p.amount, p.received, p.registered
+            RETURN cat.category, int.name, p.amount, p.received, p.registered
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "category": entry["cat.category"],
-                "interest": entry["int.interest"],
+                "interest": entry["int.name"],
                 "amount": entry["p.amount"],
                 "received": entry["p.received"],
                 "registered": entry["p.registered"]

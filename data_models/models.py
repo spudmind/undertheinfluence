@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from data_models import core
 
 
@@ -67,7 +68,8 @@ class MemberOfParliament(NamedEntity):
             detail = {
                 "category": entry["cat.category"],
                 "interest": entry["int.name"],
-                "amount": entry["p.amount"],
+                "amount_int": entry["p.amount"],
+                "amount": u'£{:20,.2f}'.format(entry["p.amount"]),
                 "received": entry["p.received"],
                 "registered": entry["p.registered"]
             }
@@ -87,7 +89,8 @@ class MemberOfParliament(NamedEntity):
         for entry in output:
             detail = {
                 "donor": entry["rel.donor"],
-                "amount": entry["x.amount"],
+                "amount": u'£{:20,.2f}'.format(entry["x.amount"]),
+                "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
                 "nature": entry["x.nature"],

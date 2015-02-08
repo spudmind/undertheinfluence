@@ -19,6 +19,13 @@ app.config.from_object(__name__)
 api = Api(app)
 
 
+@app.route('/influencers')
+def show_influencers():
+    args = {}
+    influencers = get_influencers_function.InfluencersApi().request(args)
+    return render_template('show_influencers.html', influencers=influencers)
+
+
 @app.route('/mps')
 def show_mps():
     mps = get_mps_function.MpsApi().request()

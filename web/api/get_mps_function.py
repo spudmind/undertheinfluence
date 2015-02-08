@@ -31,11 +31,11 @@ class MpsApi:
         for entry in results:
             register = entry["influences"]["register_of_interests"]
             ec = entry["influences"]["electoral_commission"]
-            detail_url = url_for('show_mp', name=urllib.quote(entry["name"]), _external=True)
+            detail_url = url_for('show_mp', name=entry["name"], _external=True)
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],
-                "image": entry["image_url"],
+                "image_url": entry["image_url"],
                 "register_of_interests_categories": register["interest_categories"],
                 "register_of_interests_relationships": register["interest_relationships"],
                 "register_of_interests_count": register["remuneration_count"],
@@ -44,7 +44,7 @@ class MpsApi:
                 "electoral_commission_count": ec["donor_count"],
                 "positions": entry["government_positions"],
                 "weight": entry["weight"],
-                "detail_url": detail_url,
+                "detail_url": detail_url
             }
             response_data.append(detail)
         # return {

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from utils import mongo
 from data_models import core, models
 
@@ -26,12 +27,18 @@ class PopulateMpsApi():
         twfy_id = record[2]
         image_url = record[3]
         weight = record[4]
-        register["remuneration_total"] = self._remuneration_total(name)
+        register["remuneration_total"] = _convert_to_currency(
+            self._remuneration_total(name)
+        )
+        register["remuneration_total_int"] = self._remuneration_total(name)
         register["interest_categories"] = self._interest_categories(name)
         register["interest_relationships"] = self._interest_relationships(name)
         register["remuneration_count"] = self._remuneration_count(name)
         ec["donor_count"] = self._donor_count(name)
-        ec["donation_total"] = self._donation_total(name)
+        ec["donation_total"] = _convert_to_currency(
+            self._donation_total(name)
+        )
+        ec["donation_total_int"] = self._donation_total(name)
         positions = self._gov_positions(name)
         data_sources = {
             "register_of_interests": register,
@@ -145,7 +152,8 @@ class PopulateLordsApi():
         register["interest_relationships"] = self._interest_relationships(name)
         register["interest_categories"] = self._interest_categories(name)
         ec["donation_count"] = self._donation_count(name)
-        ec["donation_total"] = self._donation_total(name)
+        ec["donation_total"] = _convert_to_currency(self._donation_total(name))
+        ec["donation_total_int"] = self._donation_total(name)
         data_sources = {
             "register_of_interests": register,
             "electoral_commission": ec
@@ -218,22 +226,30 @@ class PopulateInfluencersApi():
         weight = record[3]
         register = {}
         ec = {}
-        register["remuneration_total"] = self._remuneration_total(name)
+        register["remuneration_total"] = _convert_to_currency(
+            self._remuneration_total(name)
+        )
+        register["remuneration_total_int"] = self._remuneration_total(name)
         register["remuneration_count"] = self._remuneration_count(name)
         ec["donation_count"] = self._donation_count(name)
-        ec["donation_total"] = self._donation_total(name)
+        ec["donation_total"] = _convert_to_currency(
+            self._donation_total(name)
+        )
+        ec["donation_total_int"] = self._donation_total(name)
         ec["donor_type"] = donor_type
-        data_sources = {
-            "register_of_interests": register,
-            "electoral_commission": ec
-        }
+        data_sources = {}
+        if register["remuneration_total_int"] > 0:
+            data_sources["register_of_interests"] = register
+        if ec["donation_total_int"] > 0:
+            data_sources["electoral_commission"] = ec
         influencer_data = {
             "name": name,
             "labels": labels,
             "weight": weight,
             "influences": data_sources
         }
-        self.cache_data.save(influencer_data)
+        if len(data_sources) > 0:
+            self.cache_data.save(influencer_data)
 
     def _donation_total(self, name):
         query = u"""
@@ -274,3 +290,5 @@ class PopulateInfluencersApi():
         return self.core_model.query(query)[0]["count"]
 
 
+def _convert_to_currency(number):
+    return u'£{:20,.2f}'.format(number)

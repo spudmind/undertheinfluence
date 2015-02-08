@@ -29,22 +29,16 @@ class MpsApi:
         else:
             results = self.cache_data.find().skip(skip_to).limit(page_size)
         for entry in results:
-            register = entry["influences"]["register_of_interests"]
-            ec = entry["influences"]["electoral_commission"]
             detail_url = url_for('show_mp', name=entry["name"], _external=True)
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],
                 "image_url": entry["image_url"],
-                "register_of_interests_categories": register["interest_categories"],
-                "register_of_interests_relationships": register["interest_relationships"],
-                "register_of_interests_count": register["remuneration_count"],
-                "register_of_interests_total": register["remuneration_total"],
-                "electoral_commission_total": ec["donation_total"],
-                "electoral_commission_count": ec["donor_count"],
-                "positions": entry["government_positions"],
+                "detail_url": detail_url,
                 "weight": entry["weight"],
-                "detail_url": detail_url
+                "twfy_id": entry["twfy_id"],
+                "government_positions": entry["government_positions"],
+                "influences_summary": entry["influences"]
             }
             response_data.append(detail)
         # return {

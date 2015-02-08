@@ -22,12 +22,19 @@ api = Api(app)
 @app.route('/influencers')
 def show_influencers():
     args = {}
-    influencers = get_influencers_function.InfluencersApi().request(args)
+    influencers = get_influencers_function.InfluencersApi().request()[1]
     return render_template('show_influencers.html', influencers=influencers)
+
+@app.route('/influencer/<name>')
+def show_influencer(name):
+    args = {"name": name}
+    influencer = get_influencer_function.InfluencerApi().request(args)
+    return render_template('show_influencer.html', influencer=influencer)
 
 
 @app.route('/mps')
 def show_mps():
+    args = {}
     mps = get_mps_function.MpsApi().request()
     return render_template('show_mps.html', mps=mps)
 
@@ -101,7 +108,7 @@ class GetInfluencers(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_influencers_function.InfluencersApi().request(args)
+        return get_influencers_function.InfluencersApi().request(**args)
 
 
 class GetInfluencer(Resource):

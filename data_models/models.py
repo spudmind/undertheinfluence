@@ -69,7 +69,7 @@ class MemberOfParliament(NamedEntity):
                 "category": entry["cat.category"],
                 "interest": entry["int.name"],
                 "amount_int": entry["p.amount"],
-                "amount": u'£{:20,.2f}'.format(entry["p.amount"]),
+                "amount": _convert_to_currency(entry["p.amount"]),
                 "received": entry["p.received"],
                 "registered": entry["p.registered"]
             }
@@ -89,7 +89,7 @@ class MemberOfParliament(NamedEntity):
         for entry in output:
             detail = {
                 "donor": entry["rel.donor"],
-                "amount": u'£{:20,.2f}'.format(entry["x.amount"]),
+                "amount": _convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
@@ -421,7 +421,8 @@ class Influencer(core.BaseDataModel):
                 "name": entry["p.name"],
                 "party": entry["p.party"],
                 "category": entry["cat.category"],
-                "amount": entry["x.amount"]
+                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount_int": entry["x.amount"]
             }
             results.append(detail)
         return results
@@ -441,7 +442,8 @@ class Influencer(core.BaseDataModel):
         for entry in output:
             detail = {
                 "recipient": entry["rel.recipient"],
-                "amount": entry["x.amount"],
+                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount_int": entry["x.amount"],
                 "donee_type": entry["donr.donee_type"],
                 "recipient_type": entry["donr.recipient_type"],
                 "reported": entry["x.reported_date"],
@@ -614,3 +616,7 @@ class Constituency(core.BaseDataModel):
             self.label, self.primary_attribute, self.name
         )
         self.exists = True
+
+
+def _convert_to_currency(number):
+    return u'£{:20,.2f}'.format(number)

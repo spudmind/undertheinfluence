@@ -37,7 +37,8 @@
                                 <div class="least-content">{{ influencer.influences_summary.register_of_interests.remuneration_total }}</div>
                                 <h4 class="list-group-item-heading">Register Of Interests</h4>
                                 {% for interest in influencer.influences_detail.register_of_interests %}
-                                    <p class="list-group-item-text">
+
+                                    <div class="well well-sm">
                                         <b>{{ interest.category}}</b> </br>
                                         {{ interest.amount }} associated with {{ interest.name }}
                                         {% if interest %}
@@ -52,7 +53,7 @@
                                         {% if interest.received and not interest.registered == "Unknown" %}
                                             Registered: {{ interest.registered }} </br>
                                         {% endif %}
-                                    </p>
+                                    </div>
                                     <div class="list-group-separator"></div>
 
                                 {% endfor %}
@@ -66,7 +67,7 @@
                                 <div class="least-content">{{ influencer.influences_summary.electoral_commission.donation_total }}</div>
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
                                 {% for donation in influencer.influences_detail.electoral_commission %}
-                                    <p class="list-group-item-text">
+                                    <div class="well well-sm">
                                         <b>{{ donation.donee_type }}</b></br>
                                         {{ donation.amount }} donated to {{ donation.recipient }} </br>
                                         {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
@@ -78,7 +79,7 @@
                                         {% if donation.purpose and not donation.purpose == ""  %}
                                             Purpose: {{ donation.purpose }} </br>
                                         {% endif %}
-                                    </p>
+                                    </div>
                                     <div class="list-group-separator"></div>
                                 {% endfor %}
                             </div>

@@ -5,8 +5,7 @@
         <div class="col-md-2">
         </div >
         <div class="col-md-9">
-            <h1>{{ mp.name }}. {{ mp.party }}</h1>
-
+            <h1>{{ lord.name }}. {{ lord.party }}</h1>
         </div >
     </div>
     <div class="col-md-2">
@@ -18,9 +17,9 @@
     </div>
     <div class="row">
         <div class="col-md-2">
-            {% if mp.image_url %}
+            {% if lord.image_url %}
                 <div class="row-picture">
-                    <img class="circle" src="{{ mp.image_url }}" alt="icon">
+                    <img class="circle" src="{{ lord.image_url }}" alt="icon">
                 </div>
             {% else %}
                 <div class="row-action-primary">
@@ -31,17 +30,21 @@
         <div class="col-md-7">
             <div id="government-container">
                 <div class="list-group">
-                    {% if mp.influences_detail.register_of_interests %}
+                    {% if lord.influences_detail.register_of_interests %}
                         <div class="list-group-item">
                             <div class="row-content">
-                                <div class="least-content">{{ mp.influences_summary.register_of_interests.remuneration_total }}</div>
+                                <div class="least-content">{{ lord.influences_summary.register_of_interests.remuneration_total }}</div>
                                 <h4 class="list-group-item-heading">Register Of Interests</h4>
-                                {% for interest in mp.influences_detail.register_of_interests %}
+                                {% for interest in lord.influences_detail.register_of_interests %}
                                     <p class="list-group-item-text">
 
                                     <div class="well well-sm">
                                         <b>{{ interest.category}}</b> </br>
-                                        {{ interest.amount }} received from {{ interest.interest }} </br>
+                                        {% if interest.position and not interest.position == ""  %}
+                                        {{ interest.position }} -
+                                        {% endif %}
+
+                                        {{ interest.interest }} </br>
                                         {% if interest.received and not interest.received == "Unknown" or interest.received and not interest.registered == "Unknown" %}
                                             </br>
                                         {% endif %}
@@ -61,15 +64,16 @@
                         </div>
                     {% endif %}
                     <hr>
-                    {% if mp.influences_detail.electoral_commission %}
+                    {% if lord.influences_detail.electoral_commission %}
                         <div class="list-group-item">
                             <div class="row-content">
-                                <div class="least-content">{{ mp.influences_summary.electoral_commission.donation_total }}</div>
+                                <div class="least-content">{{ lord.influences_summary.electoral_commission.donation_total }}</div>
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
-                                {% for donation in mp.influences_detail.electoral_commission %}
-                                    <p class="list-group-item-text">
+                                {% for donation in lord.influences_detail.electoral_commission %}
+
+
                                     <div class="well well-sm">
-                                        {{ donation.amount }} received from <b>{{ donation.donor }}</b> </br>
+                                        {{ donation.amount }} donated to <b>{{ donation.recipient }}</b> </br>
                                         {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
                                             </br>
                                         {% endif %}
@@ -81,7 +85,6 @@
                                         {% endif %}
                                     </div>
 
-                                    </p>
                                     <div class="list-group-separator"></div>
                                 {% endfor %}
                             </div>

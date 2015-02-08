@@ -82,7 +82,7 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
             MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
             MATCH (rel)-[y:DONATION_RECEIVED]-(x)
-            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose
+            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose, x.donee_type
             ORDER BY x.received_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
@@ -94,6 +94,7 @@ class MemberOfParliament(NamedEntity):
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
                 "nature": entry["x.nature"],
+                "donee_type": entry["x.donee_type"],
                 "purpose": entry["x.purpose"]
             }
             results.append(detail)
@@ -234,7 +235,8 @@ class Lord(NamedEntity):
         for entry in output:
             detail = {
                 "recipient": entry["rel.recipient"],
-                "amount": entry["x.amount"],
+                "amount_int": entry["x.amount"],
+                "amount": _convert_to_currency(entry["x.amount"]),
                 "donee_type": entry["donr.donee_type"],
                 "recipient_type": entry["donr.recipient_type"],
                 "reported": entry["x.reported_date"],

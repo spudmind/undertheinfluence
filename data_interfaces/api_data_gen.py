@@ -158,6 +158,11 @@ class PopulateLordsApi():
             "register_of_interests": register,
             "electoral_commission": ec
         }
+        data_sources = {}
+        if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
+            data_sources["register_of_interests"] = register
+        if ec["donation_total_int"] > 0 and ec["donation_count"] > 0:
+            data_sources["electoral_commission"] = ec
         lord_data = {
             "name": name,
             "party": party,

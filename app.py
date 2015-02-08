@@ -46,6 +46,20 @@ def show_mp(name):
     return render_template('show_mp.html', mp=mp)
 
 
+@app.route('/lords')
+def show_lords():
+    args = {}
+    lords = get_lords_function.LordsApi().request()
+    return render_template('show_lords.html', lords=lords)
+
+
+@app.route('/lord/<name>')
+def show_lord(name):
+    args = {"name": name}
+    lord = get_lord_function.LordApi().request(args)
+    return render_template('show_lord.html', lord=lord)
+
+
 class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -82,7 +96,7 @@ class GetLords(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_lords_function.MpsApi().request(args)
+        return get_lords_function.LordsApi().request(**args)
 
 
 class GetLord(Resource):

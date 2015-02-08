@@ -68,3 +68,4 @@ class MpsApi:
             _funding_search["$lt"] = args.get("donations_lt")
         if _funding_search != {}:
             self.query[self._funding] = _funding_search
+

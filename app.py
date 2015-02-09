@@ -6,6 +6,7 @@ from web.api import get_lords_function
 from web.api import get_lord_function
 from web.api import get_influencers_function
 from web.api import get_influencer_function
+from web.api import find_entity_function
 import os
 
 template_dir = os.path.join(
@@ -136,12 +137,24 @@ class GetInfluencer(Resource):
         return get_influencer_function.InfluencerApi().request(args)
 
 
+class FindEntity(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('search', type=str)
+        super(FindEntity, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return find_entity_function.EntityApi().request(**args)
+
+
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')
 api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
 api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
+api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 
 if __name__ == '__main__':
     app.debug = True

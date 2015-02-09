@@ -66,12 +66,13 @@ class BaseDataModel:
             #print search_query
         output = self.query(search_query)
         self.vertex = output[0][0]
-        self.vertex.add_labels(label)
+        self.vertex.labels.add(label)
         return self.vertex
 
     def set_node_properties(self, properties=None, labels=None):
         if properties:
-            node_properties = self.vertex.get_properties()
+            #node_properties = self.vertex.get_properties()
+            node_properties = self.vertex.pull()
             for prop in properties:
                 self.vertex.properties[prop] = properties[prop]
         if labels:

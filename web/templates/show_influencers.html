@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block article %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1>The Influencers</h1>
+            <hr>
+        </div >
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="government-container">
+                <div class="list-group">
+                    {% for actor in influencers %}
+                        <div class="list-group-item" >
+                            <div class="row-action-primary">
+                                <i class="icon-material-folder" ></i>
+                            </div>
+                            <div class="row-content">
+                                <div class="least-content">
+                                    <a href="{{ actor.detail_url }}">detail</a>
+                                </div>
+                                <h4 class="list-group-item-heading">{{ actor.name }}</h4>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% if "register_of_interests" in actor.influences_summary %}
+                                            <div class="well well-sm">
+                                                <b>Register of Interests</b><br>
+                                                {{ actor.influences_summary.register_of_interests.remuneration_total }} registered interests
+                                                {{ actor.influences_summary.register_of_interests.remuneration_count }} across
+                                                {{ actor.influences_summary.register_of_interests.interest_categories }} categories
+                                            </div>
+                                        {% endif %}
+                                        {% if "electoral_commission" in actor.influences_summary %}
+                                            <div class="well well-sm">
+                                                <b>Electoral Commission</b><br>
+                                                {{ actor.influences_summary.electoral_commission.donation_total }} donated across
+                                                {{ actor.influences_summary.electoral_commission.donation_count }} donations
+                                            </div>
+                                        {% endif %}
+                                    </div >
+                                </div >
+                            </div>
+                        </div>
+                        <div class="list-group-separator"></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock article %}

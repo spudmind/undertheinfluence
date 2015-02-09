@@ -1,14 +1,12 @@
-import urllib
-from flask import url_for
 from utils import mongo
+from flask import url_for
 
-
-class MpsApi:
+class LordsApi:
     def __init__(self):
         self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_mps
-        self._remuneration = "influences.register_of_interests.remuneration_total"
-        self._funding = "influences.electoral_commision.donation_total"
+        self.cache_data = self.cache.db.api_lords
+        self._funding = "influences.electoral_commission.donation_total"
+        self._funding_search = None
         self.query = None
 
     def request(self, **args):
@@ -21,7 +19,6 @@ class MpsApi:
         skip_to = 0
         print "*args", args
         self._filter_party(args)
-        self._filter_interests(args)
         self._filter_funding(args)
         if len(self.query) > 0:
             print self.query
@@ -29,15 +26,15 @@ class MpsApi:
         else:
             results = self.cache_data.find().skip(skip_to).limit(page_size)
         for entry in results:
-            detail_url = url_for('show_mp', name=entry["name"], _external=True)
+            detail_url = url_for('show_lord', name=entry["name"], _external=True)
+
             detail = {
                 "name": entry["name"],
                 "party": entry["party"],
-                "image_url": entry["image_url"],
+                "image_url": None,
                 "detail_url": detail_url,
                 "weight": entry["weight"],
                 "twfy_id": entry["twfy_id"],
-                "government_positions": entry["government_positions"],
                 "influences_summary": entry["influences"]
             }
             response_data.append(detail)
@@ -48,24 +45,18 @@ class MpsApi:
         return response_data
 
     def _filter_party(self, args):
-        if args.get("party") is not None:
+        if args.get("party"):
             self.query["party"] = args.get("party")
-
-    def _filter_interests(self, args):
-        _remuneration_search = {}
-        if args.get("interests_gt"):
-            _remuneration_search["$gt"] = args.get("interests_gt")
-        elif args.get("interests_lt"):
-            _remuneration_search["$lt"] = args.get("interests_lt")
-        if _remuneration_search != {}:
-            self.query[self._remuneration] = _remuneration_search
 
     def _filter_funding(self, args):
         _funding_search = {}
-        if args.get("donations_gt"):
+        if args.get("donations_gt") and args.get("donations_lt"):
             _funding_search["$gt"] = args.get("donations_gt")
-        if args.get("donations_lt"):
             _funding_search["$lt"] = args.get("donations_lt")
-        if _funding_search != {}:
             self.query[self._funding] = _funding_search
-
+        elif args.get("donations_gt"):
+            _funding_search["$gt"] = args.get("donations_gt")
+            self.query[self._funding] = _funding_search
+        elif args.get("donations_lt"):
+            _funding_search["$lt"] = args.get("donations_lt")
+            self.query[self._funding] = _funding_search

@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block article %}
+
+    <div class="row">
+        <div class="col-md-2">
+        </div >
+        <div class="col-md-9">
+            <h1>{{ mp.name }}. {{ mp.party }}</h1>
+
+        </div >
+    </div>
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+        </div >
+        <hr>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            {% if mp.image_url %}
+                <div class="row-picture">
+                    <img class="circle" src="{{ mp.image_url }}" alt="icon">
+                </div>
+            {% else %}
+                <div class="row-action-primary">
+                    <i class="icon-material-folder" ></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-7">
+            <div id="government-container">
+                <div class="list-group">
+                    {% if mp.influences_detail.register_of_interests %}
+                        <div class="list-group-item">
+                            <div class="row-content">
+                                <div class="least-content">{{ mp.influences_summary.register_of_interests.remuneration_total }}</div>
+                                <h4 class="list-group-item-heading">Register Of Interests</h4>
+                                {% for interest in mp.influences_detail.register_of_interests %}
+                                    <p class="list-group-item-text">
+
+                                    <div class="well well-sm">
+                                        <b>{{ interest.category}}</b> </br>
+                                        {{ interest.amount }} received from {{ interest.interest }} </br>
+                                        {% if interest.received and not interest.received == "Unknown" or interest.received and not interest.registered == "Unknown" %}
+                                            </br>
+                                        {% endif %}
+                                        {% if interest.received and not interest.received == "Unknown" %}
+                                            Received: {{ interest.received }} </br>
+                                        {% endif %}
+                                        {% if interest.received and not interest.registered == "Unknown" %}
+                                            Registered: {{ interest.registered }} </br>
+                                        {% endif %}
+                                    </div>
+
+                                    </p>
+                                    <div class="list-group-separator"></div>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <hr>
+                    {% if mp.influences_detail.electoral_commission %}
+                        <div class="list-group-item">
+                            <div class="row-content">
+                                <div class="least-content">{{ mp.influences_summary.electoral_commission.donation_total }}</div>
+                                <h4 class="list-group-item-heading">Electoral Commission</h4>
+                                {% for donation in mp.influences_detail.electoral_commission %}
+                                    <p class="list-group-item-text">
+                                    <div class="well well-sm">
+                                        {{ donation.amount }} received from <b>{{ donation.donor }}</b> </br>
+                                        {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
+                                            </br>
+                                        {% endif %}
+                                        {% if donation.nature and not donation.nature == ""  %}
+                                            Nature</br>{{ donation.nature }} </br>
+                                        {% endif %}
+                                        {% if donation.purpose and not donation.purpose == ""  %}
+                                            Purpose</br>{{ donation.purpose }} </br>
+                                        {% endif %}
+                                    </div>
+
+                                    </p>
+                                    <div class="list-group-separator"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock article %}

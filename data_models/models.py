@@ -21,6 +21,7 @@ class MemberOfParliament(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.label = "Member of Parliament"
+        self.api_resource = u"/api/v0.1/getMp"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
@@ -60,14 +61,20 @@ class MemberOfParliament(NamedEntity):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
-            RETURN cat.category, int.name, p.amount, p.received, p.registered
+            RETURN cat.category, int.name, p.amount, p.received, p.registered,
+                labels(int) as labels
             ORDER BY p.received DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
+                "interest": {
+                    "name": entry["int.name"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "category": entry["cat.category"],
-                "interest": entry["int.name"],
                 "amount_int": entry["p.amount"],
                 "amount": _convert_to_currency(entry["p.amount"]),
                 "received": entry["p.received"],
@@ -81,14 +88,23 @@ class MemberOfParliament(NamedEntity):
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
             MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
-            MATCH (rel)-[y:DONATION_RECEIVED]-(x)
-            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose, x.donee_type
+            MATCH (rel)-[:DONATION_RECEIVED]-(x) with mp, rel, x
+            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(p) with mp, rel, p, x
+            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose, x.donee_type,
+                p.donor_type, p.company_reg, labels(p) as labels
             ORDER BY x.received_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
-                "donor": entry["rel.donor"],
+                "donor": {
+                    "name":entry["rel.donor"],
+                    "donor_type": entry["p.donor_type"],
+                    "company_reg": entry["p.company_reg"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],

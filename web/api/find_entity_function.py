@@ -1,10 +1,11 @@
+from web.api import BaseAPI
 from utils import mongo
 from data_models import core
-from flask import url_for
 
 
-class EntityApi:
+class EntityApi(BaseAPI):
     def __init__(self):
+        BaseAPI.__init__(self)
         self.cache = mongo.MongoInterface()
         self.cache_data = self.cache.db.api_lords
         self.data_model = core.BaseDataModel()
@@ -19,38 +20,12 @@ class EntityApi:
         for entry in search_results:
             labels = entry["labels"]
             name = entry["name"]
-            if "Member of Parliament" in labels:
-                api_details_url = u"/api/v0.1/getMp?name={0}".format(name)
-                details_url = url_for('show_mp', name=name, _external=True)
-                detail = {
-                    "name": name,
-                    "labels": labels,
-                    "details_url": details_url,
-                    "api_details_url": api_details_url
-                }
-                response_data.append(detail)
-            elif "Lord" in labels:
-                api_details_url = u"/api/v0.1/getLord?name={0}".format(name)
-                details_url = url_for(
-                    'show_lord', name=entry["name"], _external=True
-                )
-                detail = {
-                    "name": entry["name"],
-                    "labels": labels,
-                    "details_url": details_url,
-                    "api_details_url": api_details_url
-                }
-                response_data.append(detail)
-            elif "Donor" in labels or "Registered Interest" in labels:
-                api_details_url = u"/api/v0.1/getInfluencer?name={0}".format(name)
-                details_url = url_for(
-                    'show_influencer', name=entry["name"], _external=True
-                )
-                detail = {
-                    "name": entry["name"],
-                    "labels": labels,
-                    "details_url": details_url,
-                    "api_details_url": api_details_url
-                }
-                response_data.append(detail)
+            web_url, api_url = self.named_entity_resources(name, labels)
+            detail = {
+                "name": name,
+                "labels": labels,
+                "details_url": web_url,
+                "api_url": api_url
+            }
+            response_data.append(detail)
         return response_data

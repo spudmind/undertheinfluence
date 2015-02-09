@@ -2,8 +2,8 @@
 import sys
 import os
 parent = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(parent + "/information_extraction/mitielib")
 
-sys.path.append(os.path.join(parent, 'mitie', 'mitielib'))
 from mitie import named_entity_extractor, tokenize
 
 

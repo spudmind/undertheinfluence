@@ -69,7 +69,7 @@
                                 {% for donation in influencer.influences_detail.electoral_commission %}
                                     <div class="well well-sm">
                                         <b>{{ donation.donee_type }}</b></br>
-                                        {{ donation.amount }} donated to {{ donation.recipient }} </br>
+                                        {{ donation.amount }} donated to <a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></br>
                                         {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
                                             </br>
                                         {% endif %}

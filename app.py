@@ -103,6 +103,7 @@ class GetMp(Resource):
 class GetLords(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
         self.reqparse.add_argument('party', type=str)
         self.reqparse.add_argument('donations_gt', type=int)
         self.reqparse.add_argument('donations_lt', type=int)
@@ -110,6 +111,9 @@ class GetLords(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+
         return get_lords_function.LordsApi().request(**args)
 
 
@@ -127,6 +131,7 @@ class GetLord(Resource):
 class GetInfluencers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
         self.reqparse.add_argument('labels', type=str)
         self.reqparse.add_argument('interests_gt', type=int)
         self.reqparse.add_argument('interests_lt', type=int)
@@ -136,6 +141,9 @@ class GetInfluencers(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+
         return get_influencers_function.InfluencersApi().request(**args)
 
 

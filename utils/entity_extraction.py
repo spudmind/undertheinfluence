@@ -3,13 +3,13 @@ import sys
 import os
 parent = os.path.dirname(os.path.realpath(__file__))
 
-sys.path.append(os.path.join(parent, 'mitie', 'mitielib'))
+sys.path.append(os.path.join(parent, 'mitie_interface', 'mitielib'))
 from mitie import named_entity_extractor, tokenize
 
 
 class NamedEntityExtractor:
     SYSTEM_PATH = os.path.dirname(os.path.realpath(__file__))
-    MIT_NLP = '/mitie/'
+    MIT_NLP = '/mitie_interface/'
     NE_MODELS = "MITIE-models/english/ner_model.dat"
     NE_DATA = SYSTEM_PATH + MIT_NLP + NE_MODELS
 

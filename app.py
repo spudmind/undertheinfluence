@@ -1,4 +1,4 @@
-from flask import Flask, url_for, render_template, abort
+from flask import Flask, url_for, render_template, abort, request
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_mps_function
 from web.api import get_mp_function
@@ -21,8 +21,12 @@ api = Api(app)
 
 @app.route('/influencers')
 def show_influencers():
-    influencers = get_influencers_function.InfluencersApi().request()['results']
-    return render_template('show_influencers.html', influencers=influencers)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    influencers = get_influencers_function.InfluencersApi().request(page=page)['results']
+    return render_template('show_influencers.html', influencers=influencers, page=page)
 
 @app.route('/influencer/<name>')
 def show_influencer(name):
@@ -33,8 +37,12 @@ def show_influencer(name):
 
 @app.route('/mps')
 def show_mps():
-    mps = get_mps_function.MpsApi().request()['results']
-    return render_template('show_mps.html', mps=mps)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    mps = get_mps_function.MpsApi().request(page=page)['results']
+    return render_template('show_mps.html', mps=mps, page=page)
 
 
 @app.route('/mp/<name>')
@@ -46,8 +54,12 @@ def show_mp(name):
 
 @app.route('/lords')
 def show_lords():
-    lords = get_lords_function.LordsApi().request()['results']
-    return render_template('show_lords.html', lords=lords)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    lords = get_lords_function.LordsApi().request(page=page)['results']
+    return render_template('show_lords.html', lords=lords, page=page)
 
 
 @app.route('/lord/<name>')

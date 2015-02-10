@@ -136,7 +136,8 @@ donor_entities = [
     u"Communication Workers Union",
     u"UNISON",
     u"Ministry of Sound",
-    u"Northampton Lib Dem Council Group"
+    u"Northampton Lib Dem Council Group",
+    u"Shell International Ltd"
 ]
 
 mapped_donors = [
@@ -172,6 +173,7 @@ mapped_donors = [
     (u"Shura Council of Kingdom Saudi Arabia", u"Shura Council of the Kingdom of Saudi Arabia"),
     (u"ResultsUK", u"Results UK"),
     (u"RESULTS UK", u"Results UK"),
+    (u"Shell International", u"Shell International Ltd"),
 ]
 
 

@@ -31,7 +31,7 @@
         <div class="col-md-7">
             <div id="government-container">
                 <div class="list-group">
-                    {% if influencer.influences_detail.register_of_interests %}
+                    {% if influencer.influences_detail["register_of_interests"] %}
                         <div class="list-group-item">
                             <div class="row-content">
                                 <div class="least-content">{{ influencer.influences_summary.register_of_interests.remuneration_total }}</div>
@@ -40,9 +40,9 @@
 
                                     <div class="well well-sm">
                                         <b>{{ interest.category}}</b> </br>
-                                        {{ interest.amount }} associated with {{ interest.name }}
+                                        {{ interest.amount }} associated with <a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a>
                                         {% if interest %}
-                                            - {{ interest.party }}
+                                            - {{ interest.interest["party"] }}
                                         {% endif %}
                                         {% if interest.received and not interest.received == "Unknown" or interest.received and not interest.registered == "Unknown" %}
                                             </br>
@@ -61,7 +61,7 @@
                         </div>
                     {% endif %}
                     <hr>
-                    {% if influencer.influences_detail.electoral_commission %}
+                    {% if influencer.influences_detail["electoral_commission"] %}
                         <div class="list-group-item">
                             <div class="row-content">
                                 <div class="least-content">{{ influencer.influences_summary.electoral_commission.donation_total }}</div>
@@ -69,7 +69,7 @@
                                 {% for donation in influencer.influences_detail.electoral_commission %}
                                     <div class="well well-sm">
                                         <b>{{ donation.donee_type }}</b></br>
-                                        {{ donation.amount }} donated to {{ donation.recipient }} </br>
+                                        {{ donation.amount }} donated to <a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></br>
                                         {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
                                             </br>
                                         {% endif %}

@@ -44,7 +44,7 @@
                                         {{ interest.position }} -
                                         {% endif %}
 
-                                        {{ interest.interest }} </br>
+                                        <a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></br>
                                         {% if interest.received and not interest.received == "Unknown" or interest.received and not interest.registered == "Unknown" %}
                                             </br>
                                         {% endif %}

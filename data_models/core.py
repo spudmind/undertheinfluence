@@ -33,6 +33,22 @@ class BaseDataModel:
         else:
             return None
 
+    def find_entity(self, name):
+        results = []
+        search_query = u"""
+                MATCH (entity:`Named Entity` {{name: "{0}"}})
+                RETURN entity.name, labels(entity)
+            """.format(name)
+        output = self.query(search_query)
+        if output:
+            for entry in output:
+                detail = {
+                    "name": entry[0],
+                    "labels": entry[1]
+                }
+                results.append(detail)
+        return results
+
     def create_vertex(self, label, node_key, value, merge=True):
         self.vertex = None
         if merge:
@@ -50,12 +66,12 @@ class BaseDataModel:
             #print search_query
         output = self.query(search_query)
         self.vertex = output[0][0]
-        self.vertex.add_labels(label)
+        self.vertex.labels.add(label)
         return self.vertex
 
     def set_node_properties(self, properties=None, labels=None):
         if properties:
-            node_properties = self.vertex.get_properties()
+            node_properties = self.vertex.pull()
             for prop in properties:
                 self.vertex.properties[prop] = properties[prop]
         if labels:

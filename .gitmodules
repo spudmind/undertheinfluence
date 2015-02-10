@@ -1,6 +1,3 @@
-[submodule "utils/mitie"]
-	path = utils/mitie
-	url = https://github.com/mit-nlp/MITIE.git
 [submodule "utils/mitie_interface"]
 	path = utils/mitie_interface
 	url = https://github.com/mit-nlp/MITIE.git

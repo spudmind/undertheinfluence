@@ -4,32 +4,20 @@ from utils import mongo
 
 class InfluencerApi:
     def __init__(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_influencers
-        self.data_models = models
+        self._db = mongo.MongoInterface()
+        self._db_table = 'api_influencers'
 
-    def request(self, args):
-        return self._fetch(args)
-
-    def _fetch(self, args):
-        api_query = {}
-        response_data = {}
-        name = args["name"]
-        api_query["name"] = name
-        party = None
-        api_entry = list(self.cache.db.api_influencers.find(api_query))
-        if len(api_entry) == 1:
-            influencer = self.data_models.Influencer(name)
-            detail = {
-                "register_of_interests": influencer.interests,
-                "electoral_commission": influencer.donations
+    def request(self, query):
+        name = query["name"]
+        result, _ = self._db.query(self._db_table, query=query)
+        if len(result) > 0:
+            influencer = models.Influencer(name)
+            result = {
+                'name': result[0]['name'],
+                'influences_summary': result[0]['influences'],
+                'influences_detail': {
+                    "register_of_interests": influencer.interests,
+                    "electoral_commission": influencer.donations
+                },
             }
-            response_data = {
-                "name": api_entry[0]["name"],
-                "influences_summary": api_entry[0]["influences"],
-                "influences_detail": detail
-            }
-        return response_data
-
-
-
+        return result

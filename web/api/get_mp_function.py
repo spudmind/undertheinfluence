@@ -4,35 +4,19 @@ from utils import mongo
 
 class MpApi:
     def __init__(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_mps
-        self.data_models = models
+        self._db = mongo.MongoInterface()
+        self._db_table = 'api_mps'
 
-    def request(self, args):
-        return self._fetch(args)
-
-    def _fetch(self, args):
-        api_query = {}
-        response_data = {}
-        name = args["name"]
-        api_query["name"] = name
-        api_entry = list(self.cache.db.api_mps.find(api_query))
-        if len(api_entry) == 1:
-            mp = self.data_models.MemberOfParliament(name)
-            detail = {
+    def request(self, query):
+        name = query['name']
+        result, _ = self._db.query(self._db_table, query=query)
+        if len(result) > 0:
+            fields = ["name", "party", "twfy_id", "image_url", "government_positions", "influences"]
+            rename_field = {"influences": "influences_summary"}
+            result = {rename_field.get(k, k): v for k, v in result[0].items() if k in fields}
+            mp = models.MemberOfParliament(name)
+            result['influences_detail'] = {
                 "register_of_interests": mp.interests,
-                "electoral_commission": mp.donations
+                "electoral_commission": mp.donations,
             }
-            response_data = {
-                "name": api_entry[0]["name"],
-                "party": api_entry[0]["party"],
-                "twfy_id": api_entry[0]["twfy_id"],
-                "image_url": api_entry[0]["image_url"],
-                "government_positions": api_entry[0]["government_positions"],
-                "influences_summary": api_entry[0]["influences"],
-                "influences_detail": detail
-            }
-        return response_data
-
-
-
+        return result

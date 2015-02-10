@@ -21,8 +21,7 @@ api = Api(app)
 
 @app.route('/influencers')
 def show_influencers():
-    args = {}
-    influencers = get_influencers_function.InfluencersApi().request()[1]
+    influencers = get_influencers_function.InfluencersApi().request()['results']
     return render_template('show_influencers.html', influencers=influencers)
 
 @app.route('/influencer/<name>')
@@ -34,8 +33,7 @@ def show_influencer(name):
 
 @app.route('/mps')
 def show_mps():
-    args = {}
-    mps = get_mps_function.MpsApi().request()
+    mps = get_mps_function.MpsApi().request()['results']
     return render_template('show_mps.html', mps=mps)
 
 
@@ -48,8 +46,7 @@ def show_mp(name):
 
 @app.route('/lords')
 def show_lords():
-    args = {}
-    lords = get_lords_function.LordsApi().request()
+    lords = get_lords_function.LordsApi().request()['results']
     return render_template('show_lords.html', lords=lords)
 
 
@@ -63,6 +60,7 @@ def show_lord(name):
 class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
         self.reqparse.add_argument('party', type=str)
         self.reqparse.add_argument('interests_gt', type=int)
         self.reqparse.add_argument('interests_lt', type=int)
@@ -72,6 +70,9 @@ class GetMps(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+
         return get_mps_function.MpsApi().request(**args)
 
 

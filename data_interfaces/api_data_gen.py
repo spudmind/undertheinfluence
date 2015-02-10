@@ -130,14 +130,12 @@ class PopulateMpsApi():
 class PopulateLordsApi():
     def __init__(self):
         self.cache = mongo.MongoInterface()
-        self.data_models = models
         self.core_model = core.BaseDataModel()
-        self.lords_graph = self.data_models.Lords()
-        self.all_lords = []
+        self.lords_graph = models.Lords()
 
     def run(self):
-        self.all_lords = self.lords_graph.get_all()
-        for doc in self.all_lords:
+        all_lords = self.lords_graph.get_all()
+        for doc in all_lords:
             name = doc[0]
             print name
             self._get_stats(doc)
@@ -154,10 +152,6 @@ class PopulateLordsApi():
         ec["donation_count"] = self._donation_count(name)
         ec["donation_total"] = _convert_to_currency(self._donation_total(name))
         ec["donation_total_int"] = self._donation_total(name)
-        data_sources = {
-            "register_of_interests": register,
-            "electoral_commission": ec
-        }
         data_sources = {}
         if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
             data_sources["register_of_interests"] = register
@@ -210,15 +204,12 @@ class PopulateLordsApi():
 class PopulateInfluencersApi():
     def __init__(self):
         self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_influencers
-        self.data_models = models
         self.core_model = core.BaseDataModel()
-        self.influencers_graph = self.data_models.Influencers()
-        self.all_influencers = []
+        self.influencers_graph = models.Influencers()
 
     def run(self):
-        self.all_influencers = self.influencers_graph.get_all()
-        for doc in self.all_influencers:
+        all_influencers = self.influencers_graph.get_all()
+        for doc in all_influencers:
             print doc[0], doc[1]
             self._get_stats(doc)
 
@@ -254,7 +245,7 @@ class PopulateInfluencersApi():
             "influences": data_sources
         }
         if len(data_sources) > 0:
-            self.cache_data.save(influencer_data)
+            self.cache.save("api_influencers", influencer_data)
 
     def _donation_total(self, name):
         query = u"""
@@ -293,6 +284,72 @@ class PopulateInfluencersApi():
             RETURN count(x) as count
         """.format(name)
         return self.core_model.query(query)[0]["count"]
+
+
+class PopulatePoliticalPartyApi():
+    def __init__(self):
+        self.cache = mongo.MongoInterface()
+        self.core_model = core.BaseDataModel()
+        self.parties_graph = models.PoliticalParties()
+
+    def run(self):
+        all_parties = self.parties_graph.get_all()
+        for doc in all_parties:
+            name = doc[0]
+            print name
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        ec = {}
+        name = record[0]
+        weight = record[1]
+        total, count = self._donations(name)
+        ec["donation_count"] = count
+        ec["donation_total"] = _convert_to_currency(total)
+        ec["donation_total_int"] = total
+        mp_count = self._mp_count(name)
+        lord_count = self._lord_count(name)
+        data_sources = {}
+        if ec["donation_total_int"] > 0 and ec["donation_count"] > 0:
+            data_sources["electoral_commission"] = ec
+        party_data = {
+            "name": name,
+            "weight": weight,
+            "mp_count": mp_count,
+            "lord_count": lord_count,
+            "influences": data_sources
+        }
+        self.cache.save("api_political_parties", party_data)
+
+    def _mp_count(self, name):
+        query = u"""
+            MATCH (d:`Political Party` {{name: "{0}"}})
+            MATCH (mp:`Member of Parliament`)-[:MEMBER_OF]-(p)
+            RETURN count(mp) as mp_count
+        """.format(name)
+        return self.core_model.query(query)[0]["mp_count"]
+
+    def _lord_count(self, name):
+        query = u"""
+            MATCH (d:`Political Party` {{name: "{0}"}})
+            MATCH (l:`Lord`)-[:MEMBER_OF]-(p)
+            RETURN count(l) as lord_count
+        """.format(name)
+        return self.core_model.query(query)[0]["lord_count"]
+
+    def _donations(self, name):
+        query = u"""
+            MATCH (d:`Political Party` {{name: "{0}"}})
+            MATCH (d)-[:FUNDING_RELATIONSHIP]-(x)
+            MATCH (x)-[:DONATION_RECEIVED]-(f)
+            RETURN d.name as Party, sum(f.amount) as total, count(f.amount) as count
+            ORDER BY total DESC
+        """.format(name)
+        output = self.core_model.query(query)
+        if output:
+            return output[0]["total"], output[0]["count"]
+        else:
+            return 0, 0
 
 
 def _convert_to_currency(number):

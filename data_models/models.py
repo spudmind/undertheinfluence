@@ -590,6 +590,31 @@ class Remuneration(core.BaseDataModel):
         self.set_date(date, "RECEIVED")
 
 
+class PoliticalParties(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (d:`Political Party`)
+            MATCH (d)-[x]-()
+            RETURN d.name, count(x) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (d:`Political Party`)
+            RETURN count(d)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+
+
 class GovernmentOffice(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)

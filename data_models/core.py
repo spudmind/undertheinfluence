@@ -71,7 +71,6 @@ class BaseDataModel:
 
     def set_node_properties(self, properties=None, labels=None):
         if properties:
-            #node_properties = self.vertex.get_properties()
             node_properties = self.vertex.pull()
             for prop in properties:
                 self.vertex.properties[prop] = properties[prop]

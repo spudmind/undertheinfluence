@@ -98,7 +98,7 @@ class MemberOfParliament(NamedEntity):
         for entry in output:
             detail = {
                 "donor": {
-                    "name":entry["rel.donor"],
+                    "name": entry["rel.donor"],
                     "donor_type": entry["p.donor_type"],
                     "company_reg": entry["p.company_reg"],
                     "labels": entry["labels"],
@@ -224,13 +224,18 @@ class Lord(NamedEntity):
             MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with lord, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with lord, cat, rel, int
-            RETURN cat.category, rel.position, int.name
+            RETURN cat.category, rel.position, int.name, labels(int) as labels
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "category": entry["cat.category"],
-                "interest": entry["int.name"],
+                "interest": {
+                    "name": entry["int.name"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "position": entry["rel.position"]
             }
             results.append(detail)
@@ -244,13 +249,19 @@ class Lord(NamedEntity):
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN rel.recipient, donr.donee_type, donr.recipient_type,
-                x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+                x.amount, x.reported_date,x.received_date, x.nature,
+                x.purpose, labels(donr) as labels
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
-                "recipient": entry["rel.recipient"],
+                "recipient": {
+                    "name": entry["rel.recipient"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "amount_int": entry["x.amount"],
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "donee_type": entry["donr.donee_type"],

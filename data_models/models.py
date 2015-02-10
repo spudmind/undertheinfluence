@@ -441,14 +441,20 @@ class Influencer(core.BaseDataModel):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (p)-[:INTERESTS_REGISTERED_IN]-(cat)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
-            RETURN p.name, p.party, cat.category, x.amount
+            RETURN p.name, p.party, cat.category, x.amount,
+                labels(p) as labels
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
-                "name": entry["p.name"],
-                "party": entry["p.party"],
+                "interest": {
+                    "name": entry["p.name"],
+                    "party": entry["p.party"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "category": entry["cat.category"],
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"]
@@ -464,13 +470,19 @@ class Influencer(core.BaseDataModel):
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN rel.recipient, donr.donee_type, donr.recipient_type,
-                x.amount, x.reported_date,x.received_date, x.nature, x.purpose
+                x.amount, x.reported_date,x.received_date, x.nature,
+                x.purpose, labels(donr) as labels
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
-                "recipient": entry["rel.recipient"],
+                "recipient": {
+                    "name": entry["rel.recipient"],
+                    "labels": entry["labels"],
+                    "details_url": None,
+                    "api_url": None
+                },
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "donee_type": entry["donr.donee_type"],

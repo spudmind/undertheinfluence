@@ -59,8 +59,9 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <hr>
                     {% endif %}
-                    <hr>
+
                     {% if influencer.influences_detail["electoral_commission"] %}
                         <div class="list-group-item">
                             <div class="row-content">
@@ -68,7 +69,9 @@
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
                                 {% for donation in influencer.influences_detail.electoral_commission %}
                                     <div class="well well-sm">
-                                        <b>{{ donation.donee_type }}</b></br>
+                                        {% if donation.donee_type and not donation.donee_type == ""  %}
+                                            <b>{{ donation.donee_type }}</b></br>
+                                        {% endif %}
                                         {{ donation.amount }} donated to <a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></br>
                                         {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
                                             </br>

@@ -180,7 +180,6 @@ mapped_donors = [
 party_entities = [
     u"Labour Party",
     u"Labour",
-    u"Green Party",
     u"Alliance Party of Northern Ireland",
     u"Alliance Party",
     u"Alliance",
@@ -196,6 +195,7 @@ party_entities = [
     u"Independent",
     u"Social Democratic and Labour Party",
     u"Scottish National Party",
+    u"Greens",
     u"Green Party",
     u"Speaker",
     u"UK Independence Party",

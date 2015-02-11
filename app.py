@@ -6,6 +6,8 @@ from web.api import get_lords_function
 from web.api import get_lord_function
 from web.api import get_influencers_function
 from web.api import get_influencer_function
+from web.api import get_parties_function
+from web.api import get_party_function
 from web.api import find_entity_function
 import os
 
@@ -70,6 +72,20 @@ def show_lord(name):
     return render_template('show_lord.html', lord=lord)
 
 
+@app.route('/parties/')
+def show_parties():
+    args = {}
+    parties = get_parties_function.PoliticalPartiesApi().request(**args)[1]
+    return render_template('show_parties.html', parties=parties)
+
+
+@app.route('/party/<name>')
+def show_party(name):
+    args = {"name": name}
+    party = get_party_function.PoliticalPartyApi().request(args)
+    return render_template('show_party.html', party=party)
+
+
 class GetMps(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -128,6 +144,27 @@ class GetLord(Resource):
         return get_lord_function.LordApi().request(args)
 
 
+class GetPoliticalParties(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        super(GetPoliticalParties, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_parties_function.PoliticalPartiesApi().request(**args)
+
+
+class GetPoliticalParty(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetPoliticalParty, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_party_function.PolliticalPartyApi().request(args)
+
+
 class GetInfluencers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -175,6 +212,8 @@ api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')
 api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
 api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
+api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
+api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 
 if __name__ == '__main__':

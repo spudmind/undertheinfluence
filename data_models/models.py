@@ -21,7 +21,6 @@ class MemberOfParliament(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.label = "Member of Parliament"
-        self.api_resource = u"/api/v0.1/getMp"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
@@ -588,6 +587,77 @@ class Remuneration(core.BaseDataModel):
 
     def set_received_date(self, date):
         self.set_date(date, "RECEIVED")
+
+
+class PoliticalParty(core.BaseDataModel):
+    def __init__(self, name):
+        core.BaseDataModel.__init__(self)
+        self.primary_attribute = "name"
+        self.label = "Political Party"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+        if self.exists:
+            self.donations = self._get_donations()
+
+    def _get_donations(self):
+        results = []
+        search_string = u"""
+            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (p)-[:FUNDING_RELATIONSHIP]-(rel) with p, rel
+            MATCH (rel)-[:DONATION_RECEIVED]-(x) with p, rel, x
+            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(d) with p, rel, d, x
+            RETURN d.name, d.donor_type, d.company_reg, x.amount, labels(d) as labels,
+                x.reported_date, x.received_date, x.accepted_date, x.recd_by, x.ec_reference,
+                x.nature, x.purpose
+            ORDER BY x.accepted_date DESC
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "donor": {
+                    "name": entry["d.name"],
+                    "labels": entry["labels"],
+                    "donor_type": entry["d.donor_type"],
+                    "company_reg": entry["d.company_reg"],
+                    "details_url": None,
+                    "api_url": None
+                },
+                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount_int": entry["x.amount"],
+                "reported": entry["x.reported_date"],
+                "received": entry["x.received_date"],
+                "accepted_date": entry["x.accepted_date"],
+                "nature": entry["x.nature"],
+                "purpose": entry["x.purpose"]
+            }
+            results.append(detail)
+        return results
+
+
+class PoliticalParties(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (d:`Political Party`)
+            MATCH (d)-[x]-()
+            RETURN d.name, count(x) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (d:`Political Party`)
+            RETURN count(d)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
 
 
 class GovernmentOffice(NamedEntity):

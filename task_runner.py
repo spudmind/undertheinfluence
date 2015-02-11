@@ -32,7 +32,7 @@ arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify th
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
-arg_parser.add_argument('--api_gen', nargs='+', choices=['mps', 'lords', 'influencers'], help='Create mongo database for API')
+arg_parser.add_argument('--api_gen', nargs='+', choices=['mps', 'lords', 'influencers', "parties"], help='Create mongo database for API')
 arg_parser.add_argument('--export', nargs='+', choices=['named_entities'], help='Specify the export to run')
 args = arg_parser.parse_args()
 
@@ -99,7 +99,10 @@ if args.api_gen is not None:
     if "mps" in args.api_gen:
         api_data_gen.PopulateMpsApi().run()
     if "lords" in args.api_gen:
-         api_data_gen.PopulateLordsApi().run()
+        api_data_gen.PopulateLordsApi().run()
+    if "parties" in args.api_gen:
+        api_data_gen.PopulatePoliticalPartyApi().run()
+
 
 # run export
 if args.export is not None:

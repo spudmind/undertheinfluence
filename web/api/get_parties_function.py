@@ -4,34 +4,33 @@ from flask import url_for
 
 class PoliticalPartiesApi:
     def __init__(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_political_parties
-        self.query = None
+        self._db = mongo.MongoInterface()
+        self._db_table = 'api_political_parties'
 
     def request(self, **args):
         return self._fetch(args)
 
     def _fetch(self, args):
-        self.query = {}
-        response_data = []
-        page_size = 20
-        skip_to = 0
-        print "*args", args
-        if len(self.query) > 0:
-            results = self.cache_data.find(self.query).skip(skip_to).limit(page_size)
-        else:
-            results = self.cache_data.find().skip(skip_to).limit(page_size)
-        for entry in results:
-            detail_url = url_for('show_party', name=entry["name"], _external=True)
-            detail = {
+        page = args.get('page', 1)
+        query = {}
+        results, response = self._db.query(self._db_table, query=query, page=page)
+        if response['has_more']:
+            next_query = args
+            next_query['page'] = page + 1
+            response['next_url'] = url_for('getMps', _external=True, **next_query)
+
+        response["results"] = [
+            {
                 "name": entry["name"],
                 "image_url": "None",
                 "influences_summary": entry["influences"],
                 "weight": entry["weight"],
                 "mp_count": entry["mp_count"],
                 "lord_count": entry["lord_count"],
-                "detail_url": detail_url
+                "detail_url": url_for(
+                    'show_party', name=entry["name"], _external=True
+                )
             }
-            response_data.append(detail)
-        results = {"results": results.count()}
-        return [results, response_data]
+            for entry in results
+        ]
+        return response

@@ -9,9 +9,12 @@ class MpApi(BaseAPI):
         self._db = mongo.MongoInterface()
         self._db_table = 'api_mps'
 
-    def request(self, query):
-        name = query['name']
-        result, _ = self._db.query(self._db_table, query=query)
+    def request(self, args):
+        name = args['name']
+        result, _ = self._db.query(self._db_table, query=args)
+
+        # there should only ever be one result from the api
+        # list comprehension for the response doesn't make sense here
         if len(result) > 0:
             fields = ["name", "party", "twfy_id", "image_url", "government_positions", "influences"]
             rename_field = {"influences": "influences_summary"}

@@ -6,28 +6,29 @@ from utils import mongo
 class PoliticalPartyApi(BaseAPI):
     def __init__(self):
         BaseAPI.__init__(self)
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_political_parties
-        self.data_models = models
+        self._db = mongo.MongoInterface()
+        self._db_table = 'api_political_parties'
 
     def request(self, args):
         return self._fetch(args)
 
     def _fetch(self, args):
-        api_query = {}
         response_data = {}
         name = args["name"]
-        api_query["name"] = name
-        api_entry = list(self.cache_data.find(api_query))
-        if len(api_entry) == 1:
-            party = self.data_models.PoliticalParty(name)
+        page = args.get('page', 1)
+
+        query = {"name": name}
+        result, _ = self._db.query(self._db_table, query=query, page=page)
+
+        if len(result) > 0:
+            party = models.PoliticalParty(name)
             detail = {
                 "electoral_commission": self._donor_urls(party.donations)
             }
             response_data = {
-                "name": api_entry[0]["name"],
+                "name": result[0]["name"],
                 "image_url": None,
-                "influences_summary": api_entry[0]["influences"],
+                "influences_summary": result[0]["influences"],
                 "influences_detail": detail
             }
         return response_data

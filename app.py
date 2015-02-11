@@ -74,9 +74,12 @@ def show_lord(name):
 
 @app.route('/parties/')
 def show_parties():
-    args = {}
-    parties = get_parties_function.PoliticalPartiesApi().request(**args)[1]
-    return render_template('show_parties.html', parties=parties)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    parties = get_parties_function.PoliticalPartiesApi().request(page=page)['results']
+    return render_template('show_parties.html', parties=parties, page=page)
 
 
 @app.route('/party/<name>')
@@ -147,10 +150,14 @@ class GetLord(Resource):
 class GetPoliticalParties(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
         super(GetPoliticalParties, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+
         return get_parties_function.PoliticalPartiesApi().request(**args)
 
 
@@ -162,7 +169,7 @@ class GetPoliticalParty(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_party_function.PolliticalPartyApi().request(args)
+        return get_party_function.PoliticalPartyApi().request(args)
 
 
 class GetInfluencers(Resource):

@@ -9,9 +9,9 @@ class InfluencerApi(BaseAPI):
         self._db = mongo.MongoInterface()
         self._db_table = 'api_influencers'
 
-    def request(self, query):
-        name = query["name"]
-        result, _ = self._db.query(self._db_table, query=query)
+    def request(self, args):
+        name = args["name"]
+        result, _ = self._db.query(self._db_table, query=args)
         if len(result) > 0:
             influencer = models.Influencer(name)
             result = {

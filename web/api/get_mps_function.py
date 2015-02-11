@@ -22,16 +22,19 @@ class MpsApi:
             next_query['page'] = page + 1
             response['next_url'] = url_for('getMps', _external=True, **next_query)
 
-        response["results"] = [{
-            "name": entry["name"],
-            "party": entry["party"],
-            "image_url": entry["image_url"],
-            "detail_url": url_for('show_mp', name=entry["name"], _external=True),
-            "weight": entry["weight"],
-            "twfy_id": entry["twfy_id"],
-            "government_positions": entry["government_positions"],
-            "influences_summary": entry["influences"]
-        } for entry in results]
+        response["results"] = [
+            {
+                "name": entry["name"],
+                "party": entry["party"],
+                "image_url": entry["image_url"],
+                "detail_url": url_for('show_mp', name=entry["name"], _external=True),
+                "weight": entry["weight"],
+                "twfy_id": entry["twfy_id"],
+                "government_positions": entry["government_positions"],
+                "influences_summary": entry["influences"]
+            }
+            for entry in results
+        ]
 
         return response
 

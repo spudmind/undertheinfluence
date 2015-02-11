@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block article %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Political Parties</h1>
+            <hr>
+        </div >
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="government-container">
+                <div class="list-group">
+                    {% for party in parties %}
+                        <div class="list-group-item" >
+                            <div class="row-action-primary">
+                                <i class="icon-material-folder" ></i>
+                            </div>
+                            <div class="row-content">
+                                <div class="least-content">
+                                    <a href="{{ party.detail_url }}">detail</a>
+                                </div>
+                                <h4 class="list-group-item-heading">{{ party.name }}</h4>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% if party.mp_count > 0%}
+                                            {{ party.mp_count }} Members of Parliament.
+                                        {% endif %}
+                                        {% if party.lord_count > 0%}
+                                            {{ party.lord_count }} Lords<br>
+                                        {% endif %}
+                                        {% if "electoral_commission" in party.influences_summary %}
+                                            {{ party.influences_summary.electoral_commission.donation_total }} donated across
+                                            {{ party.influences_summary.electoral_commission.donation_count }} donations
+                                        {% endif %}
+                                    </div >
+                                </div >
+                            </div>
+                        </div>
+                        <div class="list-group-separator"></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock article %}

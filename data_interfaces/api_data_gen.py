@@ -323,7 +323,7 @@ class PopulatePoliticalPartyApi():
 
     def _mp_count(self, name):
         query = u"""
-            MATCH (d:`Political Party` {{name: "{0}"}})
+            MATCH (p:`Political Party` {{name: "{0}"}})
             MATCH (mp:`Member of Parliament`)-[:MEMBER_OF]-(p)
             RETURN count(mp) as mp_count
         """.format(name)
@@ -331,7 +331,7 @@ class PopulatePoliticalPartyApi():
 
     def _lord_count(self, name):
         query = u"""
-            MATCH (d:`Political Party` {{name: "{0}"}})
+            MATCH (p:`Political Party` {{name: "{0}"}})
             MATCH (l:`Lord`)-[:MEMBER_OF]-(p)
             RETURN count(l) as lord_count
         """.format(name)
@@ -339,10 +339,10 @@ class PopulatePoliticalPartyApi():
 
     def _donations(self, name):
         query = u"""
-            MATCH (d:`Political Party` {{name: "{0}"}})
-            MATCH (d)-[:FUNDING_RELATIONSHIP]-(x)
+            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (p)-[:FUNDING_RELATIONSHIP]-(x)
             MATCH (x)-[:DONATION_RECEIVED]-(f)
-            RETURN d.name as Party, sum(f.amount) as total, count(f.amount) as count
+            RETURN p.name as Party, sum(f.amount) as total, count(f.amount) as count
             ORDER BY total DESC
         """.format(name)
         output = self.core_model.query(query)

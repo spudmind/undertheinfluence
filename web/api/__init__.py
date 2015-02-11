@@ -17,4 +17,7 @@ class BaseAPI:
         elif "Donor" in labels or "Registered Interest" in labels:
             api = u"/api/v0.1/getInfluencer?name={0}".format(name)
             web = url_for('show_influencer', name=name, _external=True)
+        elif "Political Party" in labels:
+            api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
+            web = url_for('show_party', name=name, _external=True)
         return web, api

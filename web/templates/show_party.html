@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block article %}
+
+    <div class="row">
+        <div class="col-md-2">
+        </div >
+        <div class="col-md-9">
+            <h1>{{ party.name }}</h1>
+        </div >
+    </div>
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+        </div >
+        <hr>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            {% if party.image_url %}
+                <div class="row-picture">
+                    <img class="circle" src="{{ party.image_url }}" alt="icon">
+                </div>
+            {% else %}
+                <div class="row-action-primary">
+                    <i class="icon-material-folder" ></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-7">
+            <div id="government-container">
+                <div class="list-group">
+                     {% if "electoral_commission" in party["influences_detail"] %}
+                        <div class="list-group-item">
+                            <div class="row-content">
+                                <div class="least-content">{{ party.influences_summary.electoral_commission.donation_total }}</div>
+                                <h4 class="list-group-item-heading">Electoral Commission</h4>
+                                {% for donation in party.influences_detail.electoral_commission %}
+                                    <div class="well well-sm">
+                                        {{ donation.amount }} received from <a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a> </br>
+                                        {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
+                                            </br>
+                                        {% endif %}
+                                        {% if donation.nature and not donation.nature == ""  %}
+                                            Nature</br>{{ donation.nature }} </br>
+                                        {% endif %}
+                                        {% if donation.purpose and not donation.purpose == ""  %}
+                                            Purpose</br>{{ donation.purpose }} </br>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="list-group-separator"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock article %}

@@ -12,8 +12,6 @@
         <div class="col-md-6">
             <div id="government-container">
                 <div class="list-group">
-                    <a href="{{ url_for('show_lords', page=page-1) }}">Previous page</a><br>
-                    <a href="{{ url_for('show_lords', page=page+1) }}">Next page</a>
                     {% for lord in lords %}
                         <div class="list-group-item" >
                             {% if lord.image_url %}
@@ -53,9 +51,15 @@
                         </div>
                         <div class="list-group-separator"></div>
                     {% endfor %}
-                    <a href="{{ url_for('show_lords', page=page-1) }}">Previous page</a><br>
-                    <a href="{{ url_for('show_lords', page=page+1) }}">Next page</a>
                 </div>
+                <ul class="pager">
+                    {% if page == 1  %}
+                        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
+                    {% else %}
+                        <li class="previous"><a href="{{ url_for('show_lords', page=page-1) }}">Previous page</a></li>
+                    {% endif %}
+                    <li class="next"><a href="{{ url_for('show_lords', page=page+1) }}">Next page</a></li>
+                </ul>
             </div>
         </div>
     </div>

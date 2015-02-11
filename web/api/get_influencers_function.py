@@ -43,7 +43,7 @@ class InfluencersApi:
         _remuneration_search = {}
         if args.get("interests_gt"):
             _remuneration_search["$gt"] = args.get("interests_gt")
-        elif args.get("interests_lt"):
+        if args.get("interests_lt"):
             _remuneration_search["$lt"] = args.get("interests_lt")
         if _remuneration_search != {}:
             query[self._remuneration] = _remuneration_search

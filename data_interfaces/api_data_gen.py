@@ -6,10 +6,8 @@ from data_models import core, models
 class PopulateMpsApi():
     def __init__(self):
         self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.api_mps
-        self.data_models = models
         self.core_model = core.BaseDataModel()
-        self.mps_graph = self.data_models.MembersOfParliament()
+        self.mps_graph = models.MembersOfParliament()
         self.all_mps = []
 
     def run(self):
@@ -53,7 +51,7 @@ class PopulateMpsApi():
             "influences": data_sources,
             "government_positions": positions
         }
-        self.cache_data.save(mp_data)
+        self.cache.save("api_mps", mp_data)
 
     def _remuneration_total(self, name):
         query = u"""

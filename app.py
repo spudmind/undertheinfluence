@@ -225,4 +225,5 @@ api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 
 if __name__ == '__main__':
     app.debug = True
+    app.run(host='0.0.0.0')
     app.run()

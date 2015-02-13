@@ -60,8 +60,8 @@ class MemberOfParliament(NamedEntity):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
-            RETURN cat.category, int.name, p.amount, p.received, p.registered,
-                labels(int) as labels
+            RETURN cat.category, int.name, int.donor_type, int.company_reg,
+                p.amount, p.received, p.registered, labels(int) as labels
             ORDER BY p.received DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
@@ -70,6 +70,8 @@ class MemberOfParliament(NamedEntity):
                 "interest": {
                     "name": entry["int.name"],
                     "labels": entry["labels"],
+                    "donor_type": entry["int.donor_type"],
+                    "company_reg": entry["int.company_reg"],
                     "details_url": None,
                     "api_url": None
                 },
@@ -89,15 +91,15 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with mp, rel, x
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(p) with mp, rel, p, x
-            RETURN rel.donor, x.amount, x.reported_date, x.received_date, x.nature, x.purpose, x.donee_type,
-                p.donor_type, p.company_reg, labels(p) as labels
+            RETURN p.name, p.donor_type, p.company_reg, x.amount, x.reported_date, x.received_date,
+                x.nature, x.purpose, x.ec_reference, x.accepted_date, x.recd_by, labels(p) as labels
             ORDER BY x.received_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "donor": {
-                    "name": entry["rel.donor"],
+                    "name": entry["p.name"],
                     "donor_type": entry["p.donor_type"],
                     "company_reg": entry["p.company_reg"],
                     "labels": entry["labels"],
@@ -108,8 +110,10 @@ class MemberOfParliament(NamedEntity):
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
+                "accepted": entry["x.accepted_date"],
+                "ec_reference": entry["x.ec_reference"],
+                "recd_by": entry["x.recd_by"],
                 "nature": entry["x.nature"],
-                "donee_type": entry["x.donee_type"],
                 "purpose": entry["x.purpose"]
             }
             results.append(detail)
@@ -223,7 +227,8 @@ class Lord(NamedEntity):
             MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with lord, cat, rel
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with lord, cat, rel, int
-            RETURN cat.category, rel.position, int.name, labels(int) as labels
+            RETURN cat.category, rel.position, int.name, int.donor_type,
+                int.company_reg, labels(int) as labels
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
@@ -232,6 +237,8 @@ class Lord(NamedEntity):
                 "interest": {
                     "name": entry["int.name"],
                     "labels": entry["labels"],
+                    "donor_type": entry["int.donor_type"],
+                    "company_reg": entry["int.company_reg"],
                     "details_url": None,
                     "api_url": None
                 },
@@ -248,25 +255,28 @@ class Lord(NamedEntity):
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN rel.recipient, donr.donee_type, donr.recipient_type,
-                x.amount, x.reported_date,x.received_date, x.nature,
-                x.purpose, labels(donr) as labels
+            x.amount, x.reported_date,x.received_date, x.nature,
+            x.purpose,x.accepted_date, x.ec_reference, x.recd_by, labels(donr) as labels
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "recipient": {
-                    "name": entry["rel.recipient"],
+                    "name": entry["donr.name"],
                     "labels": entry["labels"],
+                    "recipient_type": entry["donr.recipient_type"],
                     "details_url": None,
                     "api_url": None
                 },
                 "amount_int": entry["x.amount"],
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "donee_type": entry["donr.donee_type"],
-                "recipient_type": entry["donr.recipient_type"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
+                "accepted": entry["x.accepted_date"],
+                "ec_reference": entry["x.ec_reference"],
+                "recd_by": entry["x.recd_by"],
                 "nature": entry["x.nature"],
                 "purpose": entry["x.purpose"]
             }
@@ -468,26 +478,29 @@ class Influencer(core.BaseDataModel):
             MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel) with rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
-            RETURN rel.recipient, donr.donee_type, donr.recipient_type,
-                x.amount, x.reported_date,x.received_date, x.nature,
-                x.purpose, labels(donr) as labels
+            RETURN donr.name, donr.donee_type, donr.recipient_type,
+            x.amount, x.reported_date,x.received_date, x.nature,
+            x.purpose, x.accepted_date, x.ec_reference,x.recd_by, labels(donr) as labels
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "recipient": {
-                    "name": entry["rel.recipient"],
+                    "name": entry["donr.name"],
                     "labels": entry["labels"],
+                    "recipient_type": entry["donr.recipient_type"],
                     "details_url": None,
                     "api_url": None
                 },
                 "amount": _convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "donee_type": entry["donr.donee_type"],
-                "recipient_type": entry["donr.recipient_type"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
+                "accepted": entry["x.accepted_date"],
+                "ec_reference": entry["x.ec_reference"],
+                "recd_by": entry["x.recd_by"],
                 "nature": entry["x.nature"],
                 "purpose": entry["x.purpose"]
             }

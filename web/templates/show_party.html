@@ -27,30 +27,36 @@
                 </div>
             {% endif %}
         </div>
-        <div class="col-md-7">
+        <div class="col-md-10">
             <div id="government-container">
                 <div class="list-group">
-                     {% if "electoral_commission" in party["influences_detail"] %}
+                    {% if "electoral_commission" in party["influences_detail"] %}
                         <div class="list-group-item">
                             <div class="row-content">
-                                <div class="least-content">{{ party.influences_summary.electoral_commission.donation_total }}</div>
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
-                                {% for donation in party.influences_detail.electoral_commission %}
-                                    <div class="well well-sm">
-                                        {{ donation.amount }} received from <a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a> </br>
-                                        {% if donation.purpose and not donation.purpose == "" or donation.nature and not donation.nature == ""  %}
-                                            </br>
-                                        {% endif %}
-                                        {% if donation.nature and not donation.nature == ""  %}
-                                            Nature</br>{{ donation.nature }} </br>
-                                        {% endif %}
-                                        {% if donation.purpose and not donation.purpose == ""  %}
-                                            Purpose</br>{{ donation.purpose }} </br>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="list-group-separator"></div>
-                                {% endfor %}
+                                <table class="table table-striped table-hover ">
+                                    <thead>
+                                    <tr>
+                                        <th>Donation</th>
+                                        <th>Donor</th>
+                                        <th>Type</th>
+                                        <th>Accepted</th>
+                                        <th>Nature</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for donation in party.influences_detail.electoral_commission %}
+                                        <tr>
+                                            <td><small>{{ donation.amount }}</small></td>
+                                            <td><small><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></small></td>
+                                            <td><small>{{ donation.donor["donor_type"] }}</small></td>
+                                            <td><small>{{ donation.accepted }}</small></td>
+                                            <td><small>{{ donation.nature }}</small></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="list-group-separator"></div>
                             </div>
                         </div>
                     {% endif %}

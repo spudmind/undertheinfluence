@@ -254,7 +254,7 @@ class Lord(NamedEntity):
             MATCH (lord)-[:REGISTERED_CONTRIBUTOR]-(rel) with rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
-            RETURN rel.recipient, donr.donee_type, donr.recipient_type,
+            RETURN donr.name, donr.donee_type, donr.recipient_type,
             x.amount, x.reported_date,x.received_date, x.nature,
             x.purpose,x.accepted_date, x.ec_reference, x.recd_by, labels(donr) as labels
             ORDER by x.reported_date DESC
@@ -435,6 +435,7 @@ class Influencer(core.BaseDataModel):
         self.primary_attribute = "name"
         self.label = "Named Entity"
         self.name = name
+        print "trying Influencer"
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
@@ -641,7 +642,7 @@ class PoliticalParty(core.BaseDataModel):
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
-                "accepted_date": entry["x.accepted_date"],
+                "accepted": entry["x.accepted_date"],
                 "nature": entry["x.nature"],
                 "purpose": entry["x.purpose"]
             }

@@ -13,13 +13,16 @@ class LordApi(BaseAPI):
         name = args["name"]
         result, _ = self._db.query(self._db_table, query=args)
         if len(result) > 0:
-            fields = ["name", "party", "twfy_id", "influences"]
-            rename_field = {"influences": "influences_summary"}
-            result = {rename_field.get(k, k): v for k, v in result[0].items() if k in fields}
             lord = models.Lord(name)
-            result['influences_detail'] = {
-                "register_of_interests": self._interest_urls(lord.interests),
-                "electoral_commission": self._recipient_urls(lord.donations),
+            result = {
+                'name': result[0]['name'],
+                'influences_summary': result[0]['influences'],
+                'influences_detail': {
+                    "register_of_interests": self._nest_category(
+                        self._interest_urls(lord.interests)
+                    ),
+                    "electoral_commission": self._recipient_urls(lord.donations),
+                },
             }
         return result
 
@@ -46,3 +49,4 @@ class LordApi(BaseAPI):
             updated["recipient"]["api_url"] = urls[1]
             results.append(updated)
         return results
+

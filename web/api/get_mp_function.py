@@ -13,16 +13,17 @@ class MpApi(BaseAPI):
         name = args['name']
         result, _ = self._db.query(self._db_table, query=args)
 
-        # there should only ever be one result from the api
-        # list comprehension for the response doesn't make sense here
         if len(result) > 0:
-            fields = ["name", "party", "twfy_id", "image_url", "government_positions", "influences"]
-            rename_field = {"influences": "influences_summary"}
-            result = {rename_field.get(k, k): v for k, v in result[0].items() if k in fields}
             mp = models.MemberOfParliament(name)
-            result['influences_detail'] = {
-                "register_of_interests": self._interest_urls(mp.interests),
-                "electoral_commission": self._donor_urls(mp.donations),
+            result = {
+                'name': result[0]['name'],
+                'influences_summary': result[0]['influences'],
+                'influences_detail': {
+                    "register_of_interests": self._nest_category(
+                        self._interest_urls(mp.interests)
+                    ),
+                    "electoral_commission": self._donor_urls(mp.donations),
+                },
             }
         return result
 

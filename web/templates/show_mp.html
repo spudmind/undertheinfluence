@@ -2,33 +2,17 @@
 {% block article %}
 
     <div class="row">
-        <div class="col-md-2">
-        </div >
-        <div class="col-md-9">
+        <div class="col-md-12">
             <h1>{{ mp.name }}. {{ mp.party }}</h1>
-
         </div >
-    </div>
-    <div class="col-md-2">
-    </div>
-    <div class="col-md-10">
-        <div class="row">
-        </div >
-        <hr>
     </div>
     <div class="row">
-        <div class="col-md-2">
-            {% if mp.image_url %}
-                <div class="row-picture">
-                    <img class="circle" src="{{ mp.image_url }}" alt="icon">
-                </div>
-            {% else %}
-                <div class="row-action-primary">
-                    <i class="icon-material-folder" ></i>
-                </div>
-            {% endif %}
+        <div class="col-md-13">
+            <hr>
         </div>
-        <div class="col-md-10">
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <div id="government-container">
                 <div class="list-group">
                     {% if mp.influences_detail.register_of_interests %}
@@ -72,7 +56,6 @@
                     {% if mp.influences_detail.electoral_commission %}
                         <div class="list-group-item">
                             <div class="row-content">
-                                <div class="least-content">{{ mp.influences_summary.electoral_commission.donation_total }}</div>
                                 <p class="list-group-item-text">
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
                                 <table class="table table-striped table-hover ">
@@ -81,9 +64,12 @@
                                         <th>Donation</th>
                                         <th>Donor</th>
                                         <th>Type</th>
+                                        <th>EC Reference</th>
                                         <th>Company Reg</th>
+                                        <th>Nature</th>
                                         <th>Received</th>
-                                        <th>Registered</th>
+                                        <th>Reported</th>
+                                        <th>Accepted</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -91,10 +77,13 @@
                                         <tr>
                                             <td><small>{{ donation.amount }}</small></td>
                                             <td><small><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></small></td>
+                                            <td><small>{{ donation.ec_reference }}</small></td>
                                             <td><small>{{ donation.donor["donor_type"] }}</small></td>
                                             <td><small>{{ donation.donor["company_reg"] }}</small></td>
+                                            <td><small>{{ donation.nature }}</small></td>
                                             <td><small>{{ donation.received }}</small></td>
-                                            <td><small>{{ donation.registered }}</small></td>
+                                            <td><small>{{ donation.reported }}</small></td>
+                                            <td><small>{{ donation.accepted }}</small></td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

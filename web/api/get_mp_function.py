@@ -17,6 +17,7 @@ class MpApi(BaseAPI):
             mp = models.MemberOfParliament(name)
             result = {
                 'name': result[0]['name'],
+                'party': result[0]['party'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
                     "register_of_interests": self._nest_category(

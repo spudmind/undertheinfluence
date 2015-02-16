@@ -2,33 +2,14 @@
 {% block article %}
 
     <div class="row">
-        <div class="col-md-2">
-        </div >
-        <div class="col-md-9">
+        <div class="col-md-12">
             <h1>{{ influencer.name }}</h1>
-
         </div >
     </div>
-    <div class="col-md-2">
-    </div>
-    <div class="col-md-9">
-        <div class="row">
-        </div >
-        <hr>
-    </div>
+    <div class="col-md-13">
+    <hr>
     <div class="row">
-        <div class="col-md-2">
-            {% if influencer.image_url %}
-                <div class="row-picture">
-                    <img class="circle" src="{{ influencer.image_url }}" alt="icon">
-                </div>
-            {% else %}
-                <div class="row-action-primary">
-                    <i class="icon-material-folder" ></i>
-                </div>
-            {% endif %}
-        </div>
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div id="government-container">
                 <div class="list-group">
                     {% if influencer.influences_detail["register_of_interests"] %}
@@ -41,7 +22,7 @@
                                         <thead>
                                         <tr>
                                             <th>Amount</th>
-                                            <th>Politican</th>
+                                            <th>Politician</th>
                                             <th>Party</th>
                                             <th>Received</th>
                                             <th>Registered</th>
@@ -76,8 +57,11 @@
                                     <thead>
                                     <tr>
                                         <th>Donation</th>
-                                        <th>Donor</th>
-                                        <th>Type</th>
+                                        <th>Recipient</th>
+                                        <th>EC Reference</th>
+                                        <th>Recipient Type</th>
+                                        <th>Received By</th>
+                                        <th>Reported</th>
                                         <th>Accepted</th>
                                         <th>Purpose</th>
                                     </tr>
@@ -87,7 +71,10 @@
                                         <tr>
                                             <td><small>{{ donation.amount }}</small></td>
                                             <td><small><a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></small></td>
-                                            <td><small>{{ donation.donee_type }}</small></td>
+                                            <td><small>{{ donation.ec_reference }}</small></td>
+                                            <td><small>{{ donation.recipient["recipient_type"] }}</small></td>
+                                            <td><small>{{ donation.recd_by }}</small></td>
+                                            <td><small>{{ donation.reported }}</small></td>
                                             <td><small>{{ donation.accepted }}</small></td>
                                             <td><small>{{ donation.purpose }}</small></td>
                                         </tr>

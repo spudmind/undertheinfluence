@@ -18,7 +18,9 @@ class InfluencerApi(BaseAPI):
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
-                    "register_of_interests": self._interest_urls(influencer.interests),
+                    "register_of_interests": self._nest_category(
+                        self._interest_urls(influencer.interests)
+                    ),
                     "electoral_commission": self._recipient_urls(influencer.donations),
                 },
             }

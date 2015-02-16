@@ -21,3 +21,12 @@ class BaseAPI:
             api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
             web = url_for('show_party', name=name, _external=True)
         return web, api
+
+    @staticmethod
+    def _nest_category(interests):
+        categories = set([x["category"] for x in interests])
+        category_entries = []
+        for category in categories:
+            entries = [x for x in interests if x["category"] == category]
+            category_entries.append({"category": category, "interests": entries})
+        return category_entries

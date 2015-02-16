@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
 from utils import mongo
 from data_models import core, models
 
 
 class PopulateMpsApi():
     def __init__(self):
+        self._logger = logging.getLogger('spud')
         self.cache = mongo.MongoInterface()
         self.core_model = core.BaseDataModel()
         self.mps_graph = models.MembersOfParliament()
@@ -12,9 +14,10 @@ class PopulateMpsApi():
 
     def run(self):
         self.all_mps = self.mps_graph.get_all()
+        self._logger.debug("Populating MPs Api")
         for doc in self.all_mps:
             name = doc[0]
-            print name
+            self._logger.debug(name)
             self._get_stats(doc)
 
     def _get_stats(self, record):
@@ -119,7 +122,7 @@ class PopulateMpsApi():
         if results:
             for result in results:
                 positions.append(result["positions"])
-            print positions
+            self._logger.debug(positions)
             return positions
         else:
             return None
@@ -127,15 +130,17 @@ class PopulateMpsApi():
 
 class PopulateLordsApi():
     def __init__(self):
+        self._logger = logging.getLogger('spud')
         self.cache = mongo.MongoInterface()
         self.core_model = core.BaseDataModel()
         self.lords_graph = models.Lords()
 
     def run(self):
         all_lords = self.lords_graph.get_all()
+        self._logger.debug("Populating  Lords Api")
         for doc in all_lords:
             name = doc[0]
-            print name
+            self._logger.debug(name)
             self._get_stats(doc)
 
     def _get_stats(self, record):
@@ -201,14 +206,16 @@ class PopulateLordsApi():
 
 class PopulateInfluencersApi():
     def __init__(self):
+        self._logger = logging.getLogger('spud')
         self.cache = mongo.MongoInterface()
         self.core_model = core.BaseDataModel()
         self.influencers_graph = models.Influencers()
 
     def run(self):
         all_influencers = self.influencers_graph.get_all()
+        self._logger.debug("Populating Influencers Api")
         for doc in all_influencers:
-            print doc[0], doc[1]
+            self._logger.debug("%s - %s" % (doc[0], doc[1]))
             self._get_stats(doc)
 
     def _get_stats(self, record):
@@ -220,6 +227,8 @@ class PopulateInfluencersApi():
         weight = record[3]
         register = {}
         ec = {}
+        register["relationship_count"] = self._interest_relationships(name)
+
         register["remuneration_total"] = _convert_to_currency(
             self._remuneration_total(name)
         )
@@ -232,9 +241,9 @@ class PopulateInfluencersApi():
         ec["donation_total_int"] = self._donation_total(name)
         ec["donor_type"] = donor_type
         data_sources = {}
-        if register["remuneration_total_int"] > 0:
+        if register["relationship_count"] > 0:
             data_sources["register_of_interests"] = register
-        if ec["donation_total_int"] > 0:
+        if ec["donation_count"] > 0:
             data_sources["electoral_commission"] = ec
         influencer_data = {
             "name": name,
@@ -242,12 +251,11 @@ class PopulateInfluencersApi():
             "weight": weight,
             "influences": data_sources
         }
-        if len(data_sources) > 0:
-            self.cache.save("api_influencers", influencer_data)
+        self.cache.save("api_influencers", influencer_data)
 
     def _donation_total(self, name):
         query = u"""
-            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (rel)-[:DONATION_RECEIVED]-(x)
             RETURN sum(x.amount) as total
@@ -256,16 +264,25 @@ class PopulateInfluencersApi():
 
     def _donation_count(self, name):
         query = u"""
-            MATCH (inf:Donor {{name: "{0}"}})
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (rel)-[:DONATION_RECEIVED]-(x)
             RETURN count(x) as count
         """.format(name)
         return self.core_model.query(query)[0]["count"]
 
+    def _interest_relationships(self, name):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            RETURN count(rel) as count
+        """.format(name)
+        return self.core_model.query(query)[0]["count"]
+
     def _remuneration_total(self, name):
         query = u"""
-            MATCH (inf:`Registered Interest` {{name: "{0}"}})
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
@@ -275,7 +292,7 @@ class PopulateInfluencersApi():
 
     def _remuneration_count(self, name):
         query = u"""
-            MATCH (inf:`Registered Interest` {{name: "{0}"}})
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
@@ -286,15 +303,17 @@ class PopulateInfluencersApi():
 
 class PopulatePoliticalPartyApi():
     def __init__(self):
+        self._logger = logging.getLogger('spud')
         self.cache = mongo.MongoInterface()
         self.core_model = core.BaseDataModel()
         self.parties_graph = models.PoliticalParties()
 
     def run(self):
         all_parties = self.parties_graph.get_all()
+        self._logger.debug("Populating Political Party Api")
         for doc in all_parties:
             name = doc[0]
-            print name
+            self._logger.debug(name)
             self._get_stats(doc)
 
     def _get_stats(self, record):

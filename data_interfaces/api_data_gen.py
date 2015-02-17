@@ -213,7 +213,8 @@ class PopulateInfluencersApi():
 
     def run(self):
         all_influencers = self.influencers_graph.get_all()
-        self._logger.debug("Populating Influencers Api")
+        self._logger.debug("\nPopulating Influencers Api")
+        self._logger.debug("Total: %s" % len(all_influencers))
         for doc in all_influencers:
             self._logger.debug("%s - %s" % (doc[0], doc[1]))
             self._get_stats(doc)

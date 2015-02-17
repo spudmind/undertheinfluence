@@ -9,7 +9,9 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
+        </div >
+        <div class="col-md-8">
             <div id="government-container">
                 <div class="list-group">
                     {% for lord in lords %}
@@ -27,7 +29,7 @@
                                 <div class="least-content">
                                     <a href="{{ lord.detail_url }}">detail</a>
                                 </div>
-                                <h4 class="list-group-item-heading">{{ lord.name }}</h4>
+                                <h4 class="list-group-item-heading">{{ lord.name }}. {{ lord.party }}</h4>
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% if "register_of_interests" in lord.influences_summary %}

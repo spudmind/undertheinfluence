@@ -9,7 +9,9 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
+        </div >
+        <div class="col-md-8">
             <div id="government-container">
                 <div class="list-group">
                     {% for party in parties %}
@@ -24,16 +26,19 @@
                                 <h4 class="list-group-item-heading">{{ party.name }}</h4>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {% if party.mp_count > 0%}
-                                            {{ party.mp_count }} Members of Parliament.
-                                        {% endif %}
-                                        {% if party.lord_count > 0%}
-                                            {{ party.lord_count }} Lords<br>
-                                        {% endif %}
-                                        {% if "electoral_commission" in party.influences_summary %}
-                                            {{ party.influences_summary.electoral_commission.donation_total }} donated across
-                                            {{ party.influences_summary.electoral_commission.donation_count }} donations
-                                        {% endif %}
+                                        <div class="well well-sm">
+                                            {% if party.mp_count > 0%}
+                                                {{ party.mp_count }} Members of Parliament.
+                                            {% endif %}
+                                            {% if party.lord_count > 0%}
+                                                {{ party.lord_count }} Lords
+                                            {% endif %}
+                                            {% if "electoral_commission" in party.influences_summary %}
+                                                <br>
+                                                {{ party.influences_summary.electoral_commission.donation_total }} donations received from
+                                                {{ party.influences_summary.electoral_commission.donation_count }} donations
+                                            {% endif %}
+                                        </div >
                                     </div >
                                 </div >
                             </div>

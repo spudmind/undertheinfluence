@@ -450,7 +450,7 @@ class Influencer(core.BaseDataModel):
             MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (p)-[:INTERESTS_REGISTERED_IN]-(cat)
-            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            OPTIONAL MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
             RETURN p.name, p.party, cat.category, x.amount,
                 labels(p) as labels
             ORDER by x.reported_date DESC
@@ -744,4 +744,7 @@ class Constituency(core.BaseDataModel):
 
 
 def _convert_to_currency(number):
-    return u'£{:20,.2f}'.format(number)
+    if isinstance(number, int):
+        return u'£{:20,.2f}'.format(number)
+    else:
+        return None

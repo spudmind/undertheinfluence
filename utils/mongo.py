@@ -48,6 +48,19 @@ class MongoInterface:
         }
         return list(q), meta
 
+    def sum(self, _collection, **kwargs):
+        field = kwargs.get('field', None)
+        q = collection.Collection(self.db, _collection)
+        pipe = [
+            {'$group': {'_id': None, 'total': {'$sum': field}}}
+        ]
+        result = q.aggregate(pipe)
+        return result["result"][0]["total"]
+
+    def count(self, _collection):
+        q = collection.Collection(self.db, _collection)
+        return q.count()
+
     # save document to a collection
     def save(self, _collection, document):
         collection.Collection(self.db, _collection).save(document)

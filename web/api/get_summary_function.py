@@ -10,15 +10,14 @@ class SummaryApi:
         apis = {
             "political_parties": "http://127.0.0.1:5000/api/v0.1/getPoliticalParties",
             "influencers": "http://127.0.0.1:5000/api/v0.1/getInfluencers",
-            "politicians": [
-                "http://127.0.0.1:5000/api/v0.1/getMps",
-                "http://127.0.0.1:5000/api/v0.1/getLords"
-            ]
+            "mps": "http://127.0.0.1:5000/api/v0.1/getMps",
+            "lords": "http://127.0.0.1:5000/api/v0.1/getLords"
         }
         summary = {
             "influencers": self._influencers_aggregate(),
             "political_parties": self._party_aggregate(),
-            "politicians": self._politician_aggregate()
+            "mps": self._mp_aggregate(),
+            "lords": self._lord_aggregate()
         }
         content = {"summary": summary, "api_detail": apis}
         response = {
@@ -31,123 +30,140 @@ class SummaryApi:
 
     def _party_aggregate(self):
         _db_table = 'api_political_parties'
-        result = {"count": self._db.count(_db_table)}
-        keys = ["donation_count", "donation_total_int"]
-        fields = [
-            '$influences.electoral_commission.donation_count',
-            '$influences.electoral_commission.donation_total_int'
-        ]
-        values = [self._db.sum(_db_table, field=f) for f in fields]
-        result.update(dict(zip(keys, values)))
-        result["donation_total"] = _convert_to_currency(result["donation_total_int"])
+        result = {}
+
+        donation_count = "$influences.electoral_commission.donation_count"
+        donation_total_int = "$influences.electoral_commission.donation_total_int"
+
+        result["count"] = _format_number(self._db.count(_db_table), currency=False)
+        result["donation_total_int"] = self._db.sum(_db_table, field=donation_total_int)
+        result["donation_count"] = _format_number(
+            self._db.sum(_db_table, field=donation_count), currency=False
+        )
+        result["donation_total"] = _format_number(
+            self._db.sum(_db_table, field=donation_total_int)
+        )
         return result
 
-    def _politician_aggregate(self):
-        return {"mps": self._mp_aggregate(), "lords": self._lord_aggregate()}
-
     def _influencers_aggregate(self):
-        categories = {}
         _db_table = 'api_influencers'
-        result = {"count": self._db.count(_db_table)}
+        categories, result, ec, reg = {}, {}, {}, {}
+
+        result["count"] = _format_number(self._db.count(_db_table), currency=False)
 
         # get electoral commission data
-        ec_keys = ["donation_count", "donation_total_int"]
-        ec_fields = [
-            '$influences.electoral_commission.donation_count',
-            '$influences.electoral_commission.donation_total_int'
-        ]
-        ec_values = [self._db.sum(_db_table, field=f) for f in ec_fields]
-        categories["electoral_commission"] = dict(zip(ec_keys, ec_values))
-        ec_display = _convert_to_currency(
-            categories["electoral_commission"]["donation_total_int"]
+        donation_count = "$influences.electoral_commission.donation_count"
+        donation_total_int = "$influences.electoral_commission.donation_total_int"
+
+        ec["donation_total_int"] = self._db.sum(_db_table, field=donation_total_int)
+        ec["donation_count"] = _format_number(
+            self._db.sum(_db_table, field=donation_count), currency=False
         )
-        categories["electoral_commission"]["donation_total"] = ec_display
+        ec["donation_total"] = _format_number(
+            self._db.sum(_db_table, field=donation_total_int)
+        )
+        categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg_keys = [
-            "interest_relationships", "remuneration_count", "remuneration_total_int"
-        ]
-        reg_fields = [
-            '$influences.register_of_interests.relationship_count',
-            '$influences.register_of_interests.remuneration_count',
-            '$influences.register_of_interests.remuneration_total_int'
-        ]
-        reg_values = [self._db.sum(_db_table, field=f) for f in reg_fields]
-        categories["register_of_interests"] = dict(zip(reg_keys, reg_values))
-        reg_display = _convert_to_currency(
-            categories["register_of_interests"]["remuneration_total_int"]
+        interest_relationships = "$influences.register_of_interests.relationship_count"
+        remuneration_count = '$influences.register_of_interests.remuneration_count'
+        remuneration_total_int = '$influences.register_of_interests.remuneration_total_int'
+
+        reg["remuneration_total_int"] = self._db.sum(
+            _db_table, field=remuneration_total_int
         )
-        categories["register_of_interests"]["remuneration_total"] = reg_display
+        reg["remuneration_total"] = _format_number(
+            self._db.sum(_db_table, field=remuneration_total_int)
+        )
+        reg["interest_relationships"] = _format_number(
+            self._db.sum(_db_table, field=interest_relationships), currency=False
+        )
+        reg["remuneration_count"] = _format_number(
+            self._db.sum(_db_table, field=remuneration_count), currency=False
+        )
+        categories["register_of_interests"] = reg
+
         result.update(categories)
         return result
 
     def _mp_aggregate(self):
-        categories = {}
         _db_table = 'api_mps'
+        categories, result, ec, reg = {}, {}, {}, {}
+
         result = {"count": self._db.count(_db_table)}
 
         # get electoral commission data
-        ec_keys = ["donor_count", "donation_total_int"]
-        ec_fields = [
-            '$influences.electoral_commission.donor_count',
-            '$influences.electoral_commission.donation_total_int'
-        ]
-        ec_values = [self._db.sum(_db_table, field=f) for f in ec_fields]
-        categories["electoral_commission"] = dict(zip(ec_keys, ec_values))
-        ec_display = _convert_to_currency(
-            categories["electoral_commission"]["donation_total_int"]
+        donor_count = '$influences.electoral_commission.donor_count'
+        donation_total_int = '$influences.electoral_commission.donation_total_int'
+
+        ec["donation_total_int"] = self._db.sum(_db_table, field=donation_total_int)
+        ec["donation_total"] = _format_number(
+            self._db.sum(_db_table, field=donation_total_int)
         )
-        categories["electoral_commission"]["donation_total"] = ec_display
+        ec["donor_count"] = _format_number(
+            self._db.sum(_db_table, field=donor_count), currency=False
+        )
+        categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg_keys = [
-            "interest_relationships", "remuneration_count", "remuneration_total_int"
-        ]
-        reg_fields = [
-            '$influences.register_of_interests.interest_relationships',
-            '$influences.register_of_interests.remuneration_count',
-            '$influences.register_of_interests.remuneration_total_int'
-        ]
-        reg_values = [self._db.sum(_db_table, field=f) for f in reg_fields]
-        categories["register_of_interests"] = dict(zip(reg_keys, reg_values))
-        reg_display = _convert_to_currency(
-            categories["register_of_interests"]["remuneration_total_int"]
+
+        interest_relationships = "$influences.register_of_interests.interest_relationships"
+        remuneration_count = '$influences.register_of_interests.remuneration_count'
+        remuneration_total_int = '$influences.register_of_interests.remuneration_total_int'
+
+        reg["remuneration_total_int"] = self._db.sum(
+            _db_table, field=remuneration_total_int
         )
-        categories["register_of_interests"]["remuneration_total"] = reg_display
+        reg["remuneration_total"] = _format_number(
+            self._db.sum(_db_table, field=remuneration_total_int)
+        )
+        reg["interest_relationships"] = _format_number(
+            self._db.sum(_db_table, field=interest_relationships), currency=False
+        )
+        reg["remuneration_count"] = _format_number(
+            self._db.sum(_db_table, field=remuneration_count), currency=False
+        )
+        categories["register_of_interests"] = reg
+
         result.update(categories)
         return result
 
     def _lord_aggregate(self):
-        categories = {}
         _db_table = 'api_lords'
+        categories, result, ec, reg = {}, {}, {}, {}
+
         result = {"count": self._db.count(_db_table)}
 
         # get electoral commission data
-        ec_keys = ["donation_count", "donation_total_int"]
-        ec_fields = [
-            '$influences.electoral_commission.donation_count',
-            '$influences.electoral_commission.donation_total_int'
-        ]
-        ec_values = [self._db.sum(_db_table, field=f) for f in ec_fields]
-        categories["electoral_commission"] = dict(zip(ec_keys, ec_values))
-        ec_display = _convert_to_currency(
-            categories["electoral_commission"]["donation_total_int"]
+
+        donation_count = "$influences.electoral_commission.donation_count"
+        donation_total_int = "$influences.electoral_commission.donation_total_int"
+
+        ec["donation_total_int"] = self._db.sum(_db_table, field=donation_total_int)
+        ec["donation_count"] = _format_number(
+            self._db.sum(_db_table, field=donation_count), currency=False
         )
-        categories["electoral_commission"]["donation_total"] = ec_display
+        ec["donation_total"] = _format_number(
+            self._db.sum(_db_table, field=donation_total_int)
+        )
+        categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg_keys = ["interest_relationships"]
-        reg_fields = [
-            '$influences.register_of_interests.interest_relationships'
-        ]
-        reg_values = [self._db.sum(_db_table, field=f) for f in reg_fields]
-        categories["register_of_interests"] = dict(zip(reg_keys, reg_values))
+        interest_relationships = '$influences.register_of_interests.interest_relationships'
+        reg["interest_relationships"] = _format_number(
+            self._db.sum(_db_table, field=interest_relationships), currency=False
+        )
+        categories["register_of_interests"] = reg
+
         result.update(categories)
         return result
 
 
-def _convert_to_currency(number):
+def _format_number(number, currency=True):
     if isinstance(number, int):
-        return u'£{:20,.2f}'.format(number)
+        if currency:
+            return u'£{:20,}'.format(number)
+        else:
+            return u'{:20,}'.format(number)
     else:
         return 0

@@ -10,7 +10,8 @@
         <hr>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
             <div id="government-container">
                 <div class="jumbotron">
                     <p>
@@ -26,21 +27,22 @@
                         to the value of {{ summary["political_parties"]["donation_total"] }}
                     </p>
                     <p>
-                        {{ summary["politicians"]["mps"]["count"] }} <a href="{{ url_for('show_mps')}}">Members of Parliament</a> received
-                        {{ summary["politicians"]["mps"]["electoral_commission"]["donor_count"] }} donations
-                        to the value of {{ summary["politicians"]["mps"]["electoral_commission"]["donation_total"] }}
-                        and have {{ summary["politicians"]["mps"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
-                        to the value of {{ summary["politicians"]["mps"]["register_of_interests"]["remuneration_total"] }}
+                        {{ summary["mps"]["count"] }} <a href="{{ url_for('show_mps')}}">Members of Parliament</a> received
+                        {{ summary["mps"]["electoral_commission"]["donor_count"] }} donations
+                        to the value of {{ summary["mps"]["electoral_commission"]["donation_total"] }}
+                        and have {{ summary["mps"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
+                        to the value of {{ summary["mps"]["register_of_interests"]["remuneration_total"] }}
                     </p>
                     <p>
-                        {{ summary["politicians"]["lords"]["count"] }} <a href="{{ url_for('show_lords')}}">Lords</a> have made
-                        {{ summary["politicians"]["lords"]["electoral_commission"]["donation_count"] }} donations
-                        to the value of {{ summary["politicians"]["lords"]["electoral_commission"]["donation_total"] }}
-                        and have {{ summary["politicians"]["lords"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
+                        {{ summary["lords"]["count"] }} <a href="{{ url_for('show_lords')}}">Lords</a> have made
+                        {{ summary["lords"]["electoral_commission"]["donation_count"] }} donations
+                        to the value of {{ summary["lords"]["electoral_commission"]["donation_total"] }}
+                        and have {{ summary["lords"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
                     </p>
                 </div>
             </div>
         </div>
+        <div class="col-md-1"></div>
     </div>
 
 {% endblock article %}

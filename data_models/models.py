@@ -435,7 +435,6 @@ class Influencer(core.BaseDataModel):
         self.primary_attribute = "name"
         self.label = "Named Entity"
         self.name = name
-        print "trying Influencer"
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )

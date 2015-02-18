@@ -23,6 +23,12 @@ app.config.from_object(__name__)
 api = Api(app)
 
 
+@app.route('/')
+def show_summary():
+    summary = get_summary_function.SummaryApi().request()['results']["summary"]
+    return render_template('show_summary.html', summary=summary)
+
+
 @app.route('/influencers')
 def show_influencers():
     try:

@@ -25,7 +25,7 @@ class SummaryApi:
             "has_more": False,
             "page": 1,
             "per_page": 20,
-            "content": content
+            "results": content
         }
         return response
 

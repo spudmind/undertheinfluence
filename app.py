@@ -29,6 +29,14 @@ def show_summary():
     return render_template('show_summary.html', summary=summary)
 
 
+@app.route('/about')
+def show_about():
+    return render_template('show_about.html')
+
+@app.route('/contact')
+def show_contact():
+    return render_template('show_contact.html')
+
 @app.route('/influencers')
 def show_influencers():
     try:

@@ -1,5 +1,6 @@
 from flask import Flask, url_for, render_template, abort, request
 from flask.ext.restful import Api, Resource, reqparse
+from web.api import get_summary_function
 from web.api import get_mps_function
 from web.api import get_mp_function
 from web.api import get_lords_function
@@ -87,6 +88,14 @@ def show_party(name):
     args = {"name": name}
     party = get_party_function.PoliticalPartyApi().request(args)
     return render_template('show_party.html', party=party)
+
+
+class GetSummary(Resource):
+    def __init__(self):
+        super(GetSummary, self).__init__()
+
+    def get(self):
+        return get_summary_function.SummaryApi().request()
 
 
 class GetMps(Resource):
@@ -213,6 +222,7 @@ class FindEntity(Resource):
         return find_entity_function.EntityApi().request(**args)
 
 
+api.add_resource(GetSummary, '/api/v0.1/', endpoint='GetSummary')
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')

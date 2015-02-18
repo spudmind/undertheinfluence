@@ -370,4 +370,7 @@ class PopulatePoliticalPartyApi():
 
 
 def _convert_to_currency(number):
-    return u'£{:20,.2f}'.format(number)
+    if isinstance(number, int):
+        return u'£{:20,.2f}'.format(number)
+    else:
+        return 0

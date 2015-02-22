@@ -233,7 +233,7 @@ class FindEntity(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return find_entity_function.EntityApi().request(**args)
+        return find_entity_function.EntityApi().request(args)
 
 
 api.add_resource(GetSummary, '/api/v0.1/', endpoint='GetSummary')

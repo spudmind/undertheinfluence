@@ -29,7 +29,6 @@ class MongoInterface:
         page = kwargs.get('page', 1)
         # figure out how many records to skip
         offset = per_page * (page-1)
-
         q = collection.Collection(self.db, _collection)
         if query is not None:
             q = q.find(query)
@@ -38,7 +37,7 @@ class MongoInterface:
         q = q.limit(per_page)
         q = q.skip(offset)
 
-        total =q.count()
+        total = q.count()
         has_more = offset + per_page < total
         meta = {
             'total': total,

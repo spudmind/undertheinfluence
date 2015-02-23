@@ -11,6 +11,7 @@ aniso8601==0.92
 argparse==1.2.1
 beautifulsoup4==4.3.2
 egenix-mx-base==3.2.8
+elasticsearch==1.4.0
 fuzzywuzzy==0.4.0
 itsdangerous==0.24
 lxml==3.4.1
@@ -22,4 +23,5 @@ requests==2.5.0
 scraperwiki==0.4.1
 simplejson==3.6.5
 six==1.9.0
+urllib3==1.10.1
 wsgiref==0.1.2

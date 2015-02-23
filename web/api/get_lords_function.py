@@ -27,6 +27,7 @@ class LordsApi:
             "detail_url": url_for('show_lord', name=entry["name"], _external=True),
             "weight": entry["weight"],
             "twfy_id": entry["twfy_id"],
+            "labels": entry["labels"],
             "influences_summary": entry["influences"]
         } for entry in results]
 

@@ -1,9 +1,11 @@
+from web.api import BaseAPI
 from flask import url_for
 from utils import mongo
 
 
-class MpsApi:
+class MpsApi(BaseAPI):
     def __init__(self):
+        BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
         self._db_table = 'api_mps'
 
@@ -27,9 +29,13 @@ class MpsApi:
                 "name": entry["name"],
                 "party": entry["party"],
                 "image_url": entry["image_url"],
-                "detail_url": url_for('show_mp', name=entry["name"], _external=True),
+                #"detail_url": url_for('show_mp', name=entry["name"], _external=True),
+                "detail_url": self.named_entity_resources(
+                    entry["name"], entry["labels"]
+                )[0],
                 "weight": entry["weight"],
                 "twfy_id": entry["twfy_id"],
+                "labels": entry["labels"],
                 "government_positions": entry["government_positions"],
                 "influences_summary": entry["influences"]
             }

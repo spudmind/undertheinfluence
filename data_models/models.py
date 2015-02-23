@@ -168,7 +168,8 @@ class MembersOfParliament(core.BaseDataModel):
         search_string = u"""
             MATCH (mp:`Member of Parliament`) with mp
             MATCH (mp)-[r]-() with mp,  r
-            RETURN mp.name, mp.party, mp.twfy_id, mp.guardian_image as image_ul, count(r) as weight
+            RETURN mp.name, mp.party, mp.twfy_id, mp.guardian_image as image_ul,
+                count(r) as weight, labels(mp) as labels
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)
@@ -293,7 +294,8 @@ class Lords(core.BaseDataModel):
         search_string = u"""
             MATCH (lord:`Lord`) with lord
             MATCH (lord)-[r]-() with lord,  r
-            RETURN lord.name, lord.party, lord.twfy_id, count(r) as weight
+            RETURN lord.name, lord.party, lord.twfy_id,
+                count(r) as weight, labels(lord) as labels
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)

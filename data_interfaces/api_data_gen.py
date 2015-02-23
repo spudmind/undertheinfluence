@@ -30,6 +30,8 @@ class PopulateMpsApi():
         image_url = record[3]
         weight = record[4]
         labels = record[5]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
         register["remuneration_total"] = _convert_to_currency(
             self._remuneration_total(name)
         )
@@ -155,6 +157,8 @@ class PopulateLordsApi():
         twfy_id = record[2]
         weight = record[3]
         labels = record[4]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
         register["interest_relationships"] = self._interest_relationships(name)
         register["interest_categories"] = self._interest_categories(name)
         ec["donation_count"] = self._donation_count(name)

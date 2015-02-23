@@ -1,4 +1,4 @@
-from flask import Flask, url_for, render_template, abort, request
+from flask import Flask, render_template, abort, request
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_summary_function
 from web.api import get_mps_function
@@ -29,13 +29,29 @@ def show_summary():
     return render_template('show_summary.html', summary=summary)
 
 
+@app.route('/search', methods=['POST'])
+def show_search_result():
+    search = request.form['search']
+    args = {"search": search}
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    results = find_entity_function.EntityApi().request(args)['results']
+    return render_template(
+        'show_search_results.html', search_string=search, results=results, page=page
+    )
+
+
 @app.route('/about')
 def show_about():
     return render_template('show_about.html')
 
+
 @app.route('/contact')
 def show_contact():
     return render_template('show_contact.html')
+
 
 @app.route('/influencers')
 def show_influencers():
@@ -45,6 +61,7 @@ def show_influencers():
         page = 1
     influencers = get_influencers_function.InfluencersApi().request(page=page)['results']
     return render_template('show_influencers.html', influencers=influencers, page=page)
+
 
 @app.route('/influencer/<name>')
 def show_influencer(name):

@@ -19,7 +19,6 @@ class EntityApi(BaseAPI):
     def _fetch(self, args):
         search = args["search"]
         response_data = []
-        print "searching mongo for:", search
         search_results = self.data_model.find_entity(search)
         for entry in search_results:
             labels = entry["labels"]
@@ -35,13 +34,28 @@ class EntityApi(BaseAPI):
         return response_data
 
     def _search(self, args):
-        mps_endpoint = "api_mps"
-        search_string = {
-            "query": {
-                "query_string": {
-                "query": u"name:{}".format(args["search"])
-                }
+        field = 'name'
+        query = args["search"]
+        results, response = self._elastic.search(field, query)
+        response["results"] = [
+            {
+                "name": entry["name"],
+                "party": self._fill_missing("party", entry),
+                "image_url": self._fill_missing("image_url", entry),
+                "detail_url": self.named_entity_resources(
+                    entry["name"], entry["labels"]
+                )[0],
+                "weight": entry["weight"],
+                "labels": entry["labels"],
+                "influences_summary": entry["influences"]
             }
-        }
-        print "elastic search for:", search_string
-        return self._elastic.search(mps_endpoint, search_string)
+            for entry in results
+        ]
+        return response
+
+    @staticmethod
+    def _fill_missing(field, record):
+        result = None
+        if field in record:
+            result = record[field]
+        return result

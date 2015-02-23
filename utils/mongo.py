@@ -63,3 +63,7 @@ class MongoInterface:
     # save document to a collection
     def save(self, _collection, document):
         collection.Collection(self.db, _collection).save(document)
+
+    def drop(self, _collection):
+        q = collection.Collection(self.db, _collection)
+        return q.drop()

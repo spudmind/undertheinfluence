@@ -1,26 +1,24 @@
 import logging
 from pymongo import MongoClient, database, collection
 
-# from pymongo.errors import DuplicateKeyError
-# from pymongo.errors import OperationFailure
-
 
 class MongoInterface:
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = database.Database(MongoClient(), 'spud')
-
         self.print_collections()
-        # self.duplicate_error = DuplicateKeyError
-        # self.index_error = OperationFailure
 
     # print all collections
     def print_collections(self):
         self._logger.debug(self.db.collection_names())
 
     # return all documents in a collection
-    def fetch_all(self, _collection):
-        return self.query(_collection)
+    def fetch_all(self, _collection, paged=True):
+        if paged:
+            return self.query(_collection)
+        else:
+            q = collection.Collection(self.db, _collection)
+            return list(q.find())
 
     # return specific documents in a collection
     def query(self, _collection, **kwargs):

@@ -1,36 +1,34 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from utils import entity_resolver
+from utils import config
 
 
 class MasterEntitiesParser:
-    def __init__(self, bootstrap=False):
+    def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.boot = bootstrap
-        self._resolver = entity_resolver.MasterEntitiesResolver()
-        self._cache = mongo.MongoInterface()
-        self.scraped_mps = self._cache.db.scraped_mp_info
-        self.scraped_lords = self._cache.db.scraped_lords_info
-        self.master_mps = self._cache.db.master_mps
-        self.master_lords = self._cache.db.master_lords
-        self._all_mps = []
-        self._all_lords = []
+        self.db = mongo.MongoInterface()
+        self.mapped_mps = config.mapped_mps
         self._titles = [
             "Earl", "Bishop", "Archbishop", "Duke", "Marquess", "Countess"
         ]
 
     def create_mps(self):
-        self._all_mps = list(self.scraped_mps.find())
+        _all_mps = self.db.fetch_all('scraped_mp_info', paged=False)
         self._print_out("Original", "*Updated")
-        for mp in self._all_mps:
-            name = self._resolver.find_mp(mp["full_name"])
+        for mp in _all_mps:
+            name = None
+            for incorrect, correct in self.mapped_mps:
+                if incorrect in mp["full_name"]:
+                    name = correct
+            if not name:
+                name = mp["full_name"]
             self._print_out(mp["full_name"], name)
-            self.master_mps.save({"name": name})
+            self.db.save('master_mps', {"name": name})
 
     def create_lords(self):
-        self._all_lords = list(self.scraped_lords.find().sort("full_name", 1))
-        for doc in self._all_lords:
+        _all_lords = self.db.fetch_all('scraped_lords_info', paged=False)
+        for doc in _all_lords:
             full_name = doc["full_name"]
             title = doc["title"]
             first = doc["first_name"]
@@ -42,15 +40,14 @@ class MasterEntitiesParser:
                 if doc["title"] in self._titles:
                     #pass
                     self._logger.debug(full_name)
-                    self.master_lords.save({"name": full_name})
+                    self.db.save('master_lords', {"name": full_name})
                 else:
                     self._logger.debug("%s -> %s" % (title_last, full_name))
-                    self.master_lords.save({"name": title_last})
-                    self.master_lords.save({"name": full_name})
+                    self.db.save('master_lords', {"name": title_last})
+                    self.db.save('master_lords', {"name": full_name})
             else:
-                #pass
                 self._logger.debug(full_name)
-                self.master_lords.save({"name": full_name})
+                self.db.save('master_lords', {"name": full_name})
 
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))

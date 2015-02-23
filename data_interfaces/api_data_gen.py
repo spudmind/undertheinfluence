@@ -13,6 +13,7 @@ class PopulateMpsApi():
         self.all_mps = []
 
     def run(self):
+        self.cache.drop("api_mps")
         self.all_mps = self.mps_graph.get_all()
         self._logger.debug("Populating MPs Api")
         for doc in self.all_mps:
@@ -28,6 +29,7 @@ class PopulateMpsApi():
         twfy_id = record[2]
         image_url = record[3]
         weight = record[4]
+        labels = record[5]
         register["remuneration_total"] = _convert_to_currency(
             self._remuneration_total(name)
         )
@@ -52,6 +54,7 @@ class PopulateMpsApi():
             "weight": weight,
             "image_url": image_url,
             "influences": data_sources,
+            "labels": labels,
             "government_positions": positions
         }
         self.cache.save("api_mps", mp_data)
@@ -136,6 +139,7 @@ class PopulateLordsApi():
         self.lords_graph = models.Lords()
 
     def run(self):
+        self.cache.drop("api_lords")
         all_lords = self.lords_graph.get_all()
         self._logger.debug("Populating  Lords Api")
         for doc in all_lords:
@@ -150,6 +154,7 @@ class PopulateLordsApi():
         party = record[1]
         twfy_id = record[2]
         weight = record[3]
+        labels = record[4]
         register["interest_relationships"] = self._interest_relationships(name)
         register["interest_categories"] = self._interest_categories(name)
         ec["donation_count"] = self._donation_count(name)
@@ -165,6 +170,7 @@ class PopulateLordsApi():
             "party": party,
             "twfy_id": twfy_id,
             "weight": weight,
+            "labels": labels,
             "influences": data_sources
         }
         self.cache.save("api_lords", lord_data)
@@ -212,6 +218,7 @@ class PopulateInfluencersApi():
         self.influencers_graph = models.Influencers()
 
     def run(self):
+        self.cache.drop("api_influencers")
         all_influencers = self.influencers_graph.get_all()
         self._logger.debug("\nPopulating Influencers Api")
         self._logger.debug("Total: %s" % len(all_influencers))
@@ -310,6 +317,7 @@ class PopulatePoliticalPartyApi():
         self.parties_graph = models.PoliticalParties()
 
     def run(self):
+        self.cache.drop("api_political_parties")
         all_parties = self.parties_graph.get_all()
         self._logger.debug("Populating Political Party Api")
         for doc in all_parties:

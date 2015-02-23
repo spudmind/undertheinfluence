@@ -9,14 +9,14 @@ from utils import entity_extraction
 class MasterEntitiesResolver:
     def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.cache = mongo.MongoInterface()
+        self.db = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.return_first_entity = True
         self.master_mps = [
-            x["name"] for x in list(self.cache.db.master_mps.find())
+            x["name"] for x in self.db.fetch_all('master_mps', paged=False)
         ]
         self.master_lords = [
-            x["name"] for x in list(self.cache.db.master_lords.find())
+            x["name"] for x in self.db.fetch_all('master_lords', paged=False)
         ]
         self.mapped_mps = config.mapped_mps
         self.mapped_donors = config.mapped_donors
@@ -39,7 +39,7 @@ class MasterEntitiesResolver:
         for p in self.prefixes:
             if p in search:
                 search = search.lstrip(p)
-        if self.master_mps != []:
+        if isinstance(self.master_mps, list):
             guess, accuracy = fuzzy_match.extractOne(search, self.master_mps)
             if accuracy > 80:
                 found = True
@@ -52,7 +52,7 @@ class MasterEntitiesResolver:
 
     def find_lord(self, search):
         found = False
-        if self.master_lords != []:
+        if isinstance(self.master_lords, list):
             guess, accuracy = fuzzy_match.extractOne(search, self.master_lords)
             if accuracy > 80:
                 found = True

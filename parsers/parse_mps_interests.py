@@ -9,6 +9,7 @@ from utils import entity_resolver
 money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
 date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
 
+
 class MPsInterestsParser:
     def __init__(self):
         self._logger = logging.getLogger('spud')
@@ -18,7 +19,7 @@ class MPsInterestsParser:
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
 
-        all_interests = self.db.fetch_all('scraped_mps_interests')
+        all_interests, _ = self.db.fetch_all('scraped_mps_interests')
         for documents in all_interests:
             # each document contains one days recorded interests
             # document structure is:

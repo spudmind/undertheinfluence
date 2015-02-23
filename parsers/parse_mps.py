@@ -9,20 +9,18 @@ class MPsParser():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self._cache = mongo.MongoInterface()
-        self._cache_data = self._cache.db.scraped_mp_info
-        self._parsed_data = self._cache.db.parsed_mp_info
+        self.db = mongo.MongoInterface()
         self.resolver = entity_resolver.MasterEntitiesResolver()
 
-        self._all_mps = list(self._cache_data.find())
-        for doc in self._all_mps:
+        #self._all_mps = list(self._cache_data.find())
+        _all_mps = self.db.fetch_all('scraped_mp_info', paged=False)
+        for doc in _all_mps:
             self._parse(doc)
 
     def _parse(self, node):
         found = self.resolver.find_mp(node["full_name"])
         party = self.resolver.find_party(node["party"])
         self._logger.debug("\n..................")
-        # self._logger.debug(node)
         self._logger.debug("%s x %s" % (found, node["number_of_terms"]))
         if node["full_name"] != found:
             self._logger.debug("*** also known as: %s" % node["full_name"])
@@ -33,5 +31,5 @@ class MPsParser():
         # self._logger.debug(node["party"])
         # self._logger.debug(node["constituency"])
         self._logger.debug("..................")
-        self._parsed_data.save(node)
+        self.db.save('parsed_mp_info', node)
         # self._logger.debug(node["twfy_id"])

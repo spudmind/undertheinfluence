@@ -3,8 +3,8 @@ from utils import entity_resolver
 resolver = entity_resolver.MasterEntitiesResolver()
 
 #test_entry = "Lord na Lester"
-test_entry = "Hezbollah is preparing for an all-out war with the Sunni fighters of al-Nusra Front and the Islamic State."
-test_type = "entity"
+test_entry = "Hezbollah is preparing for an all-out war with the Green Party fighters of al-Nusra Front and the Islamic State."
+test_type = "Political Party"
 test_recipient = None
 
 

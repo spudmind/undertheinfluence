@@ -11,9 +11,9 @@ Installation
  
  * Install Elasticsearch
  
- * Install Mongo-Connector
- [Follow these instructions for Mongo-Connector installation](https://github.com/10gen-labs/mongo-connector).
- [And these instructions configuring it for Elasticsearch](https://github.com/10gen-labs/mongo-connector/wiki/Usage%20with%20ElasticSearch).
+ * Install Mongo-Connector <br>
+ [Follow these instructions for Mongo-Connector installation](https://github.com/10gen-labs/mongo-connector). <br>
+ [And these instructions configuring it for Elasticsearch](https://github.com/10gen-labs/mongo-connector/wiki/Usage%20with%20ElasticSearch).<br>
 
  * Fetch this repo and all submodules:
 

@@ -1,10 +1,19 @@
-spud
-====
+Under The Influence
+===================
 
-Tracking influence in UK politics
+Under the Influence is a web application developed to help track the influence of lobbying over politics. The project is commissioned by Spinwatch and Unlock Democracy with additional funding from Greenpeace. In addition to the application improving their ability to research and campaign we hope it will also be a tool for the general public to explore who influences our representatives
 
 Installation
 ------------
+ * Install Neo4j
+ 
+ * Install Mongo-DB
+ 
+ * Install Elasticsearch
+ 
+ * Install Mongo-Connector
+ [Follow these instructions for Mongo-Connector installation](https://github.com/10gen-labs/mongo-connector).
+ [And these instructions configuring it for Elasticsearch](https://github.com/10gen-labs/mongo-connector/wiki/Usage%20with%20ElasticSearch).
 
  * Fetch this repo and all submodules:
 

@@ -11,8 +11,8 @@ class GraphLordsInterests():
     def run(self):
         self.db = mongo.MongoInterface()
         self.data_models = models
-        self.all_lords = list(self.db.fetch_all('parsed_lords_interests'))
-        for doc in self.all_lords:
+        all_lords = self.db.fetch_all('parsed_lords_interests', paged=False)
+        for doc in all_lords:
             self._graph_interests(doc)
 
     def _graph_interests(self, node):

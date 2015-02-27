@@ -9,8 +9,7 @@ class GraphMPsInterests():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_mps_interests
+        self.db = mongo.MongoInterface()
         self.data_models = models
         self.extra_details = [
             "donor_status",
@@ -21,8 +20,8 @@ class GraphMPsInterests():
             "nature"
         ]
 
-        self.all_mps = list(self.cache_data.find())
-        for doc in self.all_mps:
+        all_mps = self.db.fetch_all('parsed_mps_interests', paged=False)
+        for doc in all_mps:
             self._graph_interests(doc)
 
     def _graph_interests(self, node):

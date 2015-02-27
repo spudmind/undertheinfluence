@@ -9,20 +9,17 @@ class GraphLords():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_lords_info
+        self.db = mongo.MongoInterface()
         self.data_models = models
-        self.full_update = True
 
-        self.all_lords = list(self.cache_data.find())
-        for doc in self.all_lords:
+        all_lords = self.db.fetch_all('parsed_lords_info', paged=False)
+        for doc in all_lords:
             self._import(doc)
 
     def _import(self, node):
         lord = self.graph_lord(node)
-        if self.full_update:
-            if "terms" in node:
-                self.import_terms(lord, node["terms"])
+        if "terms" in node:
+            self.import_terms(lord, node["terms"])
 
     def graph_lord(self, node):
         self._logger.debug("\n..................")

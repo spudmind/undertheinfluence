@@ -9,20 +9,16 @@ class GraphMPs():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_mp_info
+        self.db = mongo.MongoInterface()
         self.data_models = models
-        self.full_update = True
-
-        self.all_mps = list(self.cache_data.find())
-        for doc in self.all_mps:
+        all_mps = self.db.fetch_all('parsed_mp_info', paged=False)
+        for doc in all_mps:
             self._import(doc)
 
     def _import(self, node):
         mp = self.graph_mp(node)
-        if self.full_update:
-            if "terms" in node:
-                self.import_terms(mp, node["terms"])
+        if "terms" in node:
+            self.import_terms(mp, node["terms"])
 
     def graph_mp(self, node):
         self._logger.debug("\n..................")

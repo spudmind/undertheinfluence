@@ -10,11 +10,10 @@ class GraphPartyFunding():
 
     def run(self):
         self.data_models = models
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_party_funding
+        self.db = mongo.MongoInterface()
 
-        self.all_mps = list(self.cache_data.find())
-        for doc in self.all_mps:
+        all_mps = self.db.fetch_all('parsed_party_funding', paged=False)
+        for doc in all_mps:
             name = doc["recipient"]
             donor = doc["donor_name"]
             self._logger.debug("\n..................")

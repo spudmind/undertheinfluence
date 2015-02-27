@@ -42,11 +42,12 @@ class GraphLords():
             "party": lord["party"],
             "title": lord["title"],
             "twfy_id": lord["twfy_id"],
-            "number_of_terms": lord["number_of_terms"]
+            "number_of_terms": lord["number_of_terms"],
+            "image_url": lord["image_url"]
         }
         if not new_lord.exists:
             new_lord.create()
-        new_lord.update_lord_details(lord_details)
+        new_lord.set_lord_details(lord_details)
         new_lord.link_party(lord["party"])
         return new_lord
 
@@ -78,7 +79,7 @@ class GraphLords():
             "left_reason": term["left_reason"],
             "type": "Peerage",
         }
-        new_term.update_details(labels=label, properties=term)
+        new_term.set_term_details(labels=label, properties=term)
         if term['constituency']:
             # self._logger.debug("--> %s" % term['constituency'])
             new_constituency = self.data_models.Constituency(term['constituency'])

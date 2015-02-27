@@ -41,30 +41,21 @@ class GraphMPs():
             "last_name": mp["last_name"],
             "party": mp["party"],
             "twfy_id": mp["twfy_id"],
-            "number_of_terms": mp["number_of_terms"]
+            "number_of_terms": mp["number_of_terms"],
+            "image_url": mp["image_url"]
         }
         if "guardian_url" in mp:
             mp_details["guardian_url"] = mp["guardian_url"]
-        if "guardian_image" in mp:
-            mp_details["guardian_image"] = mp["guardian_image"]
         if "publicwhip_url" in mp:
             mp_details["publicwhip_url"] = mp["publicwhip_url"]
             mp_details["publicwhip_id"] = mp["publicwhip_id"]
+        if "also_known_as" in mp:
+            mp_details["publicwhip_id"] = mp["also_known_as"]
         if not new_mp.exists:
             new_mp.create()
-        new_mp.update_mp_details(mp_details)
+        new_mp.set_mp_details(mp_details)
         new_mp.link_party(mp["party"])
-        if "also_known_as" in mp:
-            aka = self.create_alternate(mp["also_known_as"], mp_details)
-            new_mp.link_alternate(aka)
         return new_mp
-
-    def create_alternate(self, also_known_as, details):
-        aka = self.data_models.MemberOfParliament(also_known_as)
-        if not aka.exists:
-            aka.create()
-        aka.update_mp_details(details)
-        return aka
 
     def import_terms(self, mp, terms):
         for term in terms:
@@ -96,7 +87,7 @@ class GraphMPs():
             "left_reason": term["left_reason"],
             "type": "Elected"
         }
-        new_term.update_details(properties=term_details)
+        new_term.set_term_details(properties=term_details)
         new_term.link_constituency(new_constituency)
         return new_term
 

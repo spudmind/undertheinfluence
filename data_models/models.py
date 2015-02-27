@@ -16,6 +16,14 @@ class NamedEntity(core.BaseDataModel):
         )
         self.exists = True
 
+    @staticmethod
+    def _add_namedentity_properties(properties):
+        if properties is None:
+            properties = {"image_url": None}
+        else:
+            properties = dict({"image_url": None}, **properties)
+        return properties
+
 
 class MemberOfParliament(NamedEntity):
     def __init__(self, name=None):
@@ -119,7 +127,8 @@ class MemberOfParliament(NamedEntity):
             results.append(detail)
         return results
 
-    def update_mp_details(self, properties=None):
+    def set_mp_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
         labels = ["Named Entity", "Member of Parliament"]
         self.set_node_properties(properties, labels)
 
@@ -144,11 +153,8 @@ class MemberOfParliament(NamedEntity):
         )
 
     def link_party(self, party):
-        party = NamedEntity(party)
-        party_labels = ["Political Party"]
-        if not party.exists:
-            party.create()
-        party.set_node_properties(labels=party_labels)
+        party = PoliticalParty(party)
+        party.set_party_details()
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex
         )
@@ -197,7 +203,8 @@ class Lord(NamedEntity):
             self.interests = self._get_interests()
             self.donations = self._get_donations()
 
-    def update_lord_details(self, properties=None):
+    def set_lord_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
         labels = ["Named Entity", "Lord"]
         self.set_node_properties(properties, labels)
 
@@ -207,11 +214,8 @@ class Lord(NamedEntity):
         )
 
     def link_party(self, party):
-        party = NamedEntity(party)
-        party_labels = ["Political Party"]
-        if not party.exists:
-            party.create()
-        party.set_node_properties(labels=party_labels)
+        party = PoliticalParty(party)
+        party.set_party_details()
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex
         )
@@ -321,7 +325,8 @@ class DonationRecipient(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
 
-    def update_recipient(self, properties=None):
+    def set_recipient_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
         labels = ["Donation Recipient", "Named Entity"]
         self.set_node_properties(properties, labels)
 
@@ -342,7 +347,8 @@ class Donor(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
 
-    def update_donor(self, properties=None):
+    def set_donor_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
         labels = ["Donor", "Named Entity"]
         self.set_node_properties(properties, labels)
 
@@ -364,7 +370,7 @@ class FundingRelationship(core.BaseDataModel):
         )
         self.exists = True
 
-    def update_category_details(self, properties=None):
+    def set_category_details(self, properties=None):
         self.set_node_properties(properties)
 
     def update_raw_record(self, raw_record):
@@ -395,9 +401,9 @@ class FundingRelationship(core.BaseDataModel):
         self.set_date(date, "REGISTERED")
 
 
-class InterestCategory(NamedEntity):
+class InterestCategory(core.BaseDataModel):
     def __init__(self, name=None):
-        NamedEntity.__init__(self)
+        core.BaseDataModel.__init__(self)
         self.exists = False
         self.label = "Interest Category"
         self.primary_attribute = "name"
@@ -405,6 +411,12 @@ class InterestCategory(NamedEntity):
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.name
+        )
+        self.exists = True
 
     def update_category_details(self, properties=None):
         self.set_node_properties(properties)
@@ -426,7 +438,8 @@ class RegisteredInterest(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
 
-    def update_interest_details(self, properties=None):
+    def set_interest_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
         labels = ["Named Entity", "Registered Interest"]
         self.set_node_properties(properties, labels)
 
@@ -551,7 +564,7 @@ class RegisteredDonation(core.BaseDataModel):
         )
         self.exists = True
 
-    def update_funding_details(self, properties=None):
+    def set_donations_details(self, properties=None):
         labels = ["Donation", "Contributions"]
         self.set_node_properties(properties, labels)
 
@@ -593,7 +606,7 @@ class Remuneration(core.BaseDataModel):
         )
         self.exists = True
 
-    def update_details(self, properties=None):
+    def set_remuneration_details(self, properties=None):
         labels = ["Remuneration", "Contributions"]
         self.set_node_properties(properties, labels)
 
@@ -604,9 +617,9 @@ class Remuneration(core.BaseDataModel):
         self.set_date(date, "RECEIVED")
 
 
-class PoliticalParty(core.BaseDataModel):
+class PoliticalParty(NamedEntity):
     def __init__(self, name):
-        core.BaseDataModel.__init__(self)
+        NamedEntity.__init__(self)
         self.primary_attribute = "name"
         self.label = "Political Party"
         self.name = name
@@ -615,6 +628,11 @@ class PoliticalParty(core.BaseDataModel):
         )
         if self.exists:
             self.donations = self._get_donations()
+
+    def set_party_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Named Entity", "Political Party"]
+        self.set_node_properties(properties, labels)
 
     def _get_donations(self):
         results = []
@@ -687,12 +705,14 @@ class GovernmentOffice(NamedEntity):
         )
 
     def is_department(self):
+        properties = {"image_url": None}
         labels = ["Named Entity", "Government Department"]
-        self.set_node_properties(labels=labels)
+        self.set_node_properties(properties=properties, labels=labels)
 
     def is_position(self):
+        properties = {"image_url": None}
         labels = ["Named Entity", "Government Position"]
-        self.set_node_properties(labels=labels)
+        self.set_node_properties(properties=properties, labels=labels)
 
 
 class TermInParliament(core.BaseDataModel):
@@ -715,7 +735,7 @@ class TermInParliament(core.BaseDataModel):
     def link_constituency(self, constituency):
         self.create_relationship(self.vertex, "REPRESENTING", constituency.vertex)
 
-    def update_details(self, labels=None, properties=None):
+    def set_term_details(self, labels=None, properties=None):
         if properties["entered_house"]:
             self.set_date(properties["entered_house"], "ENTERED_HOUSE")
         if properties["left_reason"]:

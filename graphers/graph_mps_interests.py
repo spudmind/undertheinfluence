@@ -114,7 +114,7 @@ class GraphMPsInterests():
                         record["interest"]
                     )
                     new_interest = self._create_interest(record["interest"])
-                    new_interest.update_interest_details()
+                    new_interest.set_interest_details()
                     category.link_relationship(funding_relationship)
                     funding_relationship.link_donor(new_interest)
                     funding_relationship.update_raw_record(record["raw_record"])
@@ -150,7 +150,7 @@ class GraphMPsInterests():
         new_relationship = self.data_models.FundingRelationship(category_name)
         if not new_relationship.exists:
             new_relationship.create()
-        new_relationship.update_category_details(props)
+        new_relationship.set_category_details(props)
         return new_relationship
 
     def _create_interest(self, interest):
@@ -176,8 +176,8 @@ class GraphMPsInterests():
             )
             payment = self.data_models.Remuneration(summary)
             payment.create()
-            payment.update_details(payment_details)
-            payment.update_details({"amount": int_amount})
+            payment.set_remuneration_details(payment_details)
+            payment.set_remuneration_details({"amount": int_amount})
             relationship.link_payment(payment)
             if payment_details["received"] != u"Unknown":
                 payment.set_received_date(payment_details["received"])
@@ -192,7 +192,7 @@ class GraphMPsInterests():
                 payment = self.data_models.Remuneration(summary)
                 payment.create()
                 relationship.link_payment(payment)
-                payment.update_details({"amount": int_amount})
+                payment.set_remuneration_details({"amount": int_amount})
         else:
             summary = u"{} - £{} - {}".format(
                 context, payment_details, u"Unknown"
@@ -201,7 +201,7 @@ class GraphMPsInterests():
             payment = self.data_models.Remuneration(summary)
             payment.create()
             relationship.link_payment(payment)
-            payment.update_details({"amount": int_amount})
+            payment.set_remuneration_details({"amount": int_amount})
 
     def _print_out(self, key, value):
         self._logger.debug("  %-25s%-25s" % (key, value))

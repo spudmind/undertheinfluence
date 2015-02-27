@@ -42,7 +42,7 @@ class MPsInfoScraper():
                 "party": mp["party"],
                 "guardian_url": None,
                 "publicwhip_url": None,
-                "guardian_image": None
+                "image_url": None
             }
             self._logger.debug("\n")
             details = self.hansard.get_mp_details(mp["person_id"])
@@ -80,7 +80,7 @@ class MPsInfoScraper():
             self._update_cached_mp(cached["_id"], "guardian_url", url)
             if "image" in person:
                 self._update_cached_mp(
-                    cached["_id"], "guardian_image", person["image"]
+                    cached["_id"], "image_url", person["image"]
                 )
             self._print_out(cached["full_name"], url)
 

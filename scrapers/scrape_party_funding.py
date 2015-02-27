@@ -20,8 +20,7 @@ class PartyFundingScraper:
             self.scrape(file_name)
         self.csv = text_io.CsvInput()
         self.csv.open(file_name)
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.scraped_party_funding
+        self.db = mongo.MongoInterface()
 
         for row in self.csv.all_rows:
             self.extract(row)
@@ -67,7 +66,7 @@ class PartyFundingScraper:
         }
         self.print_dic(data)
         self._logger.debug("\n\n")
-        self.cache_data.save(data)
+        self.db.save("scraped_party_funding", data)
 
     def print_dic(self, dictionary):
         for keys, values in dictionary.items():

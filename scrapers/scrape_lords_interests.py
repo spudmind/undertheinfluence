@@ -21,8 +21,7 @@ class LordsInterestsScraper():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.mongo = mongo.MongoInterface()
-        self.mongo_db = self.mongo.db.scraped_lords_interests
+        self.db = mongo.MongoInterface()
         self.cache_path = os.path.join(current_path, 'data', 'reglords')
         self.url = "http://data.parliament.uk/membersdataplatform/services/mnis/members/query/house=Lords/Interests%7CPreferredNames/"
 
@@ -88,4 +87,4 @@ class LordsInterestsScraper():
                 "member_title": member_title,
                 "interests": interests,
             }
-            self.mongo_db.save(data)
+            self.db.save("scraped_lords_interests", data)

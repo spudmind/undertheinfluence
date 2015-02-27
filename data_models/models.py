@@ -537,7 +537,7 @@ class Influencers(core.BaseDataModel):
         search_string = u"""
             MATCH (inf) where inf:Donor OR inf:`Registered Interest` with inf
             MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP]-(x)
-            RETURN  inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
+            RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)

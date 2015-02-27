@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from data_models import core
+from utils import config
 
 
 class NamedEntity(core.BaseDataModel):
@@ -154,7 +155,9 @@ class MemberOfParliament(NamedEntity):
 
     def link_party(self, party):
         party = PoliticalParty(party)
-        party.set_party_details()
+        image = config.mapped_party_images[party]
+        properties = {"image_url": image}
+        party.set_party_details(properties)
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex
         )
@@ -215,7 +218,9 @@ class Lord(NamedEntity):
 
     def link_party(self, party):
         party = PoliticalParty(party)
-        party.set_party_details()
+        image = config.mapped_party_images[party]
+        properties = {"image_url": image}
+        party.set_party_details(properties)
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex
         )

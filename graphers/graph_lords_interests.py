@@ -11,8 +11,8 @@ class GraphLordsInterests():
     def run(self):
         self.db = mongo.MongoInterface()
         self.data_models = models
-        self.all_lords = list(self.db.fetch_all('parsed_lords_interests'))
-        for doc in self.all_lords:
+        all_lords = self.db.fetch_all('parsed_lords_interests', paged=False)
+        for doc in all_lords:
             self._graph_interests(doc)
 
     def _graph_interests(self, node):
@@ -42,7 +42,7 @@ class GraphLordsInterests():
                         record["interest"]
                     )
                     new_interest = self._create_interest(record["interest"])
-                    new_interest.update_interest_details()
+                    new_interest.set_interest_details()
                     category.link_relationship(funding_relationship)
                     funding_relationship.link_donor(new_interest)
                     funding_relationship.update_raw_record(record["raw_record"])
@@ -71,7 +71,7 @@ class GraphLordsInterests():
         new_relationship = self.data_models.FundingRelationship(category_name)
         if not new_relationship.exists:
             new_relationship.create()
-        new_relationship.update_category_details(props)
+        new_relationship.set_category_details(props)
         return new_relationship
 
     def _create_interest(self, interest):

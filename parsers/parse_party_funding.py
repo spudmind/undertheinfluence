@@ -11,14 +11,12 @@ class PartyFundingParser():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self._cache = mongo.MongoInterface()
-        self._cache_data = self._cache.db.scraped_party_funding
-        self._parsed_data = self._cache.db.parsed_party_funding
+        self.db = mongo.MongoInterface()
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.lords_titles = config.lords_titles
 
-        self._all_entries = list(self._cache_data.find())
-        for doc in self._all_entries:
+        _all_entries = self.db.fetch_all('scraped_party_funding', paged=False)
+        for doc in _all_entries:
             parsed = {}
             parsed["recipient"] = self._get_recipient(
                 doc["recipient"], doc["donee_type"], doc["recipient_type"]
@@ -52,7 +50,7 @@ class PartyFundingParser():
                 self._print_out("donor_type", parsed["donor_type"])
                 self._print_out("value", parsed["value"])
                 self._logger.debug("---\n")
-                self._parsed_data.save(parsed)
+                self.db.save('parsed_party_funding', parsed)
 
     def _get_recipient(self, entry, entry_type, recipient_type):
         result = self._remove_illegal_chars(entry)

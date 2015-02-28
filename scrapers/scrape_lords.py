@@ -39,7 +39,7 @@ class LordsInfoScraper():
                 "party": lord["party"],
                 "guardian_url": None,
                 "publicwhip_url": None,
-                "guardian_image": None
+                "image_url": None
             }
             # self._logger.debug("\n")
             details = self.hansard.get_lord_details(lord["person_id"])

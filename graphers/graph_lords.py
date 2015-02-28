@@ -9,20 +9,17 @@ class GraphLords():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_lords_info
+        self.db = mongo.MongoInterface()
         self.data_models = models
-        self.full_update = True
 
-        self.all_lords = list(self.cache_data.find())
-        for doc in self.all_lords:
+        all_lords = self.db.fetch_all('parsed_lords_info', paged=False)
+        for doc in all_lords:
             self._import(doc)
 
     def _import(self, node):
         lord = self.graph_lord(node)
-        if self.full_update:
-            if "terms" in node:
-                self.import_terms(lord, node["terms"])
+        if "terms" in node:
+            self.import_terms(lord, node["terms"])
 
     def graph_lord(self, node):
         self._logger.debug("\n..................")
@@ -42,11 +39,13 @@ class GraphLords():
             "party": lord["party"],
             "title": lord["title"],
             "twfy_id": lord["twfy_id"],
-            "number_of_terms": lord["number_of_terms"]
+            "number_of_terms": lord["number_of_terms"],
+            # TODO change mp["guardian_image"] to mp["image_url"]
+            "image_url": lord["guardian_image"]
         }
         if not new_lord.exists:
             new_lord.create()
-        new_lord.update_lord_details(lord_details)
+        new_lord.set_lord_details(lord_details)
         new_lord.link_party(lord["party"])
         return new_lord
 
@@ -78,7 +77,7 @@ class GraphLords():
             "left_reason": term["left_reason"],
             "type": "Peerage",
         }
-        new_term.update_details(labels=label, properties=term)
+        new_term.set_term_details(labels=label, properties=term)
         if term['constituency']:
             # self._logger.debug("--> %s" % term['constituency'])
             new_constituency = self.data_models.Constituency(term['constituency'])

@@ -14,7 +14,7 @@ class LordsInterestsParser:
         self.entity_resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
 
-        all_interests = self.db.fetch_all('scraped_lords_interests')
+        all_interests = self.db.fetch_all('scraped_lords_interests', paged=False)
         for lord in all_interests:
             lord_name = lord["member_title"]
             resolved_name = self.entity_resolver.find_lord(lord_name)

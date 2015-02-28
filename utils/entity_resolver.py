@@ -68,13 +68,13 @@ class MasterEntitiesResolver:
         for entry in self.party_entities:
             if entry in search:
                 name = entry
-        for incorrect, correct in self.mapped_parties:
-            if incorrect in search or incorrect == name:
-                name = correct
         if not name:
             cand = fuzzy_match.extractOne(search, self.party_entities)
             if cand[1] > 80:
                 name = cand[0]
+        for incorrect, correct in self.mapped_parties:
+            if incorrect in search or incorrect == name:
+                name = correct
         return name
 
     def find_donor(self, search_string, delimiter=";", fuzzy_delimit=True):

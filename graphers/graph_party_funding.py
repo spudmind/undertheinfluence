@@ -10,11 +10,10 @@ class GraphPartyFunding():
 
     def run(self):
         self.data_models = models
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.parsed_party_funding
+        self.db = mongo.MongoInterface()
 
-        self.all_mps = list(self.cache_data.find())
-        for doc in self.all_mps:
+        all_mps = self.db.fetch_all('parsed_party_funding', paged=False)
+        for doc in all_mps:
             name = doc["recipient"]
             donor = doc["donor_name"]
             self._logger.debug("\n..................")
@@ -38,7 +37,7 @@ class GraphPartyFunding():
         if not new_recipient.exists:
             self._logger.debug("*not found*")
             new_recipient.create()
-        new_recipient.update_recipient(props)
+        new_recipient.set_recipient_details(props)
         return new_recipient
 
     def _create_category(self, name, donor):
@@ -47,7 +46,7 @@ class GraphPartyFunding():
         new_category = self.data_models.FundingRelationship(category_name)
         if not new_category.exists:
             new_category.create()
-        new_category.update_category_details(props)
+        new_category.set_category_details(props)
         return new_category
 
     def _get_donor(self, name, entry):
@@ -58,7 +57,7 @@ class GraphPartyFunding():
         new_donor = self.data_models.Donor(name)
         if not new_donor.exists:
             new_donor.create()
-        new_donor.update_donor(props)
+        new_donor.set_donor_details(props)
         return new_donor
 
     def _create_donation(self, entry):
@@ -88,7 +87,7 @@ class GraphPartyFunding():
         self._logger.debug(summary)
         new_donation = self.data_models.RegisteredDonation(summary)
         new_donation.create()
-        new_donation.update_funding_details(props)
+        new_donation.set_donations_details(props)
         new_donation.set_dates(
             entry["received_date"],
             entry["reported_date"],

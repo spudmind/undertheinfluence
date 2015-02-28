@@ -203,6 +203,7 @@ party_entities = [
     u"Co-operative Party",
     u"We Demand A Referendum Now",
     u"BNP",
+    u"Respect"
     u"British National Party",
     u"NO2EU",
     u"English Democrats",
@@ -218,6 +219,8 @@ mapped_mps = [
 mapped_parties = [
     (u"DUP", u"Democratic Unionist Party"),
     (u"UKIP", u"UK Independence Party"),
+    (u"Greens", u"Green Party"),
+    (u"Respect", u"Respect Party"),
     (u"BNP", u"British National Party"),
     (u"Alliance Party", u"Alliance Party of Northern Ireland"),
     (u"Alliance", u"Alliance Party of Northern Ireland"),
@@ -244,6 +247,8 @@ mapped_party_images = {
     u"Plaid Cymru": "http://upload.wikimedia.org/wikipedia/en/archive/a/ae/20141031083815!Plaid_Cymru_Logo.New.png",
     u"Speaker": None,
     u"Green Party": "http://upload.wikimedia.org/wikipedia/en/thumb/a/ab/Green_Party_of_England_and_Wales_logo.svg/974px-Green_Party_of_England_and_Wales_logo.svg.png",
+    u"Respect Party": "http://upload.wikimedia.org/wikipedia/en/9/99/Respect_%E2%80%93_The_Unity_Coalition_logo.jpg",
+    u"None": None
 }
 
 

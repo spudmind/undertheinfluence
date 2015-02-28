@@ -153,10 +153,14 @@ class MemberOfParliament(NamedEntity):
             self.vertex, "ALSO_KNOWN_AS", alternate.vertex
         )
 
-    def link_party(self, party):
-        party = PoliticalParty(party)
-        image = config.mapped_party_images[party]
-        properties = {"image_url": image}
+    def link_party(self, name):
+        party = PoliticalParty(name)
+        party.create()
+        if name:
+            image = config.mapped_party_images[name]
+            properties = {"image_url": image}
+        else:
+            properties = {"image_url": None}
         party.set_party_details(properties)
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex
@@ -216,10 +220,15 @@ class Lord(NamedEntity):
             self.vertex, "INTERESTS_REGISTERED_IN", category.vertex
         )
 
-    def link_party(self, party):
-        party = PoliticalParty(party)
-        image = config.mapped_party_images[party]
-        properties = {"image_url": image}
+    def link_party(self, name):
+        party = PoliticalParty(name)
+        if not party.exists:
+            party.create()
+        if name:
+            image = config.mapped_party_images[name]
+            properties = {"image_url": image}
+        else:
+            properties = {"image_url": None}
         party.set_party_details(properties)
         self.create_relationship(
             self.vertex, "MEMBER_OF", party.vertex

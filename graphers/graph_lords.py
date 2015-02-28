@@ -40,7 +40,8 @@ class GraphLords():
             "title": lord["title"],
             "twfy_id": lord["twfy_id"],
             "number_of_terms": lord["number_of_terms"],
-            "image_url": lord["image_url"]
+            # TODO change mp["guardian_image"] to mp["image_url"]
+            "image_url": lord["guardian_image"]
         }
         if not new_lord.exists:
             new_lord.create()

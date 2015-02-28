@@ -38,7 +38,8 @@ class GraphMPs():
             "party": mp["party"],
             "twfy_id": mp["twfy_id"],
             "number_of_terms": mp["number_of_terms"],
-            "image_url": mp["image_url"]
+            # TODO change mp["guardian_image"] to mp["image_url"]
+            "image_url": mp["guardian_image"]
         }
         if "guardian_url" in mp:
             mp_details["guardian_url"] = mp["guardian_url"]

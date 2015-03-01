@@ -12,8 +12,8 @@ class GraphPartyFunding():
         self.data_models = models
         self.db = mongo.MongoInterface()
 
-        all_mps = self.db.fetch_all('parsed_party_funding', paged=False)
-        for doc in all_mps:
+        all_donations = self.db.fetch_all('parsed_party_funding', paged=False)
+        for doc in all_donations:
             name = doc["recipient"]
             donor = doc["donor_name"]
             self._logger.debug("\n..................")

@@ -20,10 +20,11 @@ class NamedEntity(core.BaseDataModel):
     @staticmethod
     def _add_namedentity_properties(properties):
         if properties is None:
-            properties = {"image_url": None}
+            return {"image_url": None}
         else:
-            properties = dict({"image_url": None}, **properties)
-        return properties
+            if not "image_url" in properties:
+                properties["image_url"] = None
+            return properties
 
 
 class MemberOfParliament(NamedEntity):
@@ -181,7 +182,7 @@ class MembersOfParliament(core.BaseDataModel):
         search_string = u"""
             MATCH (mp:`Member of Parliament`) with mp
             MATCH (mp)-[r]-() with mp,  r
-            RETURN mp.name, mp.party, mp.twfy_id, mp.guardian_image as image_ul,
+            RETURN mp.name, mp.party, mp.twfy_id, mp.image_url,
                 count(r) as weight, labels(mp) as labels
             ORDER BY weight DESC
         """
@@ -692,7 +693,7 @@ class PoliticalParties(core.BaseDataModel):
         search_string = u"""
             MATCH (d:`Political Party`)
             MATCH (d)-[x]-()
-            RETURN d.name, count(x) as weight
+            RETURN d.name, d.image_url, count(x) as weight
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)

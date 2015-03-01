@@ -332,7 +332,8 @@ class PopulatePoliticalPartyApi():
     def _get_stats(self, record):
         ec = {}
         name = record[0]
-        weight = record[1]
+        image_url = record[1]
+        weight = record[2]
         total, count = self._donations(name)
         ec["donation_count"] = count
         ec["donation_total"] = _convert_to_currency(total)
@@ -347,8 +348,10 @@ class PopulatePoliticalPartyApi():
             "weight": weight,
             "mp_count": mp_count,
             "lord_count": lord_count,
-            "influences": data_sources
+            "influences": data_sources,
+            "image_url": image_url
         }
+        print party_data
         self.cache.save("api_political_parties", party_data)
 
     def _mp_count(self, name):

@@ -22,7 +22,7 @@ class PoliticalPartiesApi:
         response["results"] = [
             {
                 "name": entry["name"],
-                "image_url": "None",
+                "image_url": entry["image_url"],
                 "influences_summary": entry["influences"],
                 "weight": entry["weight"],
                 "mp_count": entry["mp_count"],

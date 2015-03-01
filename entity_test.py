@@ -1,3 +1,4 @@
+from data_models import models
 from utils import entity_resolver
 
 resolver = entity_resolver.MasterEntitiesResolver()
@@ -27,4 +28,26 @@ def parse_recipient(entry, entry_type, recipient_type):
             result = result[0]
     return result
 
-print "found:", parse_recipient(test_entry, test_type, test_recipient)
+
+def node_properties_test():
+    me = models.MemberOfParliament("Warren The Magnificent")
+    details = {
+        "first_name": "Warren",
+        "last_name": "The Magnificent",
+        "party": "All the time",
+        "twfy_id": "666",
+        "number_of_terms": "infinite",
+        # TODO change mp["guardian_image"] to mp["image_url"]
+        "image_url": "http://ahyeah.com"
+    }
+    me.create()
+    me.set_mp_details(details)
+    new_me = models.DonationRecipient("Warren The Magnificent")
+    extra_details = {
+        "extra_indigo": "flatbush zombie"
+    }
+    new_me.set_recipient_details(extra_details)
+
+#print "found:", parse_recipient(test_entry, test_type, test_recipient)
+node_properties_test()
+

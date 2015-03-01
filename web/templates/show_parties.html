@@ -17,9 +17,15 @@
                 <div class="list-group">
                     {% for party in parties %}
                         <div class="list-group-item" >
-                            <div class="row-action-primary">
-                                <i class="icon-material-folder" ></i>
-                            </div>
+                            {% if party.image_url and not party.image_url == "None" %}
+                                <div class="row-picture">
+                                     <img class="circle" src="{{ party.image_url }}" alt="icon">
+                                </div>
+                            {% else %}
+                                <div class="row-action-primary">
+                                    <i class="icon-material-folder" ></i>
+                                </div>
+                            {% endif %}
                             <div class="row-content">
                                 <div class="least-content">
                                     <a href="{{ party.detail_url }}">detail</a>

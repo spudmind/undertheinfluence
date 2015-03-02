@@ -14,6 +14,7 @@ class MasterEntitiesParser:
         ]
 
     def create_mps(self):
+        self.db.drop("master_mps")
         _all_mps = self.db.fetch_all('scraped_mp_info', paged=False)
         self._print_out("Original", "*Updated")
         for mp in _all_mps:
@@ -27,6 +28,7 @@ class MasterEntitiesParser:
             self.db.save('master_mps', {"name": name})
 
     def create_lords(self):
+        self.db.drop("master_lords")
         _all_lords = self.db.fetch_all('scraped_lords_info', paged=False)
         for doc in _all_lords:
             full_name = doc["full_name"]

@@ -213,9 +213,16 @@ party_entities = [
 
 
 mapped_mps = [
-
-
+    (u"Nicholas Boles", u"Nick Boles"),
+    (u"Nicholas Clegg", u"Nick Clegg"),
+    (u"Vincent Cable", u"Vince Cable"),
+    (u"Brian H Donohoe", u"Brian Donohoe"),
+    (u"Susan Elan Jones", u"Susan Jones"),
+    (u"Jeffrey M Donaldson", u"Jeffrey Donaldson"),
+    (u"Edward Miliband", u"Ed Miliband"),
+    (u"Edward Balls", u"Ed Balls")
 ]
+
 mapped_parties = [
     (u"DUP", u"Democratic Unionist Party"),
     (u"UKIP", u"UK Independence Party"),

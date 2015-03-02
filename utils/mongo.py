@@ -6,7 +6,7 @@ class MongoInterface:
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = database.Database(MongoClient(), 'spud')
-        self.print_collections()
+        #self.print_collections()
 
     # print all collections
     def print_collections(self):

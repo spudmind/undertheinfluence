@@ -32,7 +32,7 @@ arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify th
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
 arg_parser.add_argument('--graph', nargs='+', choices=choices, help='Specify the grapher(s) to run')
-arg_parser.add_argument('--api_gen', nargs='+', choices=['mps', 'lords', 'influencers', "parties"], help='Create mongo database for API')
+arg_parser.add_argument('--api_gen', nargs='+', choices=['politicians', 'mps', 'lords', 'influencers', "parties"], help='Create mongo database for API')
 arg_parser.add_argument('--export', nargs='+', choices=['named_entities'], help='Specify the export to run')
 args = arg_parser.parse_args()
 
@@ -94,6 +94,8 @@ if args.graph is not None:
 
 # populate node stat lists for api
 if args.api_gen is not None:
+    if "politicians" in args.api_gen:
+        api_data_gen.PopulatePoliticianApi().run()
     if "influencers" in args.api_gen:
         api_data_gen.PopulateInfluencersApi().run()
     if "mps" in args.api_gen:

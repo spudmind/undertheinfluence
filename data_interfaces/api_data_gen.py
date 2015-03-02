@@ -1,22 +1,76 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models import core, models
+from data_models import models
+
+
+class PopulatePoliticianApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_politicians")
+        count = models.Politicians().count
+        all_politicians = models.Politicians().get_all()
+        self._logger.debug("Populating Politicians Api")
+        for doc in all_politicians:
+            name = doc[0]
+            self._logger.debug(name)
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        party = record[1]
+        twfy_id = record[2]
+        image_url = record[3]
+        weight = record[4]
+        labels = record[5]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+
+        politician = models.Politician(name)
+        if not politician.exists:
+            print ">Not found:", name
+            politician = models.Lord(name)
+            role = "lord"
+        else:
+            role = politician.type
+        register = politician.interests_summary
+        ec = politician.donations_summary
+
+        data_sources = {
+            "register_of_interests": register,
+            "electoral_commission": ec
+        }
+        politician_data = {
+            "name": name,
+            "type": role,
+            "party": party,
+            "twfy_id": twfy_id,
+            "weight": weight,
+            "image_url": image_url,
+            "influences": data_sources,
+            "labels": labels
+        }
+
+        if role == "mp":
+            politician_data["government_departments"] = politician.departments
+            politician_data["government_positions"] = politician.positions
+
+        self.db.save("api_politicians", politician_data)
 
 
 class PopulateMpsApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.cache = mongo.MongoInterface()
-        self.core_model = core.BaseDataModel()
-        self.mps_graph = models.MembersOfParliament()
-        self.all_mps = []
+        self.db = mongo.MongoInterface()
 
     def run(self):
-        self.cache.drop("api_mps")
-        self.all_mps = self.mps_graph.get_all()
+        self.db.drop("api_mps")
+        all_mps = models.MembersOfParliament().get_all()
         self._logger.debug("Populating MPs Api")
-        for doc in self.all_mps:
+        for doc in all_mps:
             name = doc[0]
             self._logger.debug(name)
             self._get_stats(doc)
@@ -32,10 +86,10 @@ class PopulateMpsApi():
             labels.remove("Named Entity")
 
         mp = models.MemberOfParliament(name)
+        positions = mp.positions
+        departments = mp.departments
         register = mp.interests_summary
         ec = mp.donations_summary
-        departments = mp.departments
-        positions = mp.positions
 
         data_sources = {
             "register_of_interests": register,
@@ -52,19 +106,17 @@ class PopulateMpsApi():
             "government_departments": departments,
             "government_positions": positions
         }
-        self.cache.save("api_mps", mp_data)
+        self.db.save("api_mps", mp_data)
 
 
 class PopulateLordsApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.cache = mongo.MongoInterface()
-        self.core_model = core.BaseDataModel()
-        self.lords_graph = models.Lords()
+        self.db = mongo.MongoInterface()
 
     def run(self):
-        self.cache.drop("api_lords")
-        all_lords = self.lords_graph.get_all()
+        self.db.drop("api_lords")
+        all_lords = models.Lords().get_all()
         self._logger.debug("Populating  Lords Api")
         for doc in all_lords:
             name = doc[0]
@@ -97,19 +149,17 @@ class PopulateLordsApi():
             "labels": labels,
             "influences": data_sources
         }
-        self.cache.save("api_lords", lord_data)
+        self.db.save("api_lords", lord_data)
 
 
 class PopulateInfluencersApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.cache = mongo.MongoInterface()
-        self.core_model = core.BaseDataModel()
-        self.influencers_graph = models.Influencers()
+        self.db = mongo.MongoInterface()
 
     def run(self):
-        self.cache.drop("api_influencers")
-        all_influencers = self.influencers_graph.get_all()
+        self.db.drop("api_influencers")
+        all_influencers = models.Influencers().get_all()
         self._logger.debug("\nPopulating Influencers Api")
         self._logger.debug("Total: %s" % len(all_influencers))
         for doc in all_influencers:
@@ -140,19 +190,17 @@ class PopulateInfluencersApi():
             "donor_type": donor_type,
             "influences": data_sources
         }
-        self.cache.save("api_influencers", influencer_data)
+        self.db.save("api_influencers", influencer_data)
 
 
 class PopulatePoliticalPartyApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-        self.cache = mongo.MongoInterface()
-        self.core_model = core.BaseDataModel()
-        self.parties_graph = models.PoliticalParties()
+        self.db = mongo.MongoInterface()
 
     def run(self):
-        self.cache.drop("api_political_parties")
-        all_parties = self.parties_graph.get_all()
+        self.db.drop("api_political_parties")
+        all_parties = models.PoliticalParties().get_all()
         self._logger.debug("Populating Political Party Api")
         for doc in all_parties:
             name = doc[0]
@@ -182,7 +230,7 @@ class PopulatePoliticalPartyApi():
             "image_url": image_url
         }
         print party_data
-        self.cache.save("api_political_parties", party_data)
+        self.db.save("api_political_parties", party_data)
 
 
 def _convert_to_currency(number):

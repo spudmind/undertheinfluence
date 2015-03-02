@@ -458,6 +458,48 @@ class Lords(core.BaseDataModel):
         return search_result[0][0]
 
 
+class Politician(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.label = "Named Entity"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.name
+        )
+        if self.exists:
+            self.labels = self._get_labels()
+            self.type = self._get_type()
+            self._set_properties()
+
+    def _get_type(self):
+        if "Member of Parliament" in self.labels:
+            return "mp"
+        elif "Lord" in self.labels:
+            return "lord"
+
+    def _set_properties(self):
+        if self.type == "mp":
+            politician = MemberOfParliament(self.name)
+            self.positions = politician.positions
+            self.departments = politician.departments
+        elif self.type == "lord":
+            politician = Lord(self.name)
+        else:
+            print "something wrong with:", self.name
+        self.interests = politician.interests
+        self.interests_summary = politician.interests_summary
+        self.donations = politician.donations
+        self.donations_summary = politician.donations_summary
+
+    def _get_labels(self):
+        query = u"""
+            MATCH (p:`Named Entity` {{name: "{0}"}}) WITH p
+            RETURN labels(p) as labels
+        """.format(self.vertex["name"])
+        return self.query(query)[0][0]
+
+
 class Politicians(core.BaseDataModel):
     def __init__(self):
         core.BaseDataModel.__init__(self)
@@ -467,7 +509,8 @@ class Politicians(core.BaseDataModel):
         search_string = u"""
             MATCH (p) where p:Lord OR p:`Member of Parliament` with p
             MATCH (p)-[r]-() with p,  r
-            RETURN DISTINCT p.name, labels(p), count(r) as weight
+            RETURN DISTINCT p.name, p.party, p.twfy_id, p.image_url,
+                count(r) as weight, labels(p)
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)
@@ -886,14 +929,13 @@ class PoliticalParty(NamedEntity):
             MATCH (p:`Political Party` {{name: "{0}"}})
             MATCH (l:`Lord`)-[:MEMBER_OF]-(p)
             RETURN count(l) as lord_count
-        """.format(name)
+        """.format(self.vertex["name"])
         return self.query(query)[0]["lord_count"]
 
     def _get_donations(self):
         results = []
         search_string = u"""
-            MATCH (p:`Political Party` {{name: "{0}"}})mp_count = self._mp_count(name)
-        lord_count = self._lord_count(name)
+            MATCH (p:`Political Party` {{name: "{0}"}})
             MATCH (p)-[:FUNDING_RELATIONSHIP]-(rel) with p, rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with p, rel, x
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(d) with p, rel, d, x

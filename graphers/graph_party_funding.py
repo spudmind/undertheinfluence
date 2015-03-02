@@ -31,7 +31,8 @@ class GraphPartyFunding():
     def _get_recipient(self, name, entry):
         props = {
             "recipient_type": entry["recipient_type"],
-            "donee_type": entry["donee_type"]
+            "donee_type": entry["donee_type"],
+            "data_source": "electoral_commission"
         }
         new_recipient = self.data_models.DonationRecipient(name)
         if not new_recipient.exists:
@@ -52,7 +53,8 @@ class GraphPartyFunding():
     def _get_donor(self, name, entry):
         props = {
             "donor_type": entry["donor_type"],
-            "company_reg": entry["company_reg"]
+            "company_reg": entry["company_reg"],
+            "data_source": "electoral_commission"
         }
         new_donor = self.data_models.Donor(name)
         if not new_donor.exists:

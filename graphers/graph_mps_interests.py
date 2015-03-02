@@ -39,6 +39,7 @@ class GraphMPsInterests():
         if not new_mp.exists:
             self._logger.debug("%s *not found*" % mp)
             new_mp.create()
+            new_mp.set_mp_details({"data_source": "register_of_interests"})
         return new_mp
 
     def _parse_categories(self, mp, categories):

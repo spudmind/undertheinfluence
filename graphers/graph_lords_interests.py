@@ -87,6 +87,7 @@ class GraphLordsInterests():
         if not new_lord.exists:
             self._logger.debug("%s *not found*" % lord)
             new_lord.create()
+            new_lord.set_lord_details({"data_source": "register_of_interests"})
         return new_lord
 
     def _print_out(self, key, value):

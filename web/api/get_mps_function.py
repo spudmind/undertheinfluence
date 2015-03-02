@@ -37,6 +37,7 @@ class MpsApi(BaseAPI):
                 "twfy_id": entry["twfy_id"],
                 "labels": entry["labels"],
                 "government_positions": entry["government_positions"],
+                "government_departments": entry["government_departments"],
                 "influences_summary": entry["influences"]
             }
             for entry in results

@@ -28,6 +28,7 @@ class InfluencersApi:
             "influences_summary": entry["influences"],
             "labels": entry["labels"],
             "weight": entry["weight"],
+            "donor_type": entry["donor_type"],
             "detail_url": url_for('show_influencer', name=entry["name"], _external=True),
         } for entry in results]
 

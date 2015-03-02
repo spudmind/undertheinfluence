@@ -40,7 +40,9 @@ class MemberOfParliament(NamedEntity):
             self.positions = self._get_positions()
             self.departments = self._get_departments()
             self.interests = self._get_interests()
+            self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
+            self.donations_summary = self._get_donations_summary()
 
     def _get_positions(self):
         return self._get_government_positions("Government Position")
@@ -54,7 +56,7 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
             MATCH (mp)-[:ELECTED_FOR]-(const)
             WHERE const.left_reason = "still_in_office" with const
-            MATCH (const)-[:SERVED_IN]-(p:`Government Position`) with p.name AS position
+            MATCH (const)-[:SERVED_IN]-(p:`{1}`) with p.name AS position
             RETURN position
         """.format(self.vertex["name"], pos_type)
         output = self.query(search_string)
@@ -93,6 +95,80 @@ class MemberOfParliament(NamedEntity):
             }
             results.append(detail)
         return results
+    
+    def _get_interests_summary(self):
+        total = self._remuneration_total()
+        register = {
+            "remuneration_total": _convert_to_currency(total),
+            "remuneration_total_int": total,
+            "interest_categories": self._interest_categories(),
+            "interest_relationships": self._interest_relationships(),
+            "remuneration_count": self._remuneration_count(),
+        }
+        return register
+
+    def _remuneration_total(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            MATCH (cat)-[x:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
+            MATCH (rel)-[y:REMUNERATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
+    def _interest_categories(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            RETURN count(cat) as category_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["category_count"]
+
+    def _interest_relationships(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
+            RETURN count(rel) as relationship_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["relationship_count"]
+
+    def _remuneration_count(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            MATCH (cat)-[x:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
+            MATCH (rel)-[y:REMUNERATION_RECEIVED]-(x)
+            RETURN count(x) as remuneration_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["remuneration_count"]
+
+    def _get_donations_summary(self):
+        total = self._donation_total()
+        ec = {
+            "donor_count": self._donor_count(),
+            "donation_total": _convert_to_currency(total),
+            "donation_total_int": total
+        }
+        return ec
+
+    def _donor_count(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
+            RETURN DISTINCT count(rel.donor) as donor_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["donor_count"]
+
+    def _donation_total(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
+            MATCH (rel)-[y:DONATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
 
     def _get_donations(self):
         results = []
@@ -209,7 +285,9 @@ class Lord(NamedEntity):
         )
         if self.exists:
             self.interests = self._get_interests()
+            self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
+            self.donations_summary = self._get_donations_summary()
 
     def set_lord_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
@@ -267,6 +345,30 @@ class Lord(NamedEntity):
             results.append(detail)
         return results
 
+    def _get_interests_summary(self):
+        register = {
+            "interest_relationships": self._interest_relationships(),
+            "interest_categories": self._interest_categories()
+        }
+        return register
+
+    def _interest_categories(self):
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
+            RETURN count(cat) as category_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["category_count"]
+
+    def _interest_relationships(self):
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with lord, cat, rel
+            RETURN count(rel) as relationship_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["relationship_count"]
+
     def _get_donations(self):
         results = []
         search_string = u"""
@@ -280,6 +382,7 @@ class Lord(NamedEntity):
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
+
         for entry in output:
             detail = {
                 "recipient": {
@@ -303,6 +406,32 @@ class Lord(NamedEntity):
             results.append(detail)
         return results
 
+    def _get_donations_summary(self):
+        total = self._donation_total()
+        ec = {
+            "donation_count": self._donation_count(),
+            "donation_total": _convert_to_currency(total),
+            "donation_total_int": total
+        }
+        return ec
+
+    def _donation_count(self):
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[x:REGISTERED_CONTRIBUTOR]-() with x
+            RETURN count(x) as donation_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["donation_count"]
+
+    def _donation_total(self):
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:REGISTERED_CONTRIBUTOR]-(rel) with lord, rel
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
 
 class Lords(core.BaseDataModel):
     def __init__(self):
@@ -324,6 +453,30 @@ class Lords(core.BaseDataModel):
         search_string = u"""
             MATCH (lord:`Lord`)
             RETURN count(lord)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+
+class Politicians(core.BaseDataModel):
+    def __init__(self):
+        core.BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            MATCH (p)-[r]-() with p,  r
+            RETURN DISTINCT p.name, labels(p), count(r) as weight
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            RETURN count(p)
         """
         search_result = self.query(search_string)
         return search_result[0][0]
@@ -471,6 +624,8 @@ class Influencer(core.BaseDataModel):
         if self.exists:
             self.interests = self._get_interests()
             self.donations = self._get_donations()
+            self.interests_summary = self._get_interests_summary()
+            self.donations_summary = self._get_donations_summary()
 
     def _get_interests(self):
         results = []
@@ -500,6 +655,45 @@ class Influencer(core.BaseDataModel):
             }
             results.append(detail)
         return results
+
+    def _get_interests_summary(self):
+        total = self._remuneration_total()
+        register = {
+            "relationship_count": self._interest_relationships(),
+            "remuneration_total": _convert_to_currency(total),
+            "remuneration_total_int": total,
+            "remuneration_count": self._remuneration_count()
+        }
+        return register
+
+    def _interest_relationships(self):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            RETURN count(rel) as count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["count"]
+
+    def _remuneration_total(self):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
+    def _remuneration_count(self):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+            RETURN count(x) as count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["count"]
 
     def _get_donations(self):
         results = []
@@ -536,6 +730,33 @@ class Influencer(core.BaseDataModel):
             }
             results.append(detail)
         return results
+
+    def _get_donations_summary(self):
+        total = self._donation_total()
+        ec = {
+            "donation_count": self._donation_count(),
+            "donation_total": _convert_to_currency(total),
+            "donation_total_int": total
+        }
+        return ec
+
+    def _donation_total(self):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
+            RETURN sum(x.amount) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
+    def _donation_count(self):
+        query = u"""
+            MATCH (inf:`Named Entity` {{name: "{0}"}})
+            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
+            RETURN count(x) as count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["count"]
 
 
 class Influencers(core.BaseDataModel):
@@ -643,16 +864,36 @@ class PoliticalParty(NamedEntity):
         )
         if self.exists:
             self.donations = self._get_donations()
+            self.donations_summary = self._get_donations_summary()
+            self.mp_count = self._mp_count()
+            self.lord_count = self._lord_count()
 
     def set_party_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
         labels = ["Named Entity", "Political Party"]
         self.set_node_properties(properties, labels)
 
+    def _mp_count(self):
+        query = u"""
+            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (mp:`Member of Parliament`)-[:MEMBER_OF]-(p)
+            RETURN count(mp) as mp_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["mp_count"]
+
+    def _lord_count(self):
+        query = u"""
+            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (l:`Lord`)-[:MEMBER_OF]-(p)
+            RETURN count(l) as lord_count
+        """.format(name)
+        return self.query(query)[0]["lord_count"]
+
     def _get_donations(self):
         results = []
         search_string = u"""
-            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (p:`Political Party` {{name: "{0}"}})mp_count = self._mp_count(name)
+        lord_count = self._lord_count(name)
             MATCH (p)-[:FUNDING_RELATIONSHIP]-(rel) with p, rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with p, rel, x
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(d) with p, rel, d, x
@@ -682,6 +923,29 @@ class PoliticalParty(NamedEntity):
             }
             results.append(detail)
         return results
+
+    def _get_donations_summary(self):
+        total, count = self._donations()
+        ec = {
+            "donation_count": count,
+            "donation_total": _convert_to_currency(total),
+            "donation_total_int": total
+        }
+        return ec
+
+    def _donations(self):
+        query = u"""
+            MATCH (p:`Political Party` {{name: "{0}"}})
+            MATCH (p)-[:FUNDING_RELATIONSHIP]-(x)
+            MATCH (x)-[:DONATION_RECEIVED]-(f)
+            RETURN p.name as Party, sum(f.amount) as total, count(f.amount) as count
+            ORDER BY total DESC
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        if output:
+            return output[0]["total"], output[0]["count"]
+        else:
+            return 0, 0
 
 
 class PoliticalParties(core.BaseDataModel):

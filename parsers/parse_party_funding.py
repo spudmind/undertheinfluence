@@ -53,7 +53,7 @@ class PartyFundingParser():
                 self.db.save('parsed_party_funding', parsed)
 
     def _get_recipient(self, entry, entry_type, recipient_type):
-        result = self._remove_illegal_chars(entry)
+        result = self._remove_extraneous(entry)
         if entry_type == "MP - Member of Parliament":
             result = self.resolver.find_mp(result)
         elif entry_type == "Political Party" or \
@@ -69,7 +69,7 @@ class PartyFundingParser():
             return result
 
     def _get_donor(self, entry, entry_type):
-        result = self._remove_illegal_chars(entry)
+        result = self._remove_extraneous(entry)
         if entry_type == "Individual":
             title = entry.split(" ")[0]
             if title in self.lords_titles:
@@ -92,8 +92,10 @@ class PartyFundingParser():
         return text.replace(u"��", u"£")
 
     @staticmethod
-    def _remove_illegal_chars(text):
+    def _remove_extraneous(text):
         text = text.replace("\\", " ")
+        text = text.replace('"', ' ')
+        text = text.replace('The Rt Hon ', '')
         return text
 
     def _print_out(self, key, value):

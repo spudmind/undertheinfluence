@@ -24,7 +24,8 @@ class MPsParser():
         self._logger.debug("%s x %s" % (found, node["number_of_terms"]))
         if node["full_name"] != found:
             self._logger.debug("*** also known as: %s" % node["full_name"])
-            node["also_known_as"] = found
+            node["also_known_as"] = node["full_name"]
+            node["full_name"] = found
         if node["party"] != party:
             self._logger.debug("%s %% %s" % (node["party"], party))
             node["party"] = party

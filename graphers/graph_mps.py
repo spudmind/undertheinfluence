@@ -24,7 +24,7 @@ class GraphMPs():
         self._logger.debug("\n..................")
         self._logger.debug("%s x %s" % (node["full_name"], node["number_of_terms"]))
         if "also_known_as" in node:
-            self._logger.debug("AKA: %s" % node["full_name"])
+            self._logger.debug("AKA: %s" % node["also_known_as"])
         self._logger.debug(node["party"])
         self._logger.debug("..................")
         # self._logger.debug(node["twfy_id"])

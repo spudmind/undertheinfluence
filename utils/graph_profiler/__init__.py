@@ -1,10 +1,10 @@
-from data_models import models
+from data_models import government
 from data_models import core
 
 
 class DataProfiler:
     def __init__(self):
-        self.data_models = models
+        self.data_models = government
         self.core_model = core.BaseDataModel()
         self.node_types = [
             "Named Entity",

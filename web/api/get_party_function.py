@@ -1,5 +1,5 @@
 from web.api import BaseAPI
-from data_models import models
+from data_models import government
 from utils import mongo
 
 
@@ -21,7 +21,7 @@ class PoliticalPartyApi(BaseAPI):
         result, _ = self._db.query(self._db_table, query=query, page=page)
 
         if len(result) > 0:
-            party = models.PoliticalParty(name)
+            party = government.PoliticalParty(name)
             detail = {
                 "electoral_commission": self._donor_urls(party.donations)
             }

@@ -1,5 +1,5 @@
 from web.api import BaseAPI
-from data_models import models
+from data_models import government
 from utils import mongo
 
 
@@ -14,7 +14,7 @@ class MpApi(BaseAPI):
         result, _ = self._db.query(self._db_table, query=args)
 
         if len(result) > 0:
-            mp = models.MemberOfParliament(name)
+            mp = government.MemberOfParliament(name)
             result = {
                 'name': result[0]['name'],
                 'party': result[0]['party'],

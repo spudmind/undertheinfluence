@@ -1,4 +1,5 @@
-from data_models import models
+from data_models import government
+from data_models.influencers import DonationRecipient
 from utils import entity_resolver
 
 resolver = entity_resolver.MasterEntitiesResolver()
@@ -30,7 +31,7 @@ def parse_recipient(entry, entry_type, recipient_type):
 
 
 def node_properties_test():
-    me = models.MemberOfParliament("Warren The Magnificent")
+    me = government.MemberOfParliament("Warren The Magnificent")
     details = {
         "first_name": "Warren",
         "last_name": "The Magnificent",
@@ -42,7 +43,7 @@ def node_properties_test():
     }
     me.create()
     me.set_mp_details(details)
-    new_me = models.DonationRecipient("Warren The Magnificent")
+    new_me = DonationRecipient("Warren The Magnificent")
     extra_details = {
         "extra_indigo": "flatbush zombie"
     }

@@ -41,7 +41,8 @@ class GraphLords():
             "twfy_id": lord["twfy_id"],
             "number_of_terms": lord["number_of_terms"],
             # TODO change mp["guardian_image"] to mp["image_url"]
-            "image_url": lord["guardian_image"],
+            # set to image_url for live version which is refreshed
+            "image_url": lord["image_url"],
             "data_source": "theyworkforyou"
         }
         if not new_lord.exists:

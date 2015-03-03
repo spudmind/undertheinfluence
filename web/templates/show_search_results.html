@@ -31,11 +31,10 @@
                                     {% for label in entry["labels"] %}
                                         <span class="label label-success">{{ label }}</span>
                                     {% endfor %}
-                                    <a href="{{ entry.detail_url }}">detail</a>
                                 </div>
-                                <h4 class="list-group-item-heading">{{ entry.name }}
+                                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                                     {% if entry.party %}
-                                       - {{ entry.party }}
+                                        - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
                                     {% endif %}
                                 </h4>
                                 <div class="row">

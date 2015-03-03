@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models.influencers import Influencer, Influencers
-from data_models import government
+from data_models.influencers_models import Influencer, Influencers
+from data_models import government_models
 
 
 class PopulatePoliticiansApi():
@@ -12,7 +12,7 @@ class PopulatePoliticiansApi():
 
     def run(self):
         self.db.drop("api_politicians")
-        all_politicians = government.Politicians().get_all()
+        all_politicians = government_models.Politicians().get_all()
         self._logger.debug("Populating Politicians Api")
         for doc in all_politicians:
             name = doc[0]
@@ -29,10 +29,10 @@ class PopulatePoliticiansApi():
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
 
-        politician = government.Politician(name)
+        politician = government_models.Politician(name)
         if not politician.exists:
             print ">Not found:", name
-            politician = government.Lord(name)
+            politician = government_models.Lord(name)
             role = "lord"
         else:
             role = politician.type
@@ -71,7 +71,7 @@ class PopulateMpsApi():
 
     def run(self):
         self.db.drop("api_mps")
-        all_mps = government.MembersOfParliament().get_all()
+        all_mps = government_models.MembersOfParliament().get_all()
         self._logger.debug("Populating MPs Api")
         for doc in all_mps:
             name = doc[0]
@@ -88,7 +88,7 @@ class PopulateMpsApi():
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
 
-        mp = government.MemberOfParliament(name)
+        mp = government_models.MemberOfParliament(name)
         positions = mp.positions
         departments = mp.departments
         register = mp.interests_summary
@@ -119,7 +119,7 @@ class PopulateLordsApi():
 
     def run(self):
         self.db.drop("api_lords")
-        all_lords = government.Lords().get_all()
+        all_lords = government_models.Lords().get_all()
         self._logger.debug("Populating  Lords Api")
         for doc in all_lords:
             name = doc[0]
@@ -135,7 +135,7 @@ class PopulateLordsApi():
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
 
-        lord = government.Lord(name)
+        lord = government_models.Lord(name)
         register = lord.interests_summary
         ec = lord.donations_summary
 
@@ -203,7 +203,7 @@ class PopulatePoliticalPartyApi():
 
     def run(self):
         self.db.drop("api_political_parties")
-        all_parties = government.PoliticalParties().get_all()
+        all_parties = government_models.PoliticalParties().get_all()
         self._logger.debug("Populating Political Party Api")
         for doc in all_parties:
             name = doc[0]
@@ -215,7 +215,7 @@ class PopulatePoliticalPartyApi():
         image_url = record[1]
         weight = record[2]
 
-        party = government.PoliticalParty(name)
+        party = government_models.PoliticalParty(name)
         ec = party.donations_summary
         mp_count = party.mp_count
         lord_count = party.lord_count
@@ -242,7 +242,8 @@ class PopulateGovernmentApi():
 
     def run(self):
         self.db.drop("api_government")
-        all_offices = government.GovernmentOffices().get_all()
+        all_offices = government_models.GovernmentOffices().get_all()
+
         self._logger.debug("Populating Government Api")
         for doc in all_offices:
             name = doc[0]
@@ -257,24 +258,23 @@ class PopulateGovernmentApi():
             labels.remove("Named Entity")
             labels.remove("Government Office")
 
-        lord = government.Lord(name)
-        register = lord.interests_summary
-        ec = lord.donations_summary
+        office = government_models.GovernmentOffice(name)
+        register = office.interests_summary
+        ec = office.donation_summary
 
-        data_sources = {}
-        if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
-            data_sources["register_of_interests"] = register
-        if ec["donation_total_int"] > 0 and ec["donation_count"] > 0:
-            data_sources["electoral_commission"] = ec
-        lord_data = {
+        data_sources = {
+            "register_of_interests": register,
+            "electoral_commission": ec
+        }
+
+        office_data = {
             "name": name,
-            "party": party,
-            "twfy_id": twfy_id,
-            "weight": weight,
             "labels": labels,
+            "mp_count": weight,
             "influences": data_sources
         }
-        self.db.save("api_lords", lord_data)
+        self.db.save("api_government", office_data)
+
 
 def _convert_to_currency(number):
     if isinstance(number, int):

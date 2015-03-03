@@ -8,6 +8,7 @@ from web.api import get_influencer_function
 from web.api import get_parties_function
 from web.api import get_party_function
 from web.api import get_politicians_function
+from web.api import get_government_function
 from web.api import find_entity_function
 import os
 
@@ -216,6 +217,17 @@ class GetInfluencer(Resource):
         return get_influencer_function.InfluencerApi().request(args)
 
 
+class GetGovernmentOffices(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetGovernmentOffices, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_government_function.OfficesApi().request()
+
+
 class FindEntity(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -235,6 +247,7 @@ api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInflue
 api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
 api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
+api.add_resource(GetGovernmentOffices, '/api/v0.1/getGovernmentOffices', endpoint='GetGovernmentOffices')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 
 if __name__ == '__main__':

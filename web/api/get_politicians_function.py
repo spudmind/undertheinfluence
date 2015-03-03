@@ -24,7 +24,7 @@ class PoliticiansApi(BaseAPI):
         if response['has_more']:
             next_query = args
             next_query['page'] = page + 1
-            response['next_url'] = url_for('getMps', _external=True, **next_query)
+            response['next_url'] = url_for('GetPoliticians', _external=True, **next_query)
 
         response["results"] = [
             {

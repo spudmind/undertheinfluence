@@ -45,7 +45,7 @@ class MasterEntitiesResolver:
                 found = True
                 search = guess
         for incorrect, correct in self.mapped_mps:
-            if incorrect in search:
+            if incorrect in search or incorrect == search:
                 found = True
                 search = correct
         return search if found else None

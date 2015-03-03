@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort, request
+from flask import Flask, render_template, request
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_summary_function
 from web.api import get_mps_function
@@ -9,6 +9,7 @@ from web.api import get_influencers_function
 from web.api import get_influencer_function
 from web.api import get_parties_function
 from web.api import get_party_function
+from web.api import get_politicians_function
 from web.api import find_entity_function
 import os
 
@@ -51,6 +52,17 @@ def show_about():
 @app.route('/contact')
 def show_contact():
     return render_template('show_contact.html')
+
+
+@app.route('/politicians')
+def show_politicians():
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    politicians = get_politicians_function.PoliticiansApi().request(page=page)['results']
+    print politicians
+    return render_template('show_politicians.html', politicians=politicians, page=page)
 
 
 @app.route('/influencers')
@@ -127,6 +139,26 @@ class GetSummary(Resource):
 
     def get(self):
         return get_summary_function.SummaryApi().request()
+
+
+class GetPolitcians(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
+        self.reqparse.add_argument('party', type=str)
+        self.reqparse.add_argument('type', type=str)
+        self.reqparse.add_argument('interests_gt', type=int)
+        self.reqparse.add_argument('interests_lt', type=int)
+        self.reqparse.add_argument('donations_gt', type=int)
+        self.reqparse.add_argument('donations_lt', type=int)
+        super(GetPolitcians, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+
+        return get_politicians_function.PoliticiansApi().request(**args)
 
 
 class GetMps(Resource):
@@ -254,6 +286,7 @@ class FindEntity(Resource):
 
 
 api.add_resource(GetSummary, '/api/v0.1/', endpoint='GetSummary')
+api.add_resource(GetPolitcians, '/api/v0.1/getPoliticians', endpoint='GetPolitcians')
 api.add_resource(GetMps, '/api/v0.1/getMps', endpoint='getMps')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 api.add_resource(GetLords, '/api/v0.1/getLords', endpoint='getLords')

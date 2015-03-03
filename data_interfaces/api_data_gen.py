@@ -57,6 +57,9 @@ class PopulatePoliticianApi():
         if role == "mp":
             politician_data["government_departments"] = politician.departments
             politician_data["government_positions"] = politician.positions
+        else:
+            politician_data["government_departments"] = None
+            politician_data["government_positions"] = None
 
         self.db.save("api_politicians", politician_data)
 
@@ -229,7 +232,6 @@ class PopulatePoliticalPartyApi():
             "influences": data_sources,
             "image_url": image_url
         }
-        print party_data
         self.db.save("api_political_parties", party_data)
 
 

@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter("ignore", UserWarning)
 import sys
 import argparse
 import logging

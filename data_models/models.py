@@ -281,7 +281,7 @@ class Lord(NamedEntity):
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
+            "Named Entity", self.primary_attribute, self.name
         )
         if self.exists:
             self.interests = self._get_interests()

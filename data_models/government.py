@@ -620,6 +620,32 @@ class PoliticalParty(NamedEntity):
             return 0, 0
 
 
+class GovernmentOffices(BaseDataModel):
+    def __init__(self):
+        BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (n:`Government Office`) with n
+            MATCH (n)-[:SERVED_IN]-(x) with n, x
+                WHERE x.left_reason = "still_in_office"
+            MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
+            RETURN n.name, labels(n), count(p)
+            ORDER BY count(p) DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            RETURN count(p)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+
 class GovernmentOffice(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
@@ -630,6 +656,9 @@ class GovernmentOffice(NamedEntity):
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
+        if self.exists:
+            self.mp_count = self._mp_count()
+            self.members = self._get_members()
 
     def is_department(self):
         properties = {"image_url": None}
@@ -640,6 +669,37 @@ class GovernmentOffice(NamedEntity):
         properties = {"image_url": None}
         labels = ["Named Entity", "Government Position"]
         self.set_node_properties(properties=properties, labels=labels)
+
+    def _mp_count(self):
+        query = u"""
+            MATCH (n:`Government Office` {{name: "{0}"}}) with n
+            MATCH (n)-[:SERVED_IN]-(x) with n, x
+                WHERE x.left_reason = "still_in_office"
+            MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
+            RETURN count(p)
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["mp_count"]
+
+    def _get_members(self):
+        results = []
+        search_string = u"""
+            MATCH (n:`Government Office` {{name: "{0}"}}) with n
+            MATCH (n)-[:SERVED_IN]-(t) with n, t
+                WHERE t.left_reason = "still_in_office"
+            MATCH (t)-[:ELECTED_FOR]-(p) with n, t, p
+            RETURN p.name
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        return results
+
+    def _get_donations_summary(self):
+        total, count = self._donations()
+        ec = {
+            "donation_count": count,
+            "donation_total": self._convert_to_currency(total),
+            "donation_total_int": total
+        }
+        return ec
 
 
 class TermInParliament(BaseDataModel):

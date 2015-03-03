@@ -97,7 +97,7 @@ if args.graph is not None:
 # populate node stat lists for api
 if args.api_gen is not None:
     if "politicians" in args.api_gen:
-        api_data_gen.PopulatePoliticianApi().run()
+        api_data_gen.PopulatePoliticiansApi().run()
     if "influencers" in args.api_gen:
         api_data_gen.PopulateInfluencersApi().run()
     if "mps" in args.api_gen:

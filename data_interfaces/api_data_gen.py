@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers import Influencer, Influencers
 from utils import mongo
+from data_models.influencers import Influencer, Influencers
 from data_models import government
 
 
-class PopulatePoliticianApi():
+class PopulatePoliticiansApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
@@ -234,6 +234,47 @@ class PopulatePoliticalPartyApi():
         }
         self.db.save("api_political_parties", party_data)
 
+
+class PopulateGovernmentApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_government")
+        all_offices = government.GovernmentOffices().get_all()
+        self._logger.debug("Populating Government Api")
+        for doc in all_offices:
+            name = doc[0]
+            self._logger.debug(name)
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        labels = record[1]
+        weight = record[2]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+            labels.remove("Government Office")
+
+        lord = government.Lord(name)
+        register = lord.interests_summary
+        ec = lord.donations_summary
+
+        data_sources = {}
+        if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
+            data_sources["register_of_interests"] = register
+        if ec["donation_total_int"] > 0 and ec["donation_count"] > 0:
+            data_sources["electoral_commission"] = ec
+        lord_data = {
+            "name": name,
+            "party": party,
+            "twfy_id": twfy_id,
+            "weight": weight,
+            "labels": labels,
+            "influences": data_sources
+        }
+        self.db.save("api_lords", lord_data)
 
 def _convert_to_currency(number):
     if isinstance(number, int):

@@ -58,6 +58,25 @@
                                         {% endif %}
 
                                         {% if "Member of Parliament" in entry["labels"] %}
+
+                                            {% if entry["government_positions"] %}
+                                                <div class="well well-sm">
+                                                    <b>Government Positions</b><br>
+                                                    {% for position in entry["government_positions"] %}
+                                                        {{ position }} <br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            {% if entry["government_departments"] %}
+                                                <div class="well well-sm">
+                                                    <b>Government Roles</b><br>
+                                                    {% for position in entry["government_departments"] %}
+                                                        {{ position }} <br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
                                             {% if "register_of_interests" in entry.influences_summary %}
                                                 <div class="well well-sm">
                                                     <b>Register of Interests</b><br>
@@ -125,9 +144,9 @@
                     {% if page == 1  %}
                         <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
                     {% else %}
-                        <li class="previous"><a href="{{ url_for('show_lords', page=page-1) }}">Previous page</a></li>
+                        <li class="previous"><a href="{{ url_for('show_search_result', page=page-1) }}">Previous page</a></li>
                     {% endif %}
-                    <li class="next disabled"><a href="{{ url_for('show_lords', page=page+1) }}">Next page</a></li>
+                    <li class="next disabled"><a href="{{ url_for('show_search_result', page=page+1) }}">Next page</a></li>
                 </ul>
             </div>
         </div>

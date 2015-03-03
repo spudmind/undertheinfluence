@@ -1,5 +1,5 @@
 from web.api import BaseAPI
-from data_models import government
+from data_models import government_models
 from utils import mongo
 
 
@@ -13,7 +13,7 @@ class LordApi(BaseAPI):
         name = args["name"]
         result, _ = self._db.query(self._db_table, query=args)
         if len(result) > 0:
-            lord = government.Lord(name)
+            lord = government_models.Lord(name)
             result = {
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],

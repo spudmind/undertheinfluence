@@ -106,6 +106,7 @@ class MemberOfParliament(NamedEntity):
             self.label, self.primary_attribute, self.name
         )
         if self.exists:
+            self.party, self.image_url = self._set_properties()
             self.positions = self._get_positions()
             self.departments = self._get_departments()
             self.interests = self._get_interests()
@@ -118,6 +119,14 @@ class MemberOfParliament(NamedEntity):
 
     def _get_departments(self):
         return self._get_government_positions("Government Department")
+
+    def _set_properties(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament` {{name:"{0}"}})
+            return mp.party, mp.image_url
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        return output[0]["mp.party"], output[0]["mp.image_url"]
 
     def _get_government_positions(self, pos_type):
         results = []
@@ -637,6 +646,12 @@ class GovernmentOffices(BaseDataModel):
         search_result = self.query(search_string)
         return search_result
 
+    def test(self):
+        all_offices = self.get_all()
+        for dept, labels, weight in all_offices:
+            office = GovernmentOffice(dept)
+            print dept, office.mp_count
+
     def _get_count(self):
         search_string = u"""
             MATCH (p) where p:Lord OR p:`Member of Parliament` with p
@@ -659,6 +674,8 @@ class GovernmentOffice(NamedEntity):
         if self.exists:
             self.mp_count = self._mp_count()
             self.members = self._get_members()
+            self.interests_summary, self.donation_summary =\
+                self._get_office_summary()
 
     def is_department(self):
         properties = {"image_url": None}
@@ -676,30 +693,49 @@ class GovernmentOffice(NamedEntity):
             MATCH (n)-[:SERVED_IN]-(x) with n, x
                 WHERE x.left_reason = "still_in_office"
             MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
-            RETURN count(p)
+            RETURN count(p) as mp_count
         """.format(self.vertex["name"])
         return self.query(query)[0]["mp_count"]
 
     def _get_members(self):
-        results = []
         search_string = u"""
             MATCH (n:`Government Office` {{name: "{0}"}}) with n
             MATCH (n)-[:SERVED_IN]-(t) with n, t
                 WHERE t.left_reason = "still_in_office"
             MATCH (t)-[:ELECTED_FOR]-(p) with n, t, p
-            RETURN p.name
+            RETURN p.name as name
         """.format(self.vertex["name"])
-        output = self.query(search_string)
-        return results
+        result = self.query(search_string)
+        return [r["name"] for r in result]
 
-    def _get_donations_summary(self):
-        total, count = self._donations()
-        ec = {
-            "donation_count": count,
-            "donation_total": self._convert_to_currency(total),
-            "donation_total_int": total
+    def _get_office_summary(self):
+        results = []
+        for name in self.members:
+            member = MemberOfParliament(name)
+            entry = {
+                "ri_total": member.interests_summary["remuneration_total_int"],
+                "ri_count": member.interests_summary["remuneration_count"],
+                "ri_relationships": member.interests_summary["interest_relationships"],
+                "ec_count": member.donations_summary["donor_count"],
+                "ec_total": member.donations_summary["donation_total_int"],
+            }
+            results.append(entry)
+        ri = {
+            "remuneration_count": sum(x['ri_count'] for x in results),
+            "interest_relationships": sum(x['ri_relationships'] for x in results),
+            "remuneration_total_int": sum(x['ri_total'] for x in results),
+            "remuneration_total": self._convert_to_currency(
+                sum(x['ri_total'] for x in results)
+            )
         }
-        return ec
+        ec = {
+            "donor_count": sum(x['ec_count'] for x in results),
+            "donation_total_int": sum(x['ec_total'] for x in results),
+            "donation_total": self._convert_to_currency(
+                sum(x['ec_total'] for x in results)
+            )
+        }
+        return {"register_of_interests": ri}, {"electoral_commission": ec}
 
 
 class TermInParliament(BaseDataModel):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers import FundingRelationship, InterestCategory, RegisteredInterest, Remuneration
+from data_models.influencers_models import FundingRelationship, InterestCategory, RegisteredInterest, Remuneration
 from utils import mongo
-from data_models import government
+from data_models import government_models
 
 
 class GraphMPsInterests():
@@ -11,7 +11,7 @@ class GraphMPsInterests():
 
     def run(self):
         self.db = mongo.MongoInterface()
-        self.data_models = government
+        self.data_models = government_models
         self.extra_details = [
             "donor_status",
             "purpose",

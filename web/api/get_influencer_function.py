@@ -1,6 +1,6 @@
-from data_models.influencers import Influencer
+from data_models.influencers_models import Influencer
 from web.api import BaseAPI
-from data_models import government
+from data_models import government_models
 from utils import mongo
 
 

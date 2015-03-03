@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models import government
+from data_models import government_models
 
 
 class GraphLords():
@@ -10,7 +10,7 @@ class GraphLords():
 
     def run(self):
         self.db = mongo.MongoInterface()
-        self.data_models = government
+        self.data_models = government_models
 
         all_lords = self.db.fetch_all('parsed_lords_info', paged=False)
         for doc in all_lords:

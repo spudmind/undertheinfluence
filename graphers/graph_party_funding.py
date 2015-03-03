@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers import DonationRecipient, Donor, FundingRelationship, RegisteredDonation
+from data_models.influencers_models import DonationRecipient, Donor, FundingRelationship, RegisteredDonation
 from utils import mongo
-from data_models import government
+from data_models import government_models
 
 
 class GraphPartyFunding():
@@ -10,7 +10,7 @@ class GraphPartyFunding():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.data_models = government
+        self.data_models = government_models
         self.db = mongo.MongoInterface()
 
         all_donations = self.db.fetch_all('parsed_party_funding', paged=False)

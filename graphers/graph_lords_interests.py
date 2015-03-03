@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers import FundingRelationship, InterestCategory, RegisteredInterest
+from data_models.influencers_models import FundingRelationship, InterestCategory, RegisteredInterest
 from utils import mongo
-from data_models import government
+from data_models import government_models
 
 
 class GraphLordsInterests():
@@ -11,7 +11,7 @@ class GraphLordsInterests():
 
     def run(self):
         self.db = mongo.MongoInterface()
-        self.data_models = government
+        self.data_models = government_models
         all_lords = self.db.fetch_all('parsed_lords_interests', paged=False)
         for doc in all_lords:
             self._graph_interests(doc)

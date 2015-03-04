@@ -667,6 +667,7 @@ class GovernmentOffice(NamedEntity):
         self.exists = False
         self.label = "Government Office"
         self.primary_attribute = "name"
+        #self.name = name.strip()
         self.name = name
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
@@ -720,7 +721,7 @@ class GovernmentOffice(NamedEntity):
                 "ec_total": member.donations_summary["donation_total_int"],
             }
             results.append(entry)
-        ri = {
+        register = {
             "remuneration_count": sum(x['ri_count'] for x in results),
             "interest_relationships": sum(x['ri_relationships'] for x in results),
             "remuneration_total_int": sum(x['ri_total'] for x in results),
@@ -728,14 +729,14 @@ class GovernmentOffice(NamedEntity):
                 sum(x['ri_total'] for x in results)
             )
         }
-        ec = {
+        donations = {
             "donor_count": sum(x['ec_count'] for x in results),
             "donation_total_int": sum(x['ec_total'] for x in results),
             "donation_total": self._convert_to_currency(
                 sum(x['ec_total'] for x in results)
             )
         }
-        return {"register_of_interests": ri}, {"electoral_commission": ec}
+        return register, donations
 
 
 class TermInParliament(BaseDataModel):

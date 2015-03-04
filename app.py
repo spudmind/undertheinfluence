@@ -8,7 +8,7 @@ from web.api import get_influencer_function
 from web.api import get_parties_function
 from web.api import get_party_function
 from web.api import get_politicians_function
-from web.api import get_government_function
+from web.api import get_offices_function
 from web.api import find_entity_function
 import os
 
@@ -110,6 +110,16 @@ def show_party(name):
     args = {"name": name}
     party = get_party_function.PoliticalPartyApi().request(args)
     return render_template('show_party.html', party=party)
+
+
+@app.route('/offices/')
+def show_offices():
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    offices = get_offices_function.OfficesApi().request(page=page)['results']
+    return render_template('show_offices.html', offices=offices, page=page)
 
 
 class GetSummary(Resource):
@@ -225,7 +235,7 @@ class GetGovernmentOffices(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_government_function.OfficesApi().request()
+        return get_offices_function.OfficesApi().request()
 
 
 class FindEntity(Resource):

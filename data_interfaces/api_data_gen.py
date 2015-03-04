@@ -235,7 +235,7 @@ class PopulatePoliticalPartyApi():
         self.db.save("api_political_parties", party_data)
 
 
-class PopulateGovernmentApi():
+class PopulateOfficesApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
@@ -244,21 +244,23 @@ class PopulateGovernmentApi():
         self.db.drop("api_government")
         all_offices = government_models.GovernmentOffices().get_all()
 
-        self._logger.debug("Populating Government Api")
+        self._logger.debug("Populating Government Offices Api")
         for doc in all_offices:
             name = doc[0]
-            self._logger.debug(name)
+            self._logger.debug("%s, %s" % (name, doc[2]))
             self._get_stats(doc)
 
     def _get_stats(self, record):
         name = record[0]
         labels = record[1]
-        weight = record[2]
+        mp_count = record[2]
+
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
             labels.remove("Government Office")
 
         office = government_models.GovernmentOffice(name)
+        members = office.members
         register = office.interests_summary
         ec = office.donation_summary
 
@@ -270,8 +272,9 @@ class PopulateGovernmentApi():
         office_data = {
             "name": name,
             "labels": labels,
-            "mp_count": weight,
-            "influences": data_sources
+            "mp_count": mp_count,
+            "influences": data_sources,
+            "members": members
         }
         self.db.save("api_government", office_data)
 

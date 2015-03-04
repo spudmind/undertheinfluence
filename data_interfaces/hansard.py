@@ -1,39 +1,34 @@
 from utils import theyworkforyou
-import simplejson
+import json
 
 
 class TWFYHansard:
     def __init__(self, link=False):
-        self.twfy = theyworkforyou.TWFY('ESHFQ9AQWgTuFyCfx7DAWpDc')
+        self.twfy = theyworkforyou.TWFY("ESHFQ9AQWgTuFyCfx7DAWpDc")
 
     def get_mps(self):
-        return simplejson.loads(
-            self.twfy.api.getMPs(output='js'),
-            'iso-8859-1'
+        return json.loads(
+            self.twfy.api.getMPs(output="js")
         )
 
     def get_mp_details(self, person_id):
-        return simplejson.loads(
-            self.twfy.api.getMP(output='js', id=person_id),
-            'iso-8859-1'
+        return json.loads(
+            self.twfy.api.getMP(output="js", id=person_id)
         )
 
     def get_lords(self):
-        return simplejson.loads(
-            self.twfy.api.getLords(output='js'),
-            'iso-8859-1'
+        return json.loads(
+            self.twfy.api.getLords(output="js")
         )
 
     def get_lord_details(self, person_id):
-        return simplejson.loads(
-            self.twfy.api.getLord(output='js', id=person_id),
-            'iso-8859-1'
+        return json.loads(
+            self.twfy.api.getLord(output="js", id=person_id)
         )
 
     def get_mp_debates(self, debate_type, person):
-        return simplejson.loads(
-            self.twfy.api.getDebates(output='js', type=debate_type, person=person),
-            'iso-8859-1'
+        return json.loads(
+            self.twfy.api.getDebates(output="js", type=debate_type, person=person)
         )
 
     def get_debate(self, debate_id):
@@ -74,7 +69,7 @@ class TWFYHansard:
             "commons",
             full_debate_id
         )
-        #print '\n\n[o] Getting Full Debate Details [id: %s count:%s]' \
+        #print "\n\n[o] Getting Full Debate Details [id: %s count:%s]" \
         #      % (full_debate_id, len(debate_full))
         main = {
             "debate_id": debate_full[0]["gid"],
@@ -95,10 +90,9 @@ class TWFYHansard:
 
     def _get_debate_detail(self, debate_type, debate_id):
         try:
-            return simplejson.loads(
-                self.twfy.api.getDebates(output='js', type=debate_type, gid=debate_id),
-                'iso-8859-1'
+            return json.loads(
+                self.twfy.api.getDebates(output="js", type=debate_type, gid=debate_id)
             )
-        except simplejson.scanner.JSONDecodeError:
+        except json.scanner.JSONDecodeError:
             print "JSONDecodeError"
             return None

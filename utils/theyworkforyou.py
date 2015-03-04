@@ -19,6 +19,7 @@ A library that provides a python binding to the TWFY API(http://www.theyworkfory
 """
 import datetime
 import time
+import requests
 import urllib
 
 #API Spec
@@ -59,7 +60,7 @@ class TWFY():
         # this enables 'twfy.getMP()', for example
         for prefix, methods in API.items():
             setattr(self, prefix, TWFYAPICategory(self, prefix, methods))
-       
+
     def get(self, **params):
         """
         Calls the twfy API
@@ -69,7 +70,7 @@ class TWFY():
         del params['method']
         params_encoded = urllib.urlencode(params)
         #print SERVICE_URL+method+'?'+params_encoded
-        return urllib.urlopen(SERVICE_URL+method+'?'+params_encoded).read()
+        return requests.get(SERVICE_URL+method+'?'+params_encoded).text
 
 
 class TWFYAPICategory:
@@ -77,7 +78,7 @@ class TWFYAPICategory:
     TWFYAPICategory is a modified version of RTMAPICategory in pyrtm (http://repo.or.cz/w/pyrtm.git)
     See the `API` structure and `TWFY.__init__`
     """
-   
+
     def __init__(self, twfy, prefix, methods):
         self.twfy = twfy
         self.prefix = prefix
@@ -102,15 +103,15 @@ class TWFYAPICategory:
             for param in params:
                 if param not in rargs + oargs:
                     raise TypeError, 'Invalid parameter (%s)' % param
-            
+
             if 'type' in params:
                 if params['type'] not in TYPES:
                     raise TypeError, 'Invalid type given: (%s)' % params['type']
-                
+
             if 'date' in params:
                 if not is_valid_date(params['date']):
                     raise TypeError, 'Invalid date given: (%s)' % params['date']
-                
+
             return self.twfy.get(method=aname, **params)
         else:
             raise TypeError, 'Invalid output given: (%s)' % params['output']

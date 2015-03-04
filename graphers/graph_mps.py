@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models import models
+from data_models import government_models
 
 
 class GraphMPs():
@@ -10,7 +10,7 @@ class GraphMPs():
 
     def run(self):
         self.db = mongo.MongoInterface()
-        self.data_models = models
+        self.data_models = government_models
         all_mps = self.db.fetch_all('parsed_mp_info', paged=False)
         for doc in all_mps:
             self._import(doc)

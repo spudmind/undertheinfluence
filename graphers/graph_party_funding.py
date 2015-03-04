@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
+from data_models.influencers_models import DonationRecipient, Donor, FundingRelationship, RegisteredDonation
 from utils import mongo
-from data_models import models
+from data_models import government_models
 
 
 class GraphPartyFunding():
@@ -9,7 +10,7 @@ class GraphPartyFunding():
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.data_models = models
+        self.data_models = government_models
         self.db = mongo.MongoInterface()
 
         all_donations = self.db.fetch_all('parsed_party_funding', paged=False)
@@ -34,7 +35,7 @@ class GraphPartyFunding():
             "donee_type": entry["donee_type"],
             "data_source": "electoral_commission"
         }
-        new_recipient = self.data_models.DonationRecipient(name)
+        new_recipient = DonationRecipient(name)
         if not new_recipient.exists:
             self._logger.debug("*not found*")
             new_recipient.create()
@@ -44,7 +45,7 @@ class GraphPartyFunding():
     def _create_category(self, name, donor):
         props = {"recipient": name, "donor": donor}
         category_name = u"{} and {}".format(donor, name)
-        new_category = self.data_models.FundingRelationship(category_name)
+        new_category = FundingRelationship(category_name)
         if not new_category.exists:
             new_category.create()
         new_category.set_category_details(props)
@@ -56,7 +57,7 @@ class GraphPartyFunding():
             "company_reg": entry["company_reg"],
             "data_source": "electoral_commission"
         }
-        new_donor = self.data_models.Donor(name)
+        new_donor = Donor(name)
         if not new_donor.exists:
             new_donor.create()
         new_donor.set_donor_details(props)
@@ -87,7 +88,7 @@ class GraphPartyFunding():
             entry["value"]
         )
         self._logger.debug(summary)
-        new_donation = self.data_models.RegisteredDonation(summary)
+        new_donation = RegisteredDonation(summary)
         new_donation.create()
         new_donation.set_donations_details(props)
         new_donation.set_dates(

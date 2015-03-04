@@ -1,5 +1,6 @@
-import logging
+# -*- coding: utf-8 -*-
 from data_interfaces import graph_database
+import logging
 import calendar
 import re
 
@@ -116,6 +117,13 @@ class BaseDataModel:
             self.g.calendar.date(year, month, day).day
         )
 
+    @staticmethod
+    def _convert_to_currency(number):
+        if isinstance(number, int):
+            return u'£{:20,.2f}'.format(number)
+        else:
+            return None
+
     def named_entity_export(self):
         search_query = u"""
                 MATCH (n:`Named Entity`)
@@ -157,3 +165,27 @@ class BaseDataModel:
     def _convert_month(text):
         month_to = {v: k for k, v in enumerate(calendar.month_abbr)}
         return month_to[text[:3]]
+
+
+class NamedEntity(BaseDataModel):
+    def __init__(self, name=None):
+        BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Named Entity"
+        self.primary_attribute = "name"
+        self.name = name
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.name
+        )
+        self.exists = True
+
+    @staticmethod
+    def _add_namedentity_properties(properties):
+        if properties is None:
+            return {"image_url": None}
+        else:
+            if not "image_url" in properties:
+                properties["image_url"] = None
+            return properties

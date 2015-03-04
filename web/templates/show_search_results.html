@@ -58,6 +58,25 @@
                                         {% endif %}
 
                                         {% if "Member of Parliament" in entry["labels"] %}
+
+                                            {% if entry["government_positions"] %}
+                                                <div class="well well-sm">
+                                                    <b>Government Positions</b><br>
+                                                    {% for position in entry["government_positions"] %}
+                                                        {{ position }} <br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            {% if entry["government_departments"] %}
+                                                <div class="well well-sm">
+                                                    <b>Government Roles</b><br>
+                                                    {% for position in entry["government_departments"] %}
+                                                        {{ position }} <br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
                                             {% if "register_of_interests" in entry.influences_summary %}
                                                 <div class="well well-sm">
                                                     <b>Register of Interests</b><br>
@@ -113,6 +132,38 @@
                                                 {% endif %}
                                             </div >
                                         {% endif %}
+
+                                        {% if "Government Department" in entry["labels"] or "Government Position" in entry["labels"] %}
+
+                                            <div class="well well-sm">
+
+                                                <b>Summary</b>
+                                                {% if "register_of_interests" in entry.influences_summary %}
+                                                    <br>
+                                                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
+                                                    {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
+                                                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories.
+                                                {% endif %}
+                                                {% if "electoral_commission" in entry.influences_summary %}
+                                                    <br>
+                                                    {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
+                                                    {{ entry.influences_summary.electoral_commission.donor_count }} donations.
+                                                {% endif %}
+
+                                            </div >
+
+                                            <div class="well well-sm">
+
+                                                {% if entry.weight > 0 %}
+                                                    <b>{{ entry.weight }} Members:</b>
+                                                    {% for member in entry.members %}
+                                                        <a href="{{ member.detail_url }}">{{ member.name }}</a>.
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                            </div >
+
+                                        {% endif %}
                                     </div >
                                 </div >
                             </div>
@@ -125,9 +176,9 @@
                     {% if page == 1  %}
                         <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
                     {% else %}
-                        <li class="previous"><a href="{{ url_for('show_lords', page=page-1) }}">Previous page</a></li>
+                        <li class="previous"><a href="{{ url_for('show_search_result', page=page-1) }}">Previous page</a></li>
                     {% endif %}
-                    <li class="next disabled"><a href="{{ url_for('show_lords', page=page+1) }}">Next page</a></li>
+                    <li class="next disabled"><a href="{{ url_for('show_search_result', page=page+1) }}">Next page</a></li>
                 </ul>
             </div>
         </div>

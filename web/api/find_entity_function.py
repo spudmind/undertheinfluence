@@ -46,17 +46,13 @@ class EntityApi(BaseAPI):
                 "detail_url": self.named_entity_resources(
                     entry["name"], entry["labels"]
                 )[0],
-                "weight": entry["weight"],
+                "weight": self._get_weight(entry),
+                "members": self._members_detail_url(
+                    self._get_members(entry)
+                ),
                 "labels": entry["labels"],
                 "influences_summary": entry["influences"]
             }
             for entry in results
         ]
         return response
-
-    @staticmethod
-    def _fill_missing(field, record):
-        result = None
-        if field in record:
-            result = record[field]
-        return result

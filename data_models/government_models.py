@@ -1,30 +1,99 @@
 # -*- coding: utf-8 -*-
-from data_models import core
+from data_models.core import BaseDataModel
+from data_models.core import NamedEntity
 from utils import config
 
 
-class NamedEntity(core.BaseDataModel):
+class Politicians(BaseDataModel):
+    def __init__(self):
+        BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            MATCH (p)-[r]-() with p,  r
+            RETURN DISTINCT p.name, p.party, p.twfy_id, p.image_url,
+                count(r) as weight, labels(p)
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            RETURN count(p)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
+
+
+class Politician(NamedEntity):
     def __init__(self, name=None):
-        core.BaseDataModel.__init__(self)
-        self.exists = False
+        NamedEntity.__init__(self)
         self.label = "Named Entity"
         self.primary_attribute = "name"
         self.name = name
-
-    def create(self):
-        self.vertex = self.create_vertex(
+        self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
-        self.exists = True
+        if self.exists:
+            self.labels = self._get_labels()
+            self.type = self._get_type()
+            self._set_properties()
 
-    @staticmethod
-    def _add_namedentity_properties(properties):
-        if properties is None:
-            return {"image_url": None}
+    def _get_type(self):
+        if "Member of Parliament" in self.labels:
+            return "mp"
+        elif "Lord" in self.labels:
+            return "lord"
+
+    def _set_properties(self):
+        if self.type == "mp":
+            politician = MemberOfParliament(self.name)
+            self.positions = politician.positions
+            self.departments = politician.departments
+        elif self.type == "lord":
+            politician = Lord(self.name)
         else:
-            if not "image_url" in properties:
-                properties["image_url"] = None
-            return properties
+            print "something wrong with:", self.name
+        self.interests = politician.interests
+        self.interests_summary = politician.interests_summary
+        self.donations = politician.donations
+        self.donations_summary = politician.donations_summary
+
+    def _get_labels(self):
+        query = u"""
+            MATCH (p:`Named Entity` {{name: "{0}"}}) WITH p
+            RETURN labels(p) as labels
+        """.format(self.vertex["name"])
+        return self.query(query)[0][0]
+
+
+class MembersOfParliament(BaseDataModel):
+    def __init__(self):
+        BaseDataModel.__init__(self)
+        self.count = self._get_mp_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament`) with mp
+            MATCH (mp)-[r]-() with mp,  r
+            RETURN mp.name, mp.party, mp.twfy_id, mp.image_url,
+                count(r) as weight, labels(mp) as labels
+            ORDER BY weight DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_mp_count(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament`)
+            RETURN count(mp)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
 
 
 class MemberOfParliament(NamedEntity):
@@ -37,6 +106,7 @@ class MemberOfParliament(NamedEntity):
             self.label, self.primary_attribute, self.name
         )
         if self.exists:
+            self.party, self.image_url = self._set_properties()
             self.positions = self._get_positions()
             self.departments = self._get_departments()
             self.interests = self._get_interests()
@@ -49,6 +119,14 @@ class MemberOfParliament(NamedEntity):
 
     def _get_departments(self):
         return self._get_government_positions("Government Department")
+
+    def _set_properties(self):
+        search_string = u"""
+            MATCH (mp:`Member of Parliament` {{name:"{0}"}})
+            return mp.party, mp.image_url
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        return output[0]["mp.party"], output[0]["mp.image_url"]
 
     def _get_government_positions(self, pos_type):
         results = []
@@ -89,7 +167,7 @@ class MemberOfParliament(NamedEntity):
                 },
                 "category": entry["cat.category"],
                 "amount_int": entry["p.amount"],
-                "amount": _convert_to_currency(entry["p.amount"]),
+                "amount": self._convert_to_currency(entry["p.amount"]),
                 "received": entry["p.received"],
                 "registered": entry["p.registered"]
             }
@@ -99,7 +177,7 @@ class MemberOfParliament(NamedEntity):
     def _get_interests_summary(self):
         total = self._remuneration_total()
         register = {
-            "remuneration_total": _convert_to_currency(total),
+            "remuneration_total": self._convert_to_currency(total),
             "remuneration_total_int": total,
             "interest_categories": self._interest_categories(),
             "interest_relationships": self._interest_relationships(),
@@ -148,7 +226,7 @@ class MemberOfParliament(NamedEntity):
         total = self._donation_total()
         ec = {
             "donor_count": self._donor_count(),
-            "donation_total": _convert_to_currency(total),
+            "donation_total": self._convert_to_currency(total),
             "donation_total_int": total
         }
         return ec
@@ -192,7 +270,7 @@ class MemberOfParliament(NamedEntity):
                     "details_url": None,
                     "api_url": None
                 },
-                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount": self._convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
@@ -249,26 +327,26 @@ class MemberOfParliament(NamedEntity):
         )
 
 
-class MembersOfParliament(core.BaseDataModel):
+class Lords(BaseDataModel):
     def __init__(self):
-        core.BaseDataModel.__init__(self)
-        self.count = self._get_mp_count()
+        BaseDataModel.__init__(self)
+        self.count = self._get_lord_count()
 
     def get_all(self):
         search_string = u"""
-            MATCH (mp:`Member of Parliament`) with mp
-            MATCH (mp)-[r]-() with mp,  r
-            RETURN mp.name, mp.party, mp.twfy_id, mp.image_url,
-                count(r) as weight, labels(mp) as labels
+            MATCH (lord:`Lord`) with lord
+            MATCH (lord)-[r]-() with lord,  r
+            RETURN lord.name, lord.party, lord.twfy_id,
+                count(r) as weight, labels(lord) as labels
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)
         return search_result
 
-    def _get_mp_count(self):
+    def _get_lord_count(self):
         search_string = u"""
-            MATCH (mp:`Member of Parliament`)
-            RETURN count(mp)
+            MATCH (lord:`Lord`)
+            RETURN count(lord)
         """
         search_result = self.query(search_string)
         return search_result[0][0]
@@ -393,7 +471,7 @@ class Lord(NamedEntity):
                     "api_url": None
                 },
                 "amount_int": entry["x.amount"],
-                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount": self._convert_to_currency(entry["x.amount"]),
                 "donee_type": entry["donr.donee_type"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
@@ -410,7 +488,7 @@ class Lord(NamedEntity):
         total = self._donation_total()
         ec = {
             "donation_count": self._donation_count(),
-            "donation_total": _convert_to_currency(total),
+            "donation_total": self._convert_to_currency(total),
             "donation_total_int": total
         }
         return ec
@@ -433,84 +511,16 @@ class Lord(NamedEntity):
         return self.query(query)[0]["total"]
 
 
-class Lords(core.BaseDataModel):
+class PoliticalParties(BaseDataModel):
     def __init__(self):
-        core.BaseDataModel.__init__(self)
-        self.count = self._get_lord_count()
-
-    def get_all(self):
-        search_string = u"""
-            MATCH (lord:`Lord`) with lord
-            MATCH (lord)-[r]-() with lord,  r
-            RETURN lord.name, lord.party, lord.twfy_id,
-                count(r) as weight, labels(lord) as labels
-            ORDER BY weight DESC
-        """
-        search_result = self.query(search_string)
-        return search_result
-
-    def _get_lord_count(self):
-        search_string = u"""
-            MATCH (lord:`Lord`)
-            RETURN count(lord)
-        """
-        search_result = self.query(search_string)
-        return search_result[0][0]
-
-
-class Politician(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
-        self.label = "Named Entity"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
-        )
-        if self.exists:
-            self.labels = self._get_labels()
-            self.type = self._get_type()
-            self._set_properties()
-
-    def _get_type(self):
-        if "Member of Parliament" in self.labels:
-            return "mp"
-        elif "Lord" in self.labels:
-            return "lord"
-
-    def _set_properties(self):
-        if self.type == "mp":
-            politician = MemberOfParliament(self.name)
-            self.positions = politician.positions
-            self.departments = politician.departments
-        elif self.type == "lord":
-            politician = Lord(self.name)
-        else:
-            print "something wrong with:", self.name
-        self.interests = politician.interests
-        self.interests_summary = politician.interests_summary
-        self.donations = politician.donations
-        self.donations_summary = politician.donations_summary
-
-    def _get_labels(self):
-        query = u"""
-            MATCH (p:`Named Entity` {{name: "{0}"}}) WITH p
-            RETURN labels(p) as labels
-        """.format(self.vertex["name"])
-        return self.query(query)[0][0]
-
-
-class Politicians(core.BaseDataModel):
-    def __init__(self):
-        core.BaseDataModel.__init__(self)
+        BaseDataModel.__init__(self)
         self.count = self._get_count()
 
     def get_all(self):
         search_string = u"""
-            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
-            MATCH (p)-[r]-() with p,  r
-            RETURN DISTINCT p.name, p.party, p.twfy_id, p.image_url,
-                count(r) as weight, labels(p)
+            MATCH (d:`Political Party`)
+            MATCH (d)-[x]-()
+            RETURN d.name, d.image_url, count(x) as weight
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)
@@ -518,382 +528,11 @@ class Politicians(core.BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
-            RETURN count(p)
+            MATCH (d:`Political Party`)
+            RETURN count(d)
         """
         search_result = self.query(search_string)
         return search_result[0][0]
-
-
-class DonationRecipient(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
-        self.exists = False
-        self.label = "Donation Recipient"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            "Named Entity", self.primary_attribute, self.name
-        )
-
-    def set_recipient_details(self, properties=None):
-        properties = self._add_namedentity_properties(properties)
-        labels = ["Donation Recipient", "Named Entity"]
-        self.set_node_properties(properties, labels)
-
-    def link_funding_category(self, category):
-        self.create_relationship(
-            self.vertex, "FUNDING_RELATIONSHIP", category.vertex
-        )
-
-
-class Donor(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
-        self.exists = False
-        self.label = "Donor"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            "Named Entity", self.primary_attribute, self.name
-        )
-
-    def set_donor_details(self, properties=None):
-        properties = self._add_namedentity_properties(properties)
-        labels = ["Donor", "Named Entity"]
-        self.set_node_properties(properties, labels)
-
-
-class FundingRelationship(core.BaseDataModel):
-    def __init__(self, relationship=None):
-        core.BaseDataModel.__init__(self)
-        self.exists = False
-        self.label = "Funding Relationship"
-        self.primary_attribute = "relationship"
-        self.relationship = relationship
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.relationship
-        )
-
-    def create(self):
-        self.vertex = self.create_vertex(
-            self.label, self.primary_attribute, self.relationship
-        )
-        self.exists = True
-
-    def set_category_details(self, properties=None):
-        self.set_node_properties(properties)
-
-    def update_raw_record(self, raw_record):
-        existing = self.vertex["raw_record"]
-        if existing and len(existing) > 0:
-            new = u"{}\n---\n\n{}".format(existing, raw_record)
-        else:
-            new = raw_record
-        self.vertex["raw_record"] = new
-        self.vertex.push()
-
-    def link_donor(self, donor):
-        self.create_relationship(
-            self.vertex, "REGISTERED_CONTRIBUTOR", donor.vertex
-        )
-
-    def link_funding(self, funding):
-        self.create_relationship(
-            self.vertex, "DONATION_RECEIVED", funding.vertex
-        )
-
-    def link_payment(self, payment):
-        self.create_relationship(
-            self.vertex, "REMUNERATION_RECEIVED", payment.vertex
-        )
-
-    def set_registered_date(self, date):
-        self.set_date(date, "REGISTERED")
-
-
-class InterestCategory(core.BaseDataModel):
-    def __init__(self, name=None):
-        core.BaseDataModel.__init__(self)
-        self.exists = False
-        self.label = "Interest Category"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
-        )
-
-    def create(self):
-        self.vertex = self.create_vertex(
-            self.label, self.primary_attribute, self.name
-        )
-        self.exists = True
-
-    def update_category_details(self, properties=None):
-        self.set_node_properties(properties)
-
-    def link_relationship(self, relationship):
-        self.create_relationship(
-            self.vertex, "INTEREST_RELATIONSHIP", relationship.vertex
-        )
-
-
-class RegisteredInterest(NamedEntity):
-    def __init__(self, name=None):
-        NamedEntity.__init__(self)
-        self.exists = False
-        self.label = "Registered Interest"
-        self.primary_attribute = "name"
-        self.name = name
-        self.exists = self.fetch(
-            "Named Entity", self.primary_attribute, self.name
-        )
-
-    def set_interest_details(self, properties=None):
-        properties = self._add_namedentity_properties(properties)
-        labels = ["Named Entity", "Registered Interest"]
-        self.set_node_properties(properties, labels)
-
-
-class Influencer(core.BaseDataModel):
-    def __init__(self, name):
-        core.BaseDataModel.__init__(self)
-        self.primary_attribute = "name"
-        self.label = "Named Entity"
-        self.name = name
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.name
-        )
-        if self.exists:
-            self.interests = self._get_interests()
-            self.donations = self._get_donations()
-            self.interests_summary = self._get_interests_summary()
-            self.donations_summary = self._get_donations_summary()
-
-    def _get_interests(self):
-        results = []
-        search_string = u"""
-            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
-            MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
-            MATCH (p)-[:INTERESTS_REGISTERED_IN]-(cat)
-            OPTIONAL MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
-            RETURN p.name, p.party, cat.category, x.amount,
-                labels(p) as labels
-            ORDER by x.reported_date DESC
-        """.format(self.vertex["name"])
-        output = self.query(search_string)
-        for entry in output:
-            detail = {
-                "interest": {
-                    "name": entry["p.name"],
-                    "party": entry["p.party"],
-                    "labels": entry["labels"],
-                    "details_url": None,
-                    "api_url": None
-                },
-                "category": entry["cat.category"],
-                "amount": _convert_to_currency(entry["x.amount"]),
-                "amount_int": entry["x.amount"]
-            }
-            results.append(detail)
-        return results
-
-    def _get_interests_summary(self):
-        total = self._remuneration_total()
-        register = {
-            "relationship_count": self._interest_relationships(),
-            "remuneration_total": _convert_to_currency(total),
-            "remuneration_total_int": total,
-            "remuneration_count": self._remuneration_count()
-        }
-        return register
-
-    def _interest_relationships(self):
-        query = u"""
-            MATCH (inf:`Named Entity` {{name: "{0}"}})
-            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
-            RETURN count(rel) as count
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["count"]
-
-    def _remuneration_total(self):
-        query = u"""
-            MATCH (inf:`Named Entity` {{name: "{0}"}})
-            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
-            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
-            RETURN sum(x.amount) as total
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["total"]
-
-    def _remuneration_count(self):
-        query = u"""
-            MATCH (inf:`Named Entity` {{name: "{0}"}})
-            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
-            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
-            RETURN count(x) as count
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["count"]
-
-    def _get_donations(self):
-        results = []
-        search_string = u"""
-            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
-            MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel) with rel
-            MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
-            MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
-            RETURN donr.name, donr.donee_type, donr.recipient_type,
-            x.amount, x.reported_date,x.received_date, x.nature,
-            x.purpose, x.accepted_date, x.ec_reference,x.recd_by, labels(donr) as labels
-            ORDER by x.reported_date DESC
-        """.format(self.vertex["name"])
-        output = self.query(search_string)
-        for entry in output:
-            detail = {
-                "recipient": {
-                    "name": entry["donr.name"],
-                    "labels": entry["labels"],
-                    "recipient_type": entry["donr.recipient_type"],
-                    "details_url": None,
-                    "api_url": None
-                },
-                "amount": _convert_to_currency(entry["x.amount"]),
-                "amount_int": entry["x.amount"],
-                "donee_type": entry["donr.donee_type"],
-                "reported": entry["x.reported_date"],
-                "received": entry["x.received_date"],
-                "accepted": entry["x.accepted_date"],
-                "ec_reference": entry["x.ec_reference"],
-                "recd_by": entry["x.recd_by"],
-                "nature": entry["x.nature"],
-                "purpose": entry["x.purpose"]
-            }
-            results.append(detail)
-        return results
-
-    def _get_donations_summary(self):
-        total = self._donation_total()
-        ec = {
-            "donation_count": self._donation_count(),
-            "donation_total": _convert_to_currency(total),
-            "donation_total_int": total
-        }
-        return ec
-
-    def _donation_total(self):
-        query = u"""
-            MATCH (inf:`Named Entity` {{name: "{0}"}})
-            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (rel)-[:DONATION_RECEIVED]-(x)
-            RETURN sum(x.amount) as total
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["total"]
-
-    def _donation_count(self):
-        query = u"""
-            MATCH (inf:`Named Entity` {{name: "{0}"}})
-            MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
-            MATCH (rel)-[:DONATION_RECEIVED]-(x)
-            RETURN count(x) as count
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["count"]
-
-
-class Influencers(core.BaseDataModel):
-    def __init__(self):
-        core.BaseDataModel.__init__(self)
-        self.count = self._get_count()
-
-    def get_all(self):
-        search_string = u"""
-            MATCH (inf) where inf:Donor OR inf:`Registered Interest` with inf
-            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP]-(x)
-            RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
-            ORDER BY weight DESC
-        """
-        search_result = self.query(search_string)
-        return search_result
-
-    def _get_count(self):
-        search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
-            RETURN count(inf)
-        """
-        search_result = self.query(search_string)
-        return search_result[0][0]
-
-
-class RegisteredDonation(core.BaseDataModel):
-    def __init__(self, donation=None):
-        core.BaseDataModel.__init__(self)
-        self.exists = False
-        self.label = "Donation"
-        self.primary_attribute = "donation"
-        self.donation = donation
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.donation
-        )
-
-    def create(self):
-        self.vertex = self.create_vertex(
-            self.label, self.primary_attribute, self.donation
-        )
-        self.exists = True
-
-    def set_donations_details(self, properties=None):
-        labels = ["Donation", "Contributions"]
-        self.set_node_properties(properties, labels)
-
-    def set_dates(self, received, reported, accepted):
-        if received and len(received) > 0:
-            self._set_received_date(received)
-        if reported and len(reported) > 0:
-            self._set_reported_date(reported)
-        if accepted and len(accepted) > 0:
-            self._set_accepted_date(accepted)
-
-    def _set_received_date(self, date):
-        self.set_date(date, "RECEIVED")
-
-    def _set_reported_date(self, date):
-        self.set_date(date, "REPORTED")
-
-    def _set_accepted_date(self, date):
-        self.set_date(date, "ACCEPTED")
-
-
-class Remuneration(core.BaseDataModel):
-    def __init__(self, summary=None):
-        core.BaseDataModel.__init__(self)
-        self.exists = False
-        self.label = "Remuneration"
-        self.primary_attribute = "summary"
-        self.summary = summary
-        self.exists = self.fetch(
-            self.label, self.primary_attribute, self.summary
-        )
-
-    def create(self):
-        self.vertex = self.create_vertex(
-            self.label,
-            self.primary_attribute,
-            self.summary,
-            merge=True
-        )
-        self.exists = True
-
-    def set_remuneration_details(self, properties=None):
-        labels = ["Remuneration", "Contributions"]
-        self.set_node_properties(properties, labels)
-
-    def set_registered_date(self, date):
-        self.set_date(date, "REGISTERED")
-
-    def set_received_date(self, date):
-        self.set_date(date, "RECEIVED")
 
 
 class PoliticalParty(NamedEntity):
@@ -955,7 +594,7 @@ class PoliticalParty(NamedEntity):
                     "details_url": None,
                     "api_url": None
                 },
-                "amount": _convert_to_currency(entry["x.amount"]),
+                "amount": self._convert_to_currency(entry["x.amount"]),
                 "amount_int": entry["x.amount"],
                 "reported": entry["x.reported_date"],
                 "received": entry["x.received_date"],
@@ -970,7 +609,7 @@ class PoliticalParty(NamedEntity):
         total, count = self._donations()
         ec = {
             "donation_count": count,
-            "donation_total": _convert_to_currency(total),
+            "donation_total": self._convert_to_currency(total),
             "donation_total_int": total
         }
         return ec
@@ -990,25 +629,33 @@ class PoliticalParty(NamedEntity):
             return 0, 0
 
 
-class PoliticalParties(core.BaseDataModel):
+class GovernmentOffices(BaseDataModel):
     def __init__(self):
-        core.BaseDataModel.__init__(self)
+        BaseDataModel.__init__(self)
         self.count = self._get_count()
 
     def get_all(self):
         search_string = u"""
-            MATCH (d:`Political Party`)
-            MATCH (d)-[x]-()
-            RETURN d.name, d.image_url, count(x) as weight
-            ORDER BY weight DESC
+            MATCH (n:`Government Office`) with n
+            MATCH (n)-[:SERVED_IN]-(x) with n, x
+                WHERE x.left_reason = "still_in_office"
+            MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
+            RETURN n.name, labels(n), count(p)
+            ORDER BY count(p) DESC
         """
         search_result = self.query(search_string)
         return search_result
 
+    def test(self):
+        all_offices = self.get_all()
+        for dept, labels, weight in all_offices:
+            office = GovernmentOffice(dept)
+            print dept, office.mp_count
+
     def _get_count(self):
         search_string = u"""
-            MATCH (d:`Political Party`)
-            RETURN count(d)
+            MATCH (p) where p:Lord OR p:`Member of Parliament` with p
+            RETURN count(p)
         """
         search_result = self.query(search_string)
         return search_result[0][0]
@@ -1020,10 +667,16 @@ class GovernmentOffice(NamedEntity):
         self.exists = False
         self.label = "Government Office"
         self.primary_attribute = "name"
+        #self.name = name.strip()
         self.name = name
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
+        if self.exists:
+            self.mp_count = self._mp_count()
+            self.members = self._get_members()
+            self.interests_summary, self.donation_summary =\
+                self._get_office_summary()
 
     def is_department(self):
         properties = {"image_url": None}
@@ -1035,10 +688,60 @@ class GovernmentOffice(NamedEntity):
         labels = ["Named Entity", "Government Position"]
         self.set_node_properties(properties=properties, labels=labels)
 
+    def _mp_count(self):
+        query = u"""
+            MATCH (n:`Government Office` {{name: "{0}"}}) with n
+            MATCH (n)-[:SERVED_IN]-(x) with n, x
+                WHERE x.left_reason = "still_in_office"
+            MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
+            RETURN count(p) as mp_count
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["mp_count"]
 
-class TermInParliament(core.BaseDataModel):
+    def _get_members(self):
+        search_string = u"""
+            MATCH (n:`Government Office` {{name: "{0}"}}) with n
+            MATCH (n)-[:SERVED_IN]-(t) with n, t
+                WHERE t.left_reason = "still_in_office"
+            MATCH (t)-[:ELECTED_FOR]-(p) with n, t, p
+            RETURN p.name as name
+        """.format(self.vertex["name"])
+        result = self.query(search_string)
+        return [r["name"] for r in result]
+
+    def _get_office_summary(self):
+        results = []
+        for name in self.members:
+            member = MemberOfParliament(name)
+            entry = {
+                "ri_total": member.interests_summary["remuneration_total_int"],
+                "ri_count": member.interests_summary["remuneration_count"],
+                "ri_relationships": member.interests_summary["interest_relationships"],
+                "ec_count": member.donations_summary["donor_count"],
+                "ec_total": member.donations_summary["donation_total_int"],
+            }
+            results.append(entry)
+        register = {
+            "remuneration_count": sum(x['ri_count'] for x in results),
+            "interest_relationships": sum(x['ri_relationships'] for x in results),
+            "remuneration_total_int": sum(x['ri_total'] for x in results),
+            "remuneration_total": self._convert_to_currency(
+                sum(x['ri_total'] for x in results)
+            )
+        }
+        donations = {
+            "donor_count": sum(x['ec_count'] for x in results),
+            "donation_total_int": sum(x['ec_total'] for x in results),
+            "donation_total": self._convert_to_currency(
+                sum(x['ec_total'] for x in results)
+            )
+        }
+        return register, donations
+
+
+class TermInParliament(BaseDataModel):
     def __init__(self, term=None):
-        core.BaseDataModel.__init__(self)
+        BaseDataModel.__init__(self)
         self.exists = False
         self.label = "Elected Term"
         self.primary_attribute = "term"
@@ -1067,9 +770,9 @@ class TermInParliament(core.BaseDataModel):
         self.create_relationship(self.vertex, "SERVED_IN", position.vertex)
 
 
-class Constituency(core.BaseDataModel):
+class Constituency(BaseDataModel):
     def __init__(self, name=None):
-        core.BaseDataModel.__init__(self)
+        BaseDataModel.__init__(self)
         self.exists = False
         self.label = "Constituency"
         self.primary_attribute = "name"
@@ -1085,8 +788,4 @@ class Constituency(core.BaseDataModel):
         self.exists = True
 
 
-def _convert_to_currency(number):
-    if isinstance(number, int):
-        return u'£{:20,.2f}'.format(number)
-    else:
-        return None
+

@@ -1,11 +1,12 @@
-from data_models import models
+from data_models import government_models
+from data_models.influencers_models import DonationRecipient
 from utils import entity_resolver
 
 resolver = entity_resolver.MasterEntitiesResolver()
 
 #test_entry = "Lord na Lester"
-test_entry = "Hezbollah is preparing for an all-out war with the Green Party fighters of al-Nusra Front and the Islamic State."
-test_type = "Political Party"
+test_entry = "The Rt Hon Edward Milliband MP"
+test_type = "MP"
 test_recipient = None
 
 
@@ -14,7 +15,7 @@ def parse_recipient(entry, entry_type, recipient_type):
     if entry_type == "MP":
         print "*trying mp search"
         result = resolver.find_mp(entry)
-    if entry_type == "Lord":
+    elif entry_type == "Lord":
         print "*trying lord search"
         result = resolver.find_lord(entry)
     elif entry_type == "Political Party" or \
@@ -30,7 +31,7 @@ def parse_recipient(entry, entry_type, recipient_type):
 
 
 def node_properties_test():
-    me = models.MemberOfParliament("Warren The Magnificent")
+    me = government_models.MemberOfParliament("Warren The Magnificent")
     details = {
         "first_name": "Warren",
         "last_name": "The Magnificent",
@@ -42,12 +43,12 @@ def node_properties_test():
     }
     me.create()
     me.set_mp_details(details)
-    new_me = models.DonationRecipient("Warren The Magnificent")
+    new_me = DonationRecipient("Warren The Magnificent")
     extra_details = {
         "extra_indigo": "flatbush zombie"
     }
     new_me.set_recipient_details(extra_details)
 
-#print "found:", parse_recipient(test_entry, test_type, test_recipient)
-node_properties_test()
+print "found:", parse_recipient(test_entry, test_type, test_recipient)
+#node_properties_test()
 

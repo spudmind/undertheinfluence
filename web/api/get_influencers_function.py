@@ -16,6 +16,9 @@ class InfluencersApi:
         query = self._filter_labels(args, {})
         query = self._filter_interests(args, query)
         query = self._filter_funding(args, query)
+
+        print query
+
         results, response = self._db.query(self._db_table, query=query, page=page)
         if response['has_more']:
             next_query = args

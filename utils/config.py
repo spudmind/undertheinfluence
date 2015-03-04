@@ -1,7 +1,15 @@
 prefixes = [
     u"Sir ",
     u"Mr ",
-    u"Ms "
+    u"Ms ",
+    u"The Rt Hon "
+]
+
+sufixes = [
+    u" MP",
+    u"Mr ",
+    u"Ms ",
+    u"The Rt Hon "
 ]
 
 lords_titles = [

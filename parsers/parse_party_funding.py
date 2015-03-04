@@ -61,12 +61,7 @@ class PartyFundingParser():
             result = self.resolver.find_party(result)
         else:
             result = self.resolver.get_entities(result)
-            if result and isinstance(result, list):
-                result = result[0]
-        if not result:
-            return entry
-        else:
-            return result
+        return result if result else entry
 
     def _get_donor(self, entry, entry_type):
         result = self._remove_extraneous(entry)
@@ -95,7 +90,6 @@ class PartyFundingParser():
     def _remove_extraneous(text):
         text = text.replace("\\", " ")
         text = text.replace('"', ' ')
-        text = text.replace('The Rt Hon ', '')
         return text
 
     def _print_out(self, key, value):

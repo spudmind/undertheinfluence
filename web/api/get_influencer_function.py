@@ -1,5 +1,6 @@
+from data_models.influencers_models import Influencer
 from web.api import BaseAPI
-from data_models import models
+from data_models import government_models
 from utils import mongo
 
 
@@ -13,7 +14,7 @@ class InfluencerApi(BaseAPI):
         name = args["name"]
         result, _ = self._db.query(self._db_table, query=args)
         if len(result) > 0:
-            influencer = models.Influencer(name)
+            influencer = Influencer(name)
             result = {
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],

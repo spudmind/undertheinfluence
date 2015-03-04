@@ -11,13 +11,13 @@ class LordsInterestsParser:
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.entity_resolver = entity_resolver.MasterEntitiesResolver()
+        self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
 
         all_interests = self.db.fetch_all('scraped_lords_interests', paged=False)
         for lord in all_interests:
             lord_name = lord["member_title"]
-            resolved_name = self.entity_resolver.find_lord(lord_name)
+            resolved_name = self.resolver.find_lord(lord_name)
             self._logger.debug("\n%s / %s" % (resolved_name, lord_name))
             if len(lord["interests"]) > 0:
                 # skip Lords who do not have any interests
@@ -104,7 +104,7 @@ class LordsInterestsParser:
 
         records = []
         for record in data["records"]:
-            interest_name = self.entity_resolver.find_donor(record["interest"])
+            interest_name = self.resolver.find_donor(record["interest"])
             # if no interest is found, skip record
             if interest_name:
                 self._logger.debug(" interest: %s" % interest_name)

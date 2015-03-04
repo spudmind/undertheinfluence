@@ -11,7 +11,6 @@ class MasterEntitiesResolver:
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
         self.entity_extractor = entity_extraction.NamedEntityExtractor()
-        self.return_first_entity = True
         self.master_mps = [
             x["name"] for x in self.db.fetch_all('master_mps', paged=False)
         ]
@@ -25,20 +24,29 @@ class MasterEntitiesResolver:
         self.party_entities = config.party_entities
         self.mapped_parties = config.mapped_parties
         self.prefixes = config.prefixes
+        self.sufixes = config.sufixes
 
-    def get_entities(self, search_string):
+    def get_entities(self, search_string, return_first_entity=True):
+        found = None
+        search_string = self._strip_prefix_sufix(search_string)
+        print "new search_string", search_string
         entities = self.entity_extractor.get_entities(search_string)
-        if self.return_first_entity:
-            if entities and isinstance(entities, list):
-                return entities[0]
+        if return_first_entity:
+            if len(entities) > 1:
+                for entity in entities:
+                    found = self._find_mapped_entity(entity)
+                    if found:
+                        break
+                return found if found else entities[0]
+            else:
+                found = self._find_mapped_entity(search_string)
+                return found if found else None
         else:
             return entities
 
     def find_mp(self, search):
         found = False
-        for p in self.prefixes:
-            if p in search:
-                search = search.lstrip(p)
+        search = self._strip_prefix_sufix(search)
         if isinstance(self.master_mps, list):
             guess, accuracy = fuzzy_match.extractOne(search, self.master_mps)
             if accuracy > 80:
@@ -107,13 +115,9 @@ class MasterEntitiesResolver:
                     name = correct
         return name
 
-    def _parse_donor(self, search):
-        if self.return_first_entity:
-            candidate = self.get_entities(search)
-            if isinstance(candidate, list):
-                return candidate[0]
-            else:
-                return candidate
+    def _parse_donor(self, search, return_first_entity=True):
+        if return_first_entity:
+            return self.get_entities(search)
         else:
             return self._get_best_entity(search)
 
@@ -135,3 +139,22 @@ class MasterEntitiesResolver:
                     name = guess
                     break
         return name
+
+    def _find_mapped_entity(self, search_string):
+        found = False
+        mapped_entities = [self.mapped_mps, self.mapped_donors, self.mapped_lords]
+        for mapped in mapped_entities:
+            for incorrect, correct in mapped:
+                if incorrect in search_string or incorrect == search_string:
+                    found = correct
+                    break
+        return found
+
+    def _strip_prefix_sufix(self, text):
+        for p in self.prefixes:
+            if p in text.strip():
+                text = text.strip().lstrip(p)
+        for s in self.sufixes:
+            if s in text.strip():
+                text = text.strip().rstrip(s)
+        return text

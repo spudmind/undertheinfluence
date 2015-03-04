@@ -1,0 +1,10 @@
+{
+  "details": {
+    "name": "Ministers' meetings",
+    "description": "Various government meetings are recorded as part of the transparency data on gov.uk. Unfortunately, there doesn't appear to be a machine-readable central repository of these. This scraper uses the gov.uk site search to find documents mentioning 'ministers meetings', then scrapes and parsers these.",
+    "source": "http://www.gov.uk",
+    "author": "Andy Lulham"
+  },
+  "id": "meetings",
+  "version": "0.0.1"
+}

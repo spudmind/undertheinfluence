@@ -4,6 +4,8 @@ import sys
 import argparse
 import logging
 
+from scrapers import meetings
+
 from scrapers import scrape_mps
 from scrapers import scrape_lords
 from scrapers import scrape_mps_interests
@@ -27,9 +29,10 @@ from data_interfaces import api_data_gen
 from data_models import core
 
 
-choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding']
+choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding', 'meetings']
 arg_parser = argparse.ArgumentParser(description='Task runner for spud.')
 arg_parser.add_argument('--verbose', '-v', action='store_true', help='Noisy output')
+arg_parser.add_argument('--fetch', nargs='+', choices=['meetings'], help='Specify the fetcher(s) to run')
 arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify the scraper(s) to run')
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
@@ -38,10 +41,10 @@ arg_parser.add_argument('--api_gen', nargs='+', choices=['politicians', 'governm
 arg_parser.add_argument('--export', nargs='+', choices=['named_entities'], help='Specify the export to run')
 args = arg_parser.parse_args()
 
-if (args.scrape, args.master, args.parse, args.graph, args.export) == (None, None, None, None):
-    print 'Nothing to do!'
-    arg_parser.print_help()
-    exit()
+# if (args.fetch, args.scrape, args.master, args.parse, args.graph, args.export) == (None, None, None, None, None):
+#     print 'Nothing to do!'
+#     arg_parser.print_help()
+#     exit()
 
 logger = logging.getLogger('spud')
 logger.addHandler(logging.StreamHandler())
@@ -49,6 +52,14 @@ if args.verbose:
     logger.setLevel(logging.DEBUG)
 else:
     logger.setLevel(logging.ERROR)
+
+# run fetchers
+if args.fetch is not None:
+    exec_fetcher = {
+        'meetings': meetings,
+    }
+    for fetcher in args.fetch:
+        exec_fetcher[fetcher].fetch()
 
 # run scrapers
 if args.scrape is not None:
@@ -58,9 +69,10 @@ if args.scrape is not None:
         'mps_interests': scrape_mps_interests.MPsInterestsScraper,
         'lords_interests': scrape_lords_interests.LordsInterestsScraper,
         'party_funding': scrape_party_funding.PartyFundingScraper,
+        'meetings': meetings,
     }
     for scraper in args.scrape:
-        exec_scraper[scraper]().run()
+        exec_scraper[scraper].scrape()
 
 # parse master entities
 if args.master is not None:

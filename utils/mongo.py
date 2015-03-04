@@ -58,9 +58,13 @@ class MongoInterface:
         q = collection.Collection(self.db, _collection)
         return q.count()
 
-    # save document to a collection
-    def save(self, _collection, document):
-        collection.Collection(self.db, _collection).save(document)
+    # save a document to a collection
+    def save(self, _collection, document, **kwargs):
+        return collection.Collection(self.db, _collection).save(document, **kwargs)
+
+    # update a document in a collection
+    def update(self, _collection, document, update):
+        return collection.Collection(self.db, _collection).update(document, update)
 
     def drop(self, _collection):
         q = collection.Collection(self.db, _collection)

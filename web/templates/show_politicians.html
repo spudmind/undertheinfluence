@@ -104,12 +104,16 @@
                     {% endfor %}
                 </div>
                 <ul class="pager">
-                    {% if page == 1  %}
+                    {% if not pager.previous %}
                         <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
                     {% else %}
-                        <li class="previous"><a href="{{ url_for('show_politicians', page=page-1) }}">Previous page</a></li>
+                        <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
                     {% endif %}
-                    <li class="next"><a href="{{ url_for('show_politicians', page=page+1) }}">Next page</a></li>
+                    {% if pager.next %}
+                        <li class="next"><a href="{{ pager.next }}">Next page</a></li>
+                    {% else %}
+                        <li class="previous disabled"><a href="javascript:void(0)">Next page</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

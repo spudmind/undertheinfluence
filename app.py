@@ -58,14 +58,17 @@ def show_politicians():
     args = {}
     args["page"] = int(request.args.get('page', 1))
     args["government_office"] = request.args.get('government_office', None)
-    politicians = get_politicians_function.PoliticiansApi().request(**args)['results']
+    print "http args:", args
+    reply = get_politicians_function.PoliticiansApi().request(**args)
+    politicians, pager = reply['results'], reply['pager']
     return render_template(
-        'show_politicians.html', politicians=politicians, page=args["page"]
+        'show_politicians.html', politicians=politicians, pager=pager
     )
 
 
 @app.route('/influencers')
 def show_influencers():
+    print request.args
     try:
         page = int(request.args.get('page', 1))
     except ValueError:

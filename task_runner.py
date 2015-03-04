@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 import sys
 import argparse
 import logging
 
-from scrapers import meetings, lords
+from scrapers import mps, lords, prca, meetings
 
-from scrapers import scrape_mps
 from scrapers import scrape_mps_interests
 from scrapers import scrape_lords_interests
 from scrapers import scrape_party_funding
@@ -31,7 +31,7 @@ from data_models import core
 choices = ['mps', 'lords', 'mps_interests', 'lords_interests', 'party_funding', 'meetings']
 arg_parser = argparse.ArgumentParser(description='Task runner for spud.')
 arg_parser.add_argument('--verbose', '-v', action='store_true', help='Noisy output')
-arg_parser.add_argument('--fetch', nargs='+', choices=['meetings', 'lords'], help='Specify the fetcher(s) to run')
+arg_parser.add_argument('--fetch', nargs='+', choices=['meetings', 'lords', 'mps'], help='Specify the fetcher(s) to run')
 arg_parser.add_argument('--scrape', nargs='+', choices=choices, help='Specify the scraper(s) to run')
 arg_parser.add_argument('--master', nargs='+', choices=['mps', 'lords'], help='Parse master entities')
 arg_parser.add_argument('--parse', nargs='+', choices=choices, help='Specify the parser(s) to run')
@@ -56,6 +56,7 @@ else:
 if args.fetch is not None:
     exec_fetcher = {
         'lords': lords,
+        'mps': mps,
         'meetings': meetings,
     }
     for fetcher in args.fetch:
@@ -64,7 +65,7 @@ if args.fetch is not None:
 # run scrapers
 if args.scrape is not None:
     exec_scraper = {
-        'mps': scrape_mps.MPsInfoScraper,
+        'mps': mps,
         'lords': lords,
         'mps_interests': scrape_mps_interests.MPsInterestsScraper,
         'lords_interests': scrape_lords_interests.LordsInterestsScraper,

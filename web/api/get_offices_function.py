@@ -29,7 +29,7 @@ class OfficesApi(BaseAPI):
                 ),
                 "mp_count": entry["mp_count"],
                 "detail_url": url_for(
-                    'show_party', name=entry["name"], _external=True
+                    'show_politicians', government_office=entry["name"], _external=True
 
                 )
             }

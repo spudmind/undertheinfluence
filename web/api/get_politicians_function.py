@@ -15,10 +15,15 @@ class PoliticiansApi(BaseAPI):
     def request(self, **args):
         page = args.get('page', 1)
 
+        print "args:", args
+
         query = self._filter_party(args)
-        query = self._filter_type(args)
+        query = self._filter_type(args, query=query)
         query = self._filter_interests(args, query=query)
         query = self._filter_funding(args, query=query)
+        query = self._filter_office(args, query=query)
+
+        print query
 
         results, response = self._db.query(self._db_table, query=query, page=page)
         if response['has_more']:
@@ -79,5 +84,16 @@ class PoliticiansApi(BaseAPI):
             _funding_search["$lt"] = args.get("donations_lt")
         if _funding_search != {}:
             query[self._funding] = _funding_search
+        return query
+
+    def _filter_office(self, args, query={}):
+        print "filtering office"
+        if args.get("government_office"):
+            query["$and"] = [
+                {
+                    "government_departments": {
+                    "$in": [args.get("government_office")]}
+                }
+            ]
         return query
 

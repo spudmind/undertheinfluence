@@ -55,13 +55,13 @@ def show_contact():
 
 @app.route('/politicians')
 def show_politicians():
-    print request.args.get("type")
-    try:
-        page = int(request.args.get('page', 1))
-    except ValueError:
-        page = 1
-    politicians = get_politicians_function.PoliticiansApi().request(page=page)['results']
-    return render_template('show_politicians.html', politicians=politicians, page=page)
+    args = {}
+    args["page"] = int(request.args.get('page', 1))
+    args["government_office"] = request.args.get('government_office', None)
+    politicians = get_politicians_function.PoliticiansApi().request(**args)['results']
+    return render_template(
+        'show_politicians.html', politicians=politicians, page=args["page"]
+    )
 
 
 @app.route('/influencers')
@@ -136,6 +136,7 @@ class GetPoliticians(Resource):
         self.reqparse.add_argument('page', type=int)
         self.reqparse.add_argument('party', type=str)
         self.reqparse.add_argument('type', type=str)
+        self.reqparse.add_argument('government_office', type=str)
         self.reqparse.add_argument('interests_gt', type=int)
         self.reqparse.add_argument('interests_lt', type=int)
         self.reqparse.add_argument('donations_gt', type=int)

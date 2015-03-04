@@ -5,7 +5,7 @@ from utils import entity_resolver
 resolver = entity_resolver.MasterEntitiesResolver()
 
 #test_entry = "Lord na Lester"
-test_entry = "The Rt Hon Edward Miliband MP"
+test_entry = "The Rt Hon Edward Milliband MP"
 test_type = "MP"
 test_recipient = None
 
@@ -15,7 +15,7 @@ def parse_recipient(entry, entry_type, recipient_type):
     if entry_type == "MP":
         print "*trying mp search"
         result = resolver.find_mp(entry)
-    if entry_type == "Lord":
+    elif entry_type == "Lord":
         print "*trying lord search"
         result = resolver.find_lord(entry)
     elif entry_type == "Political Party" or \

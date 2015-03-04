@@ -15,7 +15,6 @@ class MPsInterestsParser:
         self._logger = logging.getLogger('spud')
 
     def run(self):
-        self.entity_extractor = entity_extraction.NamedEntityExtractor()
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
 

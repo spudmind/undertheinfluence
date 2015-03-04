@@ -29,10 +29,7 @@ class NamedEntityExtractor:
             entity_text = u" ".join(tokens[i].decode('utf-8') for i in range)
             if not u'"' in entity_text:
                 entities_text.append(entity_text)
-        if len(entities_text) < 1:
-            return None
-        else:
-            return entities_text
+        return entities_text
 
 
 

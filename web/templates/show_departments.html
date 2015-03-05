@@ -3,7 +3,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h1>Government Office</h1>
+            <h1>Government Departments</h1>
             <hr>
         </div >
     </div>
@@ -73,9 +73,9 @@
                     {% if page == 1  %}
                         <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
                     {% else %}
-                        <li class="previous"><a href="{{ url_for('show_offices', page=page-1) }}">Previous page</a></li>
+                        <li class="previous"><a href="{{ url_for('show_departments', page=page-1) }}">Previous page</a></li>
                     {% endif %}
-                    <li class="next"><a href="{{ url_for('show_offices', page=page+1) }}">Next page</a></li>
+                    <li class="next"><a href="{{ url_for('show_departments', page=page+1) }}">Next page</a></li>
                 </ul>
             </div>
         </div>

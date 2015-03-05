@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from utils import mongo
+from flask import url_for
 
 
 class SummaryApi:
@@ -8,10 +9,10 @@ class SummaryApi:
 
     def request(self):
         apis = {
-            "political_parties": "http://127.0.0.1:5000/api/v0.1/getPoliticalParties",
-            "influencers": "http://127.0.0.1:5000/api/v0.1/getInfluencers",
-            "mps": "http://127.0.0.1:5000/api/v0.1/getMps",
-            "lords": "http://127.0.0.1:5000/api/v0.1/getLords"
+            "political_parties": url_for('getPoliticalParties', _external=True),
+            "influencers": url_for('getInfluencers', _external=True),
+            "politicians": url_for('getPoliticians', _external=True),
+            "government_departments": url_for('getGovernmentDepartments', _external=True),
         }
         summary = {
             "influencers": self._influencers_aggregate(),

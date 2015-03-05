@@ -1,9 +1,11 @@
+from web.api import BaseAPI
 from utils import mongo
 from flask import url_for
 
 
-class InfluencersApi:
+class InfluencersApi(BaseAPI):
     def __init__(self):
+        BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
         self._db_table = 'api_influencers'
 
@@ -32,7 +34,9 @@ class InfluencersApi:
             "labels": entry["labels"],
             "weight": entry["weight"],
             "donor_type": entry["donor_type"],
-            "detail_url": url_for('show_influencer', name=entry["name"], _external=True),
+            "detail_url": self.named_entity_resources(
+                entry["name"], entry["labels"]
+            )[0]
         } for entry in results]
 
         return response

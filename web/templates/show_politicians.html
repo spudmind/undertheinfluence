@@ -3,7 +3,11 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h1>Politicians</h1>
+            {% if title %}
+                <h1>{{ title }}</h1>
+            {% else %}
+                <h1>Politicians</h1>
+            {% endif %}
             <hr>
         </div >
     </div>
@@ -44,18 +48,17 @@
 
                                             {% if entry["government_positions"] %}
                                                 <div class="well well-sm">
-                                                    <b>Government Positions</b><br>
                                                     {% for position in entry["government_positions"] %}
-                                                        {{ position }} <br>
+                                                        <b>{{ position }}</b><br>
                                                     {% endfor %}
                                                 </div>
                                             {% endif %}
 
                                             {% if entry["government_departments"] %}
                                                 <div class="well well-sm">
-                                                    <b>Government Roles</b><br>
-                                                    {% for position in entry["government_departments"] %}
-                                                        {{ position }} <br>
+                                                    <b>Government Departments</b><br>
+                                                    {% for dept in entry["government_departments"] %}
+                                                        <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
                                                     {% endfor %}
                                                 </div>
                                             {% endif %}

@@ -6,29 +6,34 @@ class TWFYHansard:
     def __init__(self, link=False):
         self.twfy = theyworkforyou.TWFY("ESHFQ9AQWgTuFyCfx7DAWpDc")
 
-    def get_mps(self):
+    def get_mps(self, **kwargs):
         return json.loads(
-            self.twfy.api.getMPs(output="js")
+            self.twfy.api.getMPs(output="js", **kwargs)
         )
 
-    def get_mp_details(self, person_id):
+    def get_mp_details(self, person_id, **kwargs):
         return json.loads(
-            self.twfy.api.getMP(output="js", id=person_id)
+            self.twfy.api.getMP(output="js", id=person_id, **kwargs)
         )
 
-    def get_lords(self):
+    def get_mp_info(self, person_id, **kwargs):
         return json.loads(
-            self.twfy.api.getLords(output="js")
+            self.twfy.api.getMPInfo(output="js", id=person_id, **kwargs)
         )
 
-    def get_lord_details(self, person_id):
+    def get_lords(self, **kwargs):
         return json.loads(
-            self.twfy.api.getLord(output="js", id=person_id)
+            self.twfy.api.getLords(output="js", **kwargs)
         )
 
-    def get_mp_debates(self, debate_type, person):
+    def get_lord_details(self, person_id, **kwargs):
         return json.loads(
-            self.twfy.api.getDebates(output="js", type=debate_type, person=person)
+            self.twfy.api.getLord(output="js", id=person_id, **kwargs)
+        )
+
+    def get_mp_debates(self, debate_type, person, **kwargs):
+        return json.loads(
+            self.twfy.api.getDebates(output="js", type=debate_type, person=person, **kwargs)
         )
 
     def get_debate(self, debate_id):
@@ -88,10 +93,10 @@ class TWFYHansard:
             full_debate = debate_full[1:]
         return main, sub_cat, full_debate
 
-    def _get_debate_detail(self, debate_type, debate_id):
+    def _get_debate_detail(self, debate_type, debate_id, **kwargs):
         try:
             return json.loads(
-                self.twfy.api.getDebates(output="js", type=debate_type, gid=debate_id)
+                self.twfy.api.getDebates(output="js", type=debate_type, gid=debate_id, **kwargs)
             )
         except json.scanner.JSONDecodeError:
             print "JSONDecodeError"

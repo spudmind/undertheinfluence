@@ -5,7 +5,7 @@ import sys
 import argparse
 import logging
 
-from scrapers import mps, lords, meetings
+from scrapers import mps, lords, meetings, prca
 
 from scrapers import scrape_mps_interests
 from scrapers import scrape_lords_interests
@@ -28,10 +28,10 @@ from data_interfaces import api_data_gen
 from data_models import core
 
 
-choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings"]
+choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings", "prca"]
 arg_parser = argparse.ArgumentParser(description="Task runner for spud.")
 arg_parser.add_argument("--verbose", "-v", action="store_true", help="Noisy output")
-arg_parser.add_argument("--fetch", nargs="+", choices=["meetings", "lords", "mps"], help="Specify the fetcher(s) to run")
+arg_parser.add_argument("--fetch", nargs="+", choices=["meetings", "lords", "mps", "prca"], help="Specify the fetcher(s) to run")
 arg_parser.add_argument("--scrape", nargs="+", choices=choices, help="Specify the scraper(s) to run")
 arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords"], help="Parse master entities")
 arg_parser.add_argument("--parse", nargs="+", choices=choices, help="Specify the parser(s) to run")
@@ -58,6 +58,7 @@ if args.fetch is not None:
         "lords": lords,
         "mps": mps,
         "meetings": meetings,
+        "prca": prca,
     }
     for fetcher in args.fetch:
         exec_fetcher[fetcher].fetch()
@@ -71,6 +72,7 @@ if args.scrape is not None:
         "lords_interests": scrape_lords_interests.LordsInterestsScraper,
         "party_funding": scrape_party_funding.PartyFundingScraper,
         "meetings": meetings,
+        "prca": prca,
     }
     for scraper in args.scrape:
         exec_scraper[scraper].scrape()

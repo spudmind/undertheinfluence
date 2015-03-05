@@ -42,7 +42,10 @@ class ScrapeMPs():
 
     def get_mp_details(self, mp):
         with open(os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp["twfy_id"])) as f:
-            details = json.load(f)
+            info = json.load(f)
+        details = info.pop("details")
+        mp = dict(mp.items() + info.items())
+
         image = details[0].get("image")
         mp["first_name"] = details[0]["first_name"]
         mp["last_name"] = details[0]["last_name"]

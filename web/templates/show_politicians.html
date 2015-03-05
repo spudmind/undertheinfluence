@@ -61,19 +61,23 @@
                                             {% endif %}
 
                                             {% if "register_of_interests" in entry.influences_summary %}
-                                                <div class="well well-sm">
-                                                    <b>Register of Interests</b><br>
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
-                                                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
-                                                </div>
+                                                {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
+                                                    <div class="well well-sm">
+                                                        <b>Register of Interests</b><br>
+                                                        {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
+                                                        {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
+                                                        {{ entry.influences_summary.register_of_interests.interest_categories }} categories
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                             {% if "electoral_commission" in entry.influences_summary %}
+                                                {% if entry.influences_summary.electoral_commission.donor_count > 0 %}
                                                 <div class="well well-sm">
                                                     <b>Electoral Commission</b><br>
                                                     {{ entry.influences_summary.electoral_commission.donation_total }} received from
                                                     {{ entry.influences_summary.electoral_commission.donor_count }} donations
                                                 </div>
+                                                    {% endif %}
                                             {% endif %}
                                         {% endif %}
 

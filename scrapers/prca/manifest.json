@@ -1,0 +1,16 @@
+{
+  "details": {
+    "name": "Public Affairs Register (PRCA)",
+    "description": "The PRCA publishes, every quarter, a register of all members who practice public affairs, and in the case of consultancies the list of clients for whom they conduct public affairs.",
+    "source": "http://www.prca.org.uk/paregister",
+    "author": "Andy Lulham"
+  },
+  "id": "prca",
+  "version": "0.0.1",
+  "entity_attributes": {
+    "name": {
+      "required": true
+    },
+    "role": {}
+  }
+}

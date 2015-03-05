@@ -636,7 +636,7 @@ class GovernmentOffices(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (n:`Government Office`) with n
+            MATCH (n:`Government Department`) with n
             MATCH (n)-[:SERVED_IN]-(x) with n, x
                 WHERE x.left_reason = "still_in_office"
             MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p

@@ -235,7 +235,7 @@ class PopulatePoliticalPartyApi():
         self.db.save("api_political_parties", party_data)
 
 
-class PopulateOfficesApi():
+class PopulateDepartmentsApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()

@@ -17,22 +17,17 @@ class PoliticiansApi(BaseAPI):
         pager = {}
         page = args.get('page', 1)
 
-        print "api args:", args
-
         self._filter_party(args)
         self._filter_type(args)
         self._filter_interests(args)
         self._filter_funding(args)
-        self._filter_office(args)
-
-        print "api query:", self.query
+        self._filter_department(args)
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
         if response['has_more']:
             next_query = args
             next_query['page'] = page + 1
-            print "next args:", next_query
-            response['next_url'] = url_for('GetPoliticians', _external=True, **next_query)
+            response['next_url'] = url_for('getPoliticians', _external=True, **next_query)
             pager["next"] = url_for('show_politicians', _external=True, **next_query)
         if page > 1:
             previous_query = args
@@ -56,13 +51,14 @@ class PoliticiansApi(BaseAPI):
                 "twfy_id": entry["twfy_id"],
                 "labels": entry["labels"],
                 "government_positions": entry["government_positions"],
-                "government_departments": entry["government_departments"],
+                "government_departments": self._department_detail_urls(
+                    entry["government_departments"]
+                ),
                 "influences_summary": entry["influences"],
                 "type": entry["type"]
             }
             for entry in results
         ]
-
         return response
 
     def _filter_party(self, args):
@@ -91,12 +87,12 @@ class PoliticiansApi(BaseAPI):
         if _funding_search != {}:
             self.query[self._funding] = _funding_search
 
-    def _filter_office(self, args):
-        if args.get("government_office"):
+    def _filter_department(self, args):
+        if args.get("government_department"):
             self.query["$and"] = [
                 {
                     "government_departments": {
-                    "$in": [args.get("government_office")]}
+                    "$in": [args.get("government_department")]}
                 }
             ]
 

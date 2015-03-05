@@ -10,17 +10,24 @@ class BaseAPI:
         api, web = None, None
         if name:
             if "Member of Parliament" in labels:
-                api = u"/api/v0.1/getMp?name={0}".format(name)
+                #api = u"/api/v0.1/getMp?name={0}".format(name)
+                api = url_for('getMp', name=name, _external=True)
                 web = url_for('show_mp', name=name, _external=True)
             elif "Lord" in labels:
-                api = u"/api/v0.1/getLord?name={0}".format(name)
+                #api = u"/api/v0.1/getLord?name={0}".format(name)
+                api = url_for('getLord', name=name, _external=True)
                 web = url_for('show_lord', name=name, _external=True)
             elif "Donor" in labels or "Registered Interest" in labels:
-                api = u"/api/v0.1/getInfluencer?name={0}".format(name)
+                #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
+                api = url_for('getInfluencer', name=name, _external=True)
                 web = url_for('show_influencer', name=name, _external=True)
             elif "Political Party" in labels:
-                api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
+                #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
+                api = url_for('getPoliticalParty', name=name, _external=True)
                 web = url_for('show_party', name=name, _external=True)
+            elif "Government Department" in labels:
+                api = url_for('getPoliticians', government_department=name, _external=True)
+                web = url_for('show_politicians', government_department=name, _external=True)
         return web, api
 
     @staticmethod
@@ -41,6 +48,22 @@ class BaseAPI:
                     "name": member,
                     "detail_url": url_for(
                         'show_mp', name=member, _external=True
+                    )
+                }
+                updated.append(entry)
+            return updated
+        else:
+            return None
+
+    @staticmethod
+    def _department_detail_urls(departments):
+        if departments:
+            updated = []
+            for dept in departments:
+                entry = {
+                    "name": dept,
+                    "detail_url": url_for(
+                        'show_politicians', government_department=dept, _external=True
                     )
                 }
                 updated.append(entry)

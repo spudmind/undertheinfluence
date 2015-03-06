@@ -20,6 +20,10 @@ class MongoInterface:
             q = collection.Collection(self.db, _collection)
             return list(q.find())
 
+    def find_one(self, _collection, query):
+        q = collection.Collection(self.db, _collection)
+        return q.find_one(query)
+
     # return specific documents in a collection
     def query(self, _collection, **kwargs):
         query = kwargs.get('query', None)

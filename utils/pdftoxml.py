@@ -129,17 +129,18 @@ class PDFtoXML():
         page = self._xml.xpath('//page[@number="%d"]' % (page_num))[0]
         blocks = self._get_text(page)
 
-        d = defaultdict(dict)
-        for x in blocks:
-            top = x[1]["top"]
-            left = x[1]["left"]
-            d[top][left] = x
+        # d = defaultdict(dict)
+        # for x in blocks:
+        #     top = x[1]["top"]
+        #     left = x[1]["left"]
+        #     d[top][left] = x
 
-        self.d = d
-        self.n = self.merge_nearby_rows(self.d)
+        # n = self.merge_nearby_rows(d)
         # self.m = self.merge_continued_cells(self.n)
         # self.z = self.merge_nearby_cols(self.m)
-        return [[y[0] for _, y in sorted(x.items())] for x in self.n]
+        # return [[y for _, y in sorted(x.items())] for x in n]
+
+        return blocks
 
     def _get_text(self, page):
         out = []

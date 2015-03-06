@@ -73,7 +73,7 @@ class FetchPRCA():
         else:
             desc = "mixed"
 
-        return {"date_from": str(start_dt), "date_to": str(end_dt), "description": desc}
+        return {"date_from": datetime.strftime(start_dt, "%Y-%m-%d"), "date_to": datetime.strftime(end_dt, "%Y-%m-%d"), "description": desc}
 
     def fetch_file(self, record):
         # name the file

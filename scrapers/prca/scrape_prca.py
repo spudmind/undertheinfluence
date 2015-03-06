@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import re
 from os import listdir
 import os.path
@@ -7,6 +8,7 @@ from utils import mongo, pdftoxml
 
 class ScrapePRCA():
     def __init__(self):
+        self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
         # prefix for database tables
         self.prefix = "prca"
@@ -49,7 +51,7 @@ class ScrapePRCA():
         return all_blocks
 
     def scrape_blocks_from_pdf(self, filename):
-        print "parsing: %s" % filename
+        self._logger.info("parsing: %s" % filename)
         # convert to xml
         pdf = pdftoxml.from_file(filename)
         all_blocks = []
@@ -64,10 +66,10 @@ class ScrapePRCA():
             sorted_blocks = sorted(blocks, key=lambda x: x[1]["top"])
 
             # throw away the page number block
-            if len(sorted_blocks) > 0 and sorted_blocks[-1][0] == page_num:
+            if len(sorted_blocks) > 0 and sorted_blocks[-1][0] == str(page_num):
                 # we check the thing we're removing is at
                 # the bottom of the page
-                assert(sorted_blocks[-1]["top"] > self.FOOTER_Y)
+                assert(sorted_blocks[-1][1]["top"] > self.FOOTER_Y)
                 sorted_blocks = sorted_blocks[:-1]
 
             # include the current page number with every block
@@ -103,7 +105,7 @@ class ScrapePRCA():
                     agencies.append(agency)
 
                 # start a new agency
-                agency = {"name": block[0], "page": block[1]["page"]}
+                agency = {"name": block[0], "meta": {"page": block[1]["page"]}}
             elif block[0] == "Declaration submitted by:":
                 # [hack] this is just used in mixed_2009-12_2010-02.pdf
                 current_cat = "ignore"
@@ -134,13 +136,18 @@ class ScrapePRCA():
                 agency[cat] = [x[0] for x in agency[cat]]
         return agencies
 
-    def save_to_db(self, agencies):
+    def save_to_db(self, agencies, meta):
         for agency in agencies:
-            for k,v in agency.items():
-                print "%s:      %s" % (k, v)
-            print "---"
-            raw_input()
-            # agency_entity = db.save("%s_entities" % self.prefix, agency)
+            m = {k: v for k, v in meta.items() if k in ['linked_from', 'fetched', 'url']}
+            agency["meta"] = dict(agency["meta"].items() + m.items())
+            agency["date_from"] = meta["date_from"]
+            agency["date_to"] = meta["date_to"]
+
+            for k, v in agency.items():
+                self._logger.debug("%s:      %s" % (k, v))
+            self._logger.debug("---")
+
+            agency_entity = self.db.save("%s_scrape" % self.prefix, agency)
 
     # # TODO! This is wrong at the moment
     # def parse_contact(self, agency):
@@ -157,8 +164,12 @@ class ScrapePRCA():
     #         key = "address"
     #     agency["contact"][-1][key] = value
 
-    def parse_file(self, filename):
-        blocks = self.scrape_blocks_from_pdf(filename)
+    def parse_file(self, meta):
+        filename = meta["filename"]
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        full_path = os.path.join(current_path, self.STORE_DIR, filename)
+
+        blocks = self.scrape_blocks_from_pdf(full_path)
 
         # Right - we have a big list of text blocks, roughly in order.
         # Now let's group them by agency.
@@ -171,18 +182,15 @@ class ScrapePRCA():
 
         # TOOD: Extract the entities in the client and employee lists.
         # TODO: Save everything.
-        self.save_to_db(sorted_agencies)
+        self.save_to_db(sorted_agencies, meta)
 
     def run(self):
-        current_path = os.path.dirname(os.path.abspath(__file__))
+        metas = self.db.fetch_all("%s_fetch" % self.prefix, paged=False)
 
-        store_path = os.path.join(current_path, self.STORE_DIR)
-
-        # fetch all PDF files in the store
-        pdfs = [os.path.join(store_path, filename) for filename in listdir(store_path) if filename.endswith(".pdf")]
-
-        for filename in pdfs:
-            self.parse_file(filename)
+        for meta in metas:
+            if not meta["filename"].endswith(".pdf"):
+                continue
+            self.parse_file(meta)
 
 def scrape():
     ScrapePRCA().run()

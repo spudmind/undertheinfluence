@@ -51,6 +51,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# sqlite databases
+*.sqlite
 
 # warren test code and data
 members_test.py

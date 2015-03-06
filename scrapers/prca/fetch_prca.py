@@ -40,7 +40,7 @@ class FetchPRCA():
         self.current_path = os.path.dirname(os.path.abspath(__file__))
 
     def scrape_index(self):
-        self._logger.info("Scraping PRCA index page (%s) ..." % self.index_url)
+        self._logger.info("Fetching PRCA index page (%s) ..." % self.index_url)
         # fetch the index page
         r = requests.get(self.index_url)
         time.sleep(0.5)
@@ -48,7 +48,7 @@ class FetchPRCA():
 
         # get link and anchor text - working around links split in half
         links = [(li.text, link["href"]) for li in soup.find(id="content_1327").find_all("li") for link in li.find_all("a")]
-        self._logger.info("... Scraped.")
+        self._logger.info("... Index Scraped.")
         return links
 
     def parse_text(self, anchor_text):
@@ -90,6 +90,7 @@ class FetchPRCA():
         # record filename and timestamp in the db
         record["filename"] = filename
         record["fetched"] = str(datetime.now())
+        self._logger.info("... fetched %s." % filename)
         self.db.save(self.COLLECTION_NAME, record)
 
     def run(self):

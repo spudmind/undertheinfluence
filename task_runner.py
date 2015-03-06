@@ -5,7 +5,7 @@ import sys
 import argparse
 import logging
 
-from scrapers import mps, lords, meetings, prca, party_funding
+from scrapers import mps, lords, meetings, prca, party_funding, appc
 
 from scrapers import scrape_mps_interests
 from scrapers import scrape_lords_interests
@@ -27,7 +27,7 @@ from data_interfaces import api_data_gen
 from data_models import core
 
 
-choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings", "prca"]
+choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings", "prca", "appc"]
 arg_parser = argparse.ArgumentParser(description="Task runner for spud.")
 arg_parser.add_argument("--verbose", "-v", action="store_true", help="Noisy output")
 arg_parser.add_argument("--fetch", nargs="+", choices=choices, help="Specify the fetcher(s) to run")
@@ -53,15 +53,8 @@ else:
 
 # run fetchers
 if args.fetch is not None:
-    exec_fetcher = {
-        "lords": lords,
-        "mps": mps,
-        "meetings": meetings,
-        "prca": prca,
-        "party_funding": party_funding,
-    }
     for fetcher in args.fetch:
-        exec_fetcher[fetcher].fetch()
+        sys.modules["scrapers.%s" % fetcher].fetch()
 
 # run scrapers
 if args.scrape is not None:

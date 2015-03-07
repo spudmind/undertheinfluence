@@ -48,9 +48,15 @@ class ScrapeAPPC:
         countries = [x.text.strip() for x in country_soup.find_all("li")] if country_soup else []
 
         staff_soup = soup.find(class_="profile-staff")
-        staff = [x.text.strip() for x in staff_soup.find_all("li")] if staff_soup else []
+        all_staff = [x.text.strip() for x in staff_soup.find_all("li")] if staff_soup else []
+        staff = {"has_pass": [], "no_pass": []}
+        for staff_name in all_staff:
+            if staff_name.endswith(" *"):
+                staff["has_pass"].append(staff_name[:-2].strip())
+            else:
+                staff["no_pass"].append(staff_name)
 
-        clients = {"pro-bono": None, "consultancy": None, "monitoring": None}
+        clients = {"pro-bono": [], "consultancy": [], "monitoring": []}
         client_soups = soup.find_all(class_="profile-clients")
         for client_soup in client_soups:
             client_table_heading = client_soup.find("th").text
@@ -62,7 +68,6 @@ class ScrapeAPPC:
                 client_type = "monitoring"
             else:
                 raise Exception("Unknown client type: '%s'" % client_table_heading)
-            clients[client_type] = []
             for client in client_soup.find_all("li"):
                 client = [c for c in client.stripped_strings]
                 clients[client_type].append({

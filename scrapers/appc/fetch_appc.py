@@ -30,6 +30,7 @@ class FetchAPPC:
         self.fetch_pdfs()
 
     def fetch_html_register(self):
+        self._logger.info("Fetching APPC HTML ...")
         index_url = "%s/members/register/" % self.BASE_URL
         self._logger.debug("... %s" % index_url)
         r = requests.get(index_url)
@@ -41,35 +42,41 @@ class FetchAPPC:
         for company in companies:
             filename = self.fetch_company(company["value"], date_to)
             meta = {
-                "date_from": date_from,
-                "date_to": date_to,
-                "description": "current",
-                "fetched": str(datetime.now()),
                 "filename": filename,
-                "linked_from": index_url,
-                "source": None,
+                "date_range": (date_from, date_to),
+                "source": {
+                    "url": None,  # unfortunately we don't have a direct link
+                    "linked_from_url": index_url,
+                    "fetched": str(datetime.now()),
+                }
             }
             self.db.save(self.COLLECTION_NAME, meta)
+        self._logger.info("Done fetching APPC HTML.")
 
     def fetch_company(self, company, date_to):
+        rel_path = os.path.join(self.STORE_DIR, date_to)
+        filename = os.path.join(rel_path, "%s.html" % self.filenamify(company))
+
+        self._logger.debug("  Fetching HTML for '%s'" % company)
+
         url = "%s/members/register/register-profile/" % self.BASE_URL
         headers = {'User-Agent': 'Mozilla/5.0'}
         r = requests.post(url, data={"company": company}, headers=headers)
         time.sleep(0.5)
 
-        filename = "%s.html" % self.filenamify(company)
-        company_path = os.path.join(self.current_path, self.STORE_DIR, date_to)
+        company_path = os.path.join(self.current_path, rel_path)
         if not os.path.exists(company_path):
             os.makedirs(company_path)
-        full_path = os.path.join(company_path, filename)
+        full_path = os.path.join(self.current_path, filename)
         with open(full_path, "w") as f:
             f.write(r.text.encode('utf-8'))
         return filename
 
     def fetch_pdfs(self):
-        desc = "archive"
+        self._logger.info("Fetching APPC PDFs ...")
         pdf_index_url = "%s/previous-registers/" % self.BASE_URL
-        archive_path = os.path.join(self.current_path, self.STORE_DIR, desc)
+        rel_path = os.path.join(self.STORE_DIR, "archive")
+        archive_path = os.path.join(self.current_path, rel_path)
         if not os.path.exists(archive_path):
             os.makedirs(archive_path)
         r = requests.get(pdf_index_url)
@@ -79,28 +86,34 @@ class FetchAPPC:
         for p in paras:
             if not p.a:
                 continue
-            date_from, date_to = self.get_dates(p.text)
+            date_range = self.get_dates(p.text)
             pdf_url = p.a["href"]
-            filename = pdf_url.split("/")[-1]
-            full_path = os.path.join(archive_path, filename)
+            filename = os.path.join(rel_path, pdf_url.split("/")[-1])
+            full_path = os.path.join(self.current_path, filename)
+
+            self._logger.debug("  Fetching PDF '%s'" % p.text)
             urllib.urlretrieve(pdf_url, full_path)
             time.sleep(0.5)
 
             meta = {
-                "date_from": date_from,
-                "date_to": date_to,
-                "description": desc,
-                "fetched": str(datetime.now()),
                 "filename": filename,
-                "linked_from": pdf_index_url,
-                "source": pdf_url,
+                "date_range": date_range,
+                "source": {
+                    "url": pdf_url,
+                    "linked_from_url": pdf_index_url,
+                    "fetched": str(datetime.now()),
+                }
             }
             self.db.save(self.COLLECTION_NAME, meta)
+        self._logger.info("Done fetching APPC PDFs.")
 
+    # make a string filename-safe
     def filenamify(self, text):
         allowed_chars = "-_%s%s" % (string.ascii_letters, string.digits)
         return "".join(c if c in allowed_chars else "-" for c in text.lower())
 
+    # parse out a pair of dates (with a known format) from a string
+    # returns a tuple of dates in the form YYYY-MM-DD
     def get_dates(self, text):
         months = "|".join(calendar.month_name[1:])
         date_range = re.findall(r"(\d+).*?(%s) (\d{4})" % months, text)

@@ -11,7 +11,7 @@ class ScrapePRCA():
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
         # prefix for database tables
-        self.prefix = "prca"
+        self.PREFIX = "prca"
         # directory where files are stored
         self.STORE_DIR = "store"
         # the y-position of the top of the footer
@@ -147,7 +147,7 @@ class ScrapePRCA():
                 self._logger.debug("%s:      %s" % (k, v))
             self._logger.debug("---")
 
-            agency_entity = self.db.save("%s_scrape" % self.prefix, agency)
+            agency_entity = self.db.save("%s_scrape" % self.PREFIX, agency)
 
     # # TODO! This is wrong at the moment
     # def parse_contact(self, agency):
@@ -185,7 +185,7 @@ class ScrapePRCA():
         self.save_to_db(sorted_agencies, meta)
 
     def run(self):
-        metas = self.db.fetch_all("%s_fetch" % self.prefix, paged=False)
+        metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
 
         for meta in metas:
             if not meta["filename"].endswith(".pdf"):

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers_models import FundingRelationship, InterestCategory, RegisteredInterest, Remuneration
+from data_models.influencers_models import FundingRelationship
+from data_models.influencers_models import InterestCategory
+from data_models.influencers_models import RegisteredInterest
+from data_models.influencers_models import Remuneration
 from utils import mongo
 from data_models import government_models
 

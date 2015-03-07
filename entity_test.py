@@ -1,5 +1,5 @@
 from data_models import government_models
-from data_models.influencers_models import DonationRecipient
+from data_models.government_models import DonationRecipient
 from utils import entity_resolver
 
 resolver = entity_resolver.MasterEntitiesResolver()

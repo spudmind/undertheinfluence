@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from data_models.core import BaseDataModel
+from data_models.core import BaseDataModel, NamedEntity
 from data_models.core import NamedEntity
 from utils import config
 
@@ -788,4 +788,23 @@ class Constituency(BaseDataModel):
         self.exists = True
 
 
+class DonationRecipient(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Donation Recipient"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            "Named Entity", self.primary_attribute, self.name
+        )
 
+    def set_recipient_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Donation Recipient", "Named Entity"]
+        self.set_node_properties(properties, labels)
+
+    def link_funding_category(self, category):
+        self.create_relationship(
+            self.vertex, "FUNDING_RELATIONSHIP", category.vertex
+        )

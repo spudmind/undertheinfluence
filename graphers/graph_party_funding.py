@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
-from data_models.influencers_models import DonationRecipient, Donor, FundingRelationship, RegisteredDonation
+from data_models.government_models import DonationRecipient
+from data_models.influencers_models import Donor
+from data_models.influencers_models import FundingRelationship
+from data_models.influencers_models import RegisteredDonation
 from utils import mongo
 from data_models import government_models
 

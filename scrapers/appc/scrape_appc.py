@@ -62,7 +62,13 @@ class ScrapeAPPC:
                 client_type = "monitoring"
             else:
                 raise Exception("Unknown client type: '%s'" % client_table_heading)
-            clients[client_type] = [x.text for x in client_soup.find_all("li")]
+            clients[client_type] = []
+            for client in client_soup.find_all("li"):
+                client = [c for c in client.stripped_strings]
+                clients[client_type].append({
+                    "name": client[0],
+                    "description": client[2] if len(client) > 1 else None
+                })
 
         return {
             "name": name,

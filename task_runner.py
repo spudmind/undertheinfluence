@@ -66,6 +66,7 @@ if args.scrape is not None:
         "party_funding": party_funding,
         "meetings": meetings,
         "prca": prca,
+        "appc": appc,
     }
     for scraper in args.scrape:
         exec_scraper[scraper].scrape()

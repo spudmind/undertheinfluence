@@ -45,12 +45,12 @@ class ScrapeAPPC:
                 contacts.append(contact)
 
         country_soup = soup.find(class_="profile-country")
-        countries = [x.text for x in country_soup.find_all("li")] if country_soup else []
+        countries = [x.text.strip() for x in country_soup.find_all("li")] if country_soup else []
 
         staff_soup = soup.find(class_="profile-staff")
-        staff = [x.text for x in staff_soup.find_all("li")] if staff_soup else []
+        staff = [x.text.strip() for x in staff_soup.find_all("li")] if staff_soup else []
 
-        clients = {}
+        clients = {"pro-bono": None, "consultancy": None, "monitoring": None}
         client_soups = soup.find_all(class_="profile-clients")
         for client_soup in client_soups:
             client_table_heading = client_soup.find("th").text

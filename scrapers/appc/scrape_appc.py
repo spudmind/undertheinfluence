@@ -87,5 +87,6 @@ class ScrapeAPPC:
             "meta": {k: v for k, v in meta.items() if k in ["source", "linked_from", "fetched"]}
         }
 
+
 def scrape():
     ScrapeAPPC().run()

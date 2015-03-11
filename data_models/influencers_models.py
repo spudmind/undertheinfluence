@@ -46,7 +46,7 @@ class LobbyingClient(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
 
-    def set_employee_details(self, properties=None):
+    def set_client_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
         labels = ["Lobbyist Client", "Named Entity"]
         self.set_node_properties(properties, labels)

@@ -12,65 +12,136 @@ class PrcaParser:
     def run(self):
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
-        self._logger.debug("Parsing PRCA")
+        self._logger.debug("\n\nParsing PRCA")
         all_entries = self.db.fetch_all('prca_scrape', paged=False)
 
         for document in all_entries:
+            clients = []
+            staff = []
             name = self._normalize_text(document["name"])
-            self._logger.debug("\n... %s" % name)
+            self._logger.debug("\nLobbying Firm: %s" % name)
             meta = document["meta"]
             meta["date_range"] = {
                 "to": document["date_to"],
                 "from": document["date_from"]
             }
             if "clients" in document:
-                self._parse_clients(document["clients"])
+                clients = self._parse_clients(document["clients"])
+            if "staff" in document:
+                staff = self._parse_staff(document["staff"])
             entry = {
                 "lobbyist": {
                     "name": name,
                     "contact_details": " ".join(document["contact"]),
                     "pa_contact": self._fill_empty_field("pa_contact", document)
                 },
-                "clients": self._fill_empty_field("clients", document),
-                "staff": self._fill_empty_field("staff", document),
+                "clients": clients,
+                "staff": staff,
                 "meta": document["meta"]
             }
-            #self.db.save("prca_parse", entry)
+            self.db.save("prca_parse", entry)
 
     def _parse_clients(self, clients):
-        client_count = len(clients)
-        lengths = [len(c) for c in clients]
-        average = sum(lengths ) / client_count
-        print "client count:", client_count
-        print "average field:", average
-        print "min - max:", min(lengths), "-", max(lengths)
-        print "-"
-        for entry in clients:
+        self._logger.debug("... Parsing Clients")
+        client_list = []
+        raw_clients = self._fix_list(clients)
+        for entry in raw_clients:
             if self._has_data(entry):
-                entry = self._normalize_text(entry, capitialize=False)
-                print "*", entry
+                if self._unclosed_blacket(entry, "left"):
+                    text = entry.split("(")
+                    group_name = text[0].strip()
+                    client_list.append(group_name)
+                    self._logger.debug("# %s" % group_name)
+                    client_list = client_list + self._parse_list(text[1].split(","))
+                elif self._unclosed_blacket(entry, "right"):
+                    if "," in entry:
+                        client_list = client_list + self._parse_list(entry.split(","))
+                    else:
+                        text = self._normalize_text(entry, capitalize=False)
+                        client_list.append(text)
+                elif entry.count(",") > 1:
+                    client_list = client_list + self._parse_list(entry.split(","))
+                else:
+                    entry = self._normalize_text(entry, capitalize=False)
+                    client_list.append(entry)
+                    self._logger.debug("* %s" % entry)
+            else:
+                self._logger.debug(">>>>> no data: %s" % entry)
+        return [x for x in client_list if len(x) > 1]
 
-    def _normalize_text(self, text, capitialize=True):
+    def _parse_staff(self, staff):
+        self._logger.debug("... Parsing Staff")
+        staff_list = []
+        for entry in staff:
+            if self._has_data(entry):
+                if "," in entry:
+                    entry = entry.split(",")[0]
+                name = self._normalize_text(entry)
+                staff_list.append(name)
+                self._logger.debug("~ %s" % name)
+            else:
+                self._logger.debug(">>>>> no data: %s" % entry)
+        return [x for x in staff_list if len(x) > 1]
+
+    def _parse_list(self, entries):
+        new_list = []
+        for entry in entries:
+            if len(entry) > 2:
+                entry = self._normalize_text(entry, capitalize=False)
+                new_list.append(entry)
+                self._logger.debug("** %s" % entry)
+        return new_list
+
+    def _fix_list(self, raw_list):
+        new_list = []
+        broken_lines = [
+            "Group", "Association", "Ltd", "Council", "Foundation", "Limited", "Society"
+        ]
+        for i, entry in enumerate(raw_list):
+            broken = False
+            new_entry = None
+            for broken_line in broken_lines:
+                if entry == broken_line or entry == u" {}".format(broken_line):
+                    broken = True
+                    new_entry = u"{0} {1}".format(raw_list[i-1].strip(), entry.strip())
+            if broken:
+                new_list.remove(raw_list[i-1])
+                new_list.append(new_entry)
+                self._logger.debug("! %s + %s" % (raw_list[i-1], entry))
+            else:
+                new_list.append(entry)
+        return [x for x in new_list if x not in broken_lines]
+
+    def _normalize_text(self, text, capitalize=True):
         text = self._strip_parentheses(text)
-        if capitialize:
+        if self._unclosed_blacket(text, "right"):
+            text = text.strip(")")
+        if "funded by: " in text:
+            text = text.strip("funded by: ")
+        if capitalize:
             if text.isupper():
                 text = text.title()
-        return text
+        if len(text) > 1:
+            if text[1] == "-":
+                text = text.lstrip("-")
+            if text[:2] == "- ":
+                text = text.lstrip("-")
+        return text.strip()
 
-    @staticmethod
-    def _has_data(text):
+    def _has_data(self, text):
         result = True
         checks = [
             "Address:", "Website:", "Email:", "www.", "Telephone:",
             "@", "http:", "Employer:", "Employer:", "Job Title:",
-            "comprising:"
+            "comprising:", "Variable", u"", "N/A"
         ]
+        clean_text = self._strip_parentheses(text)
         for test in checks:
-            if test in text:
+            if test in clean_text:
                 result = False
+        if len(text) < 3 and text != "BT":
+            result = False
         return result
-
-
 
     @staticmethod
     def _fill_empty_field(field, document):
@@ -80,6 +151,16 @@ class PrcaParser:
     def _strip_parentheses(text):
         return re.sub('\(.+?\)\s*', '', text)
 
+    @staticmethod
+    def _unclosed_blacket(text, side=None):
+        result = False
+        if side == "left":
+            if "(" in text and ")" not in text:
+                result = True
+        if side == "right":
+            if ")" in text and "(" not in text:
+                result = True
+        return result
 
 
 

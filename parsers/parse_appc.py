@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import re
 from utils import mongo
 from utils import entity_resolver
 
@@ -29,8 +28,8 @@ class AppcParser:
             entry = {
                 "lobbyist": {
                     "name": name,
-                    "contact_details": document["contacts"],
-                    "address": document["addresses"],
+                    "contact_details": self._collapse_list(document["contacts"]),
+                    "address": self._collapse_list(document["addresses"]),
                     "pa_contact": self._fill_empty_field("pa_contact", document)
                 },
                 "clients": clients,
@@ -62,7 +61,7 @@ class AppcParser:
         staff_list = []
         for staff_type in types:
             for entry in staff[staff_type]:
-                print "~", self._normalize_text(entry)
+                self._logger.debug("~ %s" % self._normalize_text(entry))
                 entry = {
                     "name": self._normalize_text(entry),
                     "staff_type": staff_type
@@ -73,6 +72,15 @@ class AppcParser:
     def _parse_countries(self, countries):
         self._logger.debug("... Parsing Staff")
         return [self._normalize_text(x) for x in countries]
+
+    @staticmethod
+    def _collapse_list(content):
+        result = ["\n".join(x) for x in content]
+        if len(result) > 1:
+            result = "\n\n".join(result)
+        else:
+            result = result[0]
+        return result
 
     @staticmethod
     def _normalize_text(text, capitalize=True):

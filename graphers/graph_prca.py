@@ -21,6 +21,11 @@ class GraphPrca():
             lobby_firm = Lobbyist(name)
             if not lobby_firm.exists:
                 lobby_firm.create()
+            lobby_props = {
+                "pa_contact": doc["pa_contact"],
+                "contact_details": doc["contact_details"],
+                "data_source": "prca"
+            }
             lobby_firm.set_lobbyist_details()
             self._create_clients(lobby_firm, doc["clients"], doc["meta"])
             self._create_staff(lobby_firm, doc["staff"], doc["meta"])
@@ -32,7 +37,7 @@ class GraphPrca():
                 client = LobbyingClient(entry)
                 if not client.exists:
                     client.create()
-                client.set_client_details()
+                client.set_client_details({"data_source": "prca"})
                 relationship = self._create_relationship(
                     firm.name, client.name, "client"
                 )
@@ -47,7 +52,7 @@ class GraphPrca():
                 staff = LobbyEmployee(entry)
                 if not staff.exists:
                     staff.create()
-                staff.set_employee_details()
+                staff.set_employee_details({"data_source": "prca"})
                 relationship = self._create_relationship(
                     firm.name, staff.name, "employee"
                 )

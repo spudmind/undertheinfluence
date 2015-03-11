@@ -25,6 +25,7 @@ from graphers import graph_mps_interests
 from graphers import graph_lords_interests
 from graphers import graph_party_funding
 from graphers import graph_prca
+from graphers import graph_appc
 
 from data_interfaces import api_data_gen
 from data_models import core
@@ -105,6 +106,7 @@ if args.graph is not None:
         "lords_interests": graph_lords_interests.GraphLordsInterests,
         "party_funding": graph_party_funding.GraphPartyFunding,
         "prca": graph_prca.GraphPrca,
+        "appc": graph_appc.GraphAppc,
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()

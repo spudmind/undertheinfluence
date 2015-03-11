@@ -67,10 +67,10 @@ class GraphPrca():
     @staticmethod
     def meta_to_text(meta):
         text = u"""
-            linked_from: {0}\nsource: {1}\npage: {2}\nfetched: {3}\n
+            linked_from: {0}\nurl: {1}\npage: {2}\nfetched: {3}\n
             date_from: {4}\ndate_to: {5}\n""".format(
             meta["linked_from"],
-            meta["source"],
+            meta["url"],
             meta["page"],
             meta["fetched"],
             meta["date_range"]["to"],

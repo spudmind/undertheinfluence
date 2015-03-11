@@ -39,7 +39,7 @@ class PrcaParser:
                 "staff": staff,
                 "meta": document["meta"]
             }
-            #self.db.save("prca_parse", entry)
+            self.db.save("prca_parse", entry)
 
     def _parse_clients(self, clients):
         self._logger.debug("... Parsing Clients")

@@ -1,25 +1,99 @@
 from data_models.core import NamedEntity, BaseDataModel
 
 
-class DonationRecipient(NamedEntity):
+class Lobbyist(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.exists = False
-        self.label = "Donation Recipient"
+        self.label = "Lobbying Firm"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
             "Named Entity", self.primary_attribute, self.name
         )
 
-    def set_recipient_details(self, properties=None):
+    def set_lobbyist_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
-        labels = ["Donation Recipient", "Named Entity"]
+        labels = ["Lobbying Firm", "Named Entity"]
         self.set_node_properties(properties, labels)
 
-    def link_funding_category(self, category):
+
+class LobbyEmployee(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Lobby Employee"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            "Named Entity", self.primary_attribute, self.name
+        )
+
+    def set_employee_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Lobby Employee", "Named Entity"]
+        self.set_node_properties(properties, labels)
+
+
+class LobbyingClient(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Lobbyist Client"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            "Named Entity", self.primary_attribute, self.name
+        )
+
+    def set_client_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Lobbyist Client", "Named Entity"]
+        self.set_node_properties(properties, labels)
+
+
+class LobbyRelationship(BaseDataModel):
+    def __init__(self, relationship=None):
+        BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Lobby Relationship"
+        self.primary_attribute = "relationship"
+        self.relationship = relationship
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.relationship
+        )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.relationship
+        )
+        self.exists = True
+
+    def set_relationship_details(self, properties=None):
+        self.set_node_properties(properties)
+
+    def update_raw_record(self, raw_record):
+        existing = self.vertex["raw_record"]
+        if existing and len(existing) > 0:
+            new = u"{}\n---\n\n{}".format(existing, raw_record)
+        else:
+            new = raw_record
+        self.vertex["raw_record"] = new
+        self.vertex.push()
+
+    def link_firm(self, firm):
         self.create_relationship(
-            self.vertex, "FUNDING_RELATIONSHIP", category.vertex
+            self.vertex, "REGISTERED_LOBBYIST", firm.vertex
+        )
+
+    def link_staff(self, staff):
+        self.create_relationship(
+            self.vertex, "WORKS_FOR", staff.vertex
+        )
+
+    def link_client(self, client):
+        self.create_relationship(
+            self.vertex, "HIRED", client.vertex
         )
 
 

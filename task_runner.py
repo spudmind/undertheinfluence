@@ -16,12 +16,14 @@ from parsers import parse_lords
 from parsers import parse_mps_interests
 from parsers import parse_lords_interests
 from parsers import parse_party_funding
+from parsers import parse_prca
 
 from graphers import graph_mps
 from graphers import graph_lords
 from graphers import graph_mps_interests
 from graphers import graph_lords_interests
 from graphers import graph_party_funding
+from graphers import graph_prca
 
 from data_interfaces import api_data_gen
 from data_models import core
@@ -87,6 +89,7 @@ if args.parse is not None:
         "mps_interests": parse_mps_interests.MPsInterestsParser,
         "lords_interests": parse_lords_interests.LordsInterestsParser,
         "party_funding": parse_party_funding.PartyFundingParser,
+        "prca": parse_prca.PrcaParser,
     }
     for parser in args.parse:
         exec_parser[parser]().run()
@@ -99,6 +102,7 @@ if args.graph is not None:
         "mps_interests": graph_mps_interests.GraphMPsInterests,
         "lords_interests": graph_lords_interests.GraphLordsInterests,
         "party_funding": graph_party_funding.GraphPartyFunding,
+        "prca": graph_prca.GraphPrca,
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()

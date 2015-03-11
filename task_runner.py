@@ -17,6 +17,7 @@ from parsers import parse_mps_interests
 from parsers import parse_lords_interests
 from parsers import parse_party_funding
 from parsers import parse_prca
+from parsers import parse_appc
 
 from graphers import graph_mps
 from graphers import graph_lords
@@ -90,6 +91,7 @@ if args.parse is not None:
         "lords_interests": parse_lords_interests.LordsInterestsParser,
         "party_funding": parse_party_funding.PartyFundingParser,
         "prca": parse_prca.PrcaParser,
+        "appc": parse_appc.AppcParser,
     }
     for parser in args.parse:
         exec_parser[parser]().run()

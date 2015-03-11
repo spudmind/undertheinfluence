@@ -57,12 +57,12 @@ class PrcaParser:
                     if "," in entry:
                         client_list = client_list + self._parse_list(entry.split(","))
                     else:
-                        text = self._normalize_text(entry, capitalize=False)
+                        text = self._normalize_text(entry)
                         client_list.append(text)
                 elif entry.count(",") > 1:
                     client_list = client_list + self._parse_list(entry.split(","))
                 else:
-                    entry = self._normalize_text(entry, capitalize=False)
+                    entry = self._normalize_text(entry)
                     client_list.append(entry)
                     self._logger.debug("* %s" % entry)
             else:
@@ -87,7 +87,7 @@ class PrcaParser:
         new_list = []
         for entry in entries:
             if len(entry) > 2:
-                entry = self._normalize_text(entry, capitalize=False)
+                entry = self._normalize_text(entry)
                 new_list.append(entry)
                 self._logger.debug("** %s" % entry)
         return new_list
@@ -113,6 +113,7 @@ class PrcaParser:
         return [x for x in new_list if x not in broken_lines]
 
     def _normalize_text(self, text, capitalize=True):
+        text = text.rstrip(".").strip()
         text = self._strip_parentheses(text)
         if self._unclosed_blacket(text, "right"):
             text = text.strip(")")

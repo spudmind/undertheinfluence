@@ -10,7 +10,6 @@ import requests
 from bs4 import BeautifulSoup
 from utils import mongo
 
-
 """
 Fetch all the files at:
 http://www.prca.org.uk/paregister
@@ -19,6 +18,8 @@ and store them.
 A log of fetched files is also stored
 in the database
 """
+
+
 class FetchPRCA():
     def __init__(self):
         # fetch the logger
@@ -77,26 +78,15 @@ class FetchPRCA():
 
     def fetch_file(self, record):
         # name the file
-<<<<<<< HEAD
         file_type = record["source"][-3:]
-=======
-        file_type = record["url"][-3:]
->>>>>>> 59-prca-parse
         filename = "%s_%s_%s.%s" % (record["description"], record["date_from"][:7], record["date_to"][:7], file_type)
         full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
         # fetch from URL and save locally
         try:
-<<<<<<< HEAD
             _ = urllib.urlretrieve(record["source"], full_path)
             time.sleep(0.5)
         except IOError:
             self._logger.error("URL not found: %s" % record["source"])
-=======
-            _ = urllib.urlretrieve(record["url"], full_path)
-            time.sleep(0.5)
-        except IOError:
-            self._logger.error("URL not found: %s" % record["url"])
->>>>>>> 59-prca-parse
             raise
         # record filename and timestamp in the db
         record["filename"] = filename
@@ -124,14 +114,11 @@ class FetchPRCA():
             else:
                 # store a record in the db, but with fetched=False
                 current["fetched"] = False
-<<<<<<< HEAD
                 current["source"] = "%s%s" % (self.BASE_URL, rel_url)
-=======
-                current["url"] = "%s%s" % (self.BASE_URL, rel_url)
->>>>>>> 59-prca-parse
                 current["linked_from"] = self.index_url
                 self.db.save(self.COLLECTION_NAME, current)
             self.fetch_file(current)
+
 
 def fetch():
     FetchPRCA().run()

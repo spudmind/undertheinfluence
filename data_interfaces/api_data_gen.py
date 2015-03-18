@@ -180,12 +180,15 @@ class PopulateInfluencersApi():
         influencer = Influencer(name)
         register = influencer.interests_summary
         ec = influencer.donations_summary
+        lobby = influencer.lobbyists_summary
 
         data_sources = {}
         if register["relationship_count"] > 0:
             data_sources["register_of_interests"] = register
         if ec["donation_count"] > 0:
             data_sources["electoral_commission"] = ec
+        if lobby["lobbyist_hired"] > 0:
+            data_sources["lobby_registers"] = lobby
         influencer_data = {
             "name": name,
             "labels": labels,

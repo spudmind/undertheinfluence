@@ -217,8 +217,39 @@ class Influencer(BaseDataModel):
         if self.exists:
             self.interests = self._get_interests()
             self.donations = self._get_donations()
+            self.lobbyists = self._get_lobbyists()
             self.interests_summary = self._get_interests_summary()
             self.donations_summary = self._get_donations_summary()
+            self.lobbyists_summary = self._get_lobbyists_summary()
+
+    def _get_lobbyists(self):
+        results = []
+        search_string = u"""
+            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
+            MATCH (n)-[:HIRED]-(rel) with n, rel
+            MATCH (rel)-[:REGISTERED_LOBBYIST]-(lob) with n, rel, lob
+            RETURN lob.name, lob.data_source, lob.contact_details, lob.address
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "name": entry["lob.name"],
+                "contact_details": entry["lob.contact_details"],
+                "address": entry["lob.address"],
+                "data_source": entry["lob.data_source"],
+            }
+            results.append(detail)
+        return results
+
+    def _get_lobbyists_summary(self):
+        search_string = u"""
+            MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
+            MATCH (n)-[:HIRED]-(rel) with n, rel
+            MATCH (rel)-[:REGISTERED_LOBBYIST]-(lob) with n, rel, lob
+            RETURN count(lob) as total
+        """.format(self.vertex["name"])
+        count = self.query(search_string)[0]["total"]
+        return {"lobbyist_hired": count}
 
     def _get_interests(self):
         results = []
@@ -359,8 +390,8 @@ class Influencers(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (inf) where inf:Donor OR inf:`Registered Interest` with inf
-            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP]-(x)
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Client` with inf
+            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED]-(x)
             RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC
         """
@@ -369,7 +400,7 @@ class Influencers(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Client`
             RETURN count(inf)
         """
         search_result = self.query(search_string)

@@ -211,13 +211,15 @@ class GetInfluencers(Resource):
         self.reqparse.add_argument('interests_lt', type=int)
         self.reqparse.add_argument('donations_gt', type=int)
         self.reqparse.add_argument('donations_lt', type=int)
+        self.reqparse.add_argument('lobbyists_gt', type=int)
+        self.reqparse.add_argument('lobbyists_lt', type=int)
         super(GetInfluencers, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
         # set a default for 'page'
         args['page'] = (args['page'], 1)[args['page'] is None]
-
+        # print "args:", args
         return get_influencers_function.InfluencersApi().request(**args)
 
 

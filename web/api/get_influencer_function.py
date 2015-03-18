@@ -1,6 +1,5 @@
 from data_models.influencers_models import Influencer
 from web.api import BaseAPI
-from data_models import government_models
 from utils import mongo
 
 
@@ -15,14 +14,16 @@ class InfluencerApi(BaseAPI):
         result, _ = self._db.query(self._db_table, query=args)
         if len(result) > 0:
             influencer = Influencer(name)
+            register = self._nest_category(self._interest_urls(influencer.interests))
+            ec = self._recipient_urls(influencer.donations)
+            lobby = influencer.lobbyists
             result = {
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
-                    "register_of_interests": self._nest_category(
-                        self._interest_urls(influencer.interests)
-                    ),
-                    "electoral_commission": self._recipient_urls(influencer.donations),
+                    "lobby_registers": lobby,
+                    "register_of_interests": register,
+                    "electoral_commission": ec,
                 },
             }
         return result

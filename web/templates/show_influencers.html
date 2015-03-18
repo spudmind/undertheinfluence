@@ -19,21 +19,38 @@
             <div id="government-container">
                 <div class="list-group">
                     {% for entry in influencers %}
+
                         <div class="list-group-item" >
+
                             <div class="row-action-primary">
                                 <i class="icon-material-folder" ></i>
                             </div>
                             <div class="row-content">
-                                <div class="least-content">
-                                    {% for label in entry["labels"] %}
-                                        <span class="label label-success">{{ label }}</span>
-                                    {% endfor %}
-                                </div>
 
+                                <div class="col-md-10">
                                 <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+                                    <div class="least-content ">
+                                        {% for label in entry["labels"] %}
+                                            <span class="label label-success">{{ label }}</span>
+                                        {% endfor %}
+                                    </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
+
+
+
+                                    <div class="row">
+
+                                        {% if "lobby_registers" in entry.influences_summary %}
+                                            {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
+                                                <div class="well well-sm">
+                                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
+                                                </div>
+                                            {% else %}
+                                                <div class="well well-sm">
+                                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
                                         {% if "register_of_interests" in entry.influences_summary %}
                                             <div class="well well-sm">
                                                 <b>Register of Interests</b><br>

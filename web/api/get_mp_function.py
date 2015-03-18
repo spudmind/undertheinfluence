@@ -25,6 +25,10 @@ class MpApi(BaseAPI):
                     ),
                     "electoral_commission": self._donor_urls(mp.donations),
                 },
+                "government_positions": result[0]["government_positions"],
+                "government_departments": self._department_detail_urls(
+                    result[0]["government_departments"]
+                ),
             }
         return result
 

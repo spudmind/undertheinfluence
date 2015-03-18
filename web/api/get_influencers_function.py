@@ -22,8 +22,6 @@ class InfluencersApi(BaseAPI):
         self._filter_funding(args)
         self._filter_lobbyists(args)
 
-        print "query:", self.query
-
         results, response = self._db.query(self._db_table, query=self.query, page=page)
         if response['has_more']:
             next_query = args
@@ -69,7 +67,6 @@ class InfluencersApi(BaseAPI):
 
     def _filter_lobbyists(self, args):
         _lobby_search = {}
-        print args.get("lobbyists_gt")
         if args.get("lobbyists_gt"):
             _lobby_search["$gt"] = args.get("lobbyists_gt")
         if args.get("lobbyists_lt"):

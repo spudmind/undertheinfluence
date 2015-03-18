@@ -116,14 +116,14 @@ def show_party(name):
     return render_template('show_party.html', party=party)
 
 
-@app.route('/departments/')
-def show_departments():
+@app.route('/committees/')
+def show_committees():
     try:
         page = int(request.args.get('page', 1))
     except ValueError:
         page = 1
     offices = get_departments_function.DepartmentsApi().request(page=page)['results']
-    return render_template('show_departments.html', offices=offices, page=page)
+    return render_template('show_committees.html', offices=offices, page=page)
 
 
 class GetSummary(Resource):

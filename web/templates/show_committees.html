@@ -3,7 +3,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h1>Government Departments</h1>
+            <h1>Select Committees</h1>
             <hr>
         </div >
     </div>
@@ -30,6 +30,7 @@
                                 </div>
                             {% endif %}
                             <div class="row-content">
+                            <div class="col-md-10">
                                 <div class="least-content">
                                     {% for label in entry["labels"] %}
                                         <span class="label label-success">{{ label }}</span>
@@ -37,24 +38,6 @@
                                 </div>
                                 <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="well well-sm">
-
-                                            <b>Summary</b>
-                                            {% if "register_of_interests" in entry.influences_summary %}
-                                                <br>
-                                                {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
-                                                {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
-                                                {{ entry.influences_summary.register_of_interests.interest_categories }} categories.
-                                            {% endif %}
-                                            {% if "electoral_commission" in entry.influences_summary %}
-                                                <br>
-                                                {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
-                                                {{ entry.influences_summary.electoral_commission.donor_count }} donations.
-                                            {% endif %}
-
-                                        </div >
-
                                         <div class="well well-sm">
 
                                             {% if entry.mp_count > 0 %}
@@ -76,9 +59,9 @@
                     {% if page == 1  %}
                         <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
                     {% else %}
-                        <li class="previous"><a href="{{ url_for('show_departments', page=page-1) }}">Previous page</a></li>
+                        <li class="previous"><a href="{{ url_for('show_committees', page=page-1) }}">Previous page</a></li>
                     {% endif %}
-                    <li class="next"><a href="{{ url_for('show_departments', page=page+1) }}">Next page</a></li>
+                    <li class="next"><a href="{{ url_for('show_committees', page=page+1) }}">Next page</a></li>
                 </ul>
             </div>
         </div>

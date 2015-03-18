@@ -1,8 +1,47 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models.influencers_models import Influencer, Influencers
+from data_models.influencers_models import Influencer
+from data_models.influencers_models import Influencers
+from data_models.influencers_models import LobbyAgency
+from data_models.influencers_models import LobbyAgencies
 from data_models import government_models
+
+
+class PopulateLobbyAgenciesApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_lobbyists")
+        all_agencies = LobbyAgencies().get_all()
+        self._logger.debug("Populating Lobby Agencies Api")
+        for doc in all_agencies:
+            name = doc[0]
+            self._logger.debug(name)
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        clients = record[1]
+        employees = record[2]
+        labels = record[3]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+
+        data_sources = {
+            "lobbying_registers": {
+                "client_count": clients,
+                "employee_count": employees
+            }
+        }
+        agency_data = {
+            "name": name,
+            "influences": data_sources,
+            "labels": labels
+        }
+        self.db.save("api_lobbyists", agency_data)
 
 
 class PopulatePoliticiansApi():

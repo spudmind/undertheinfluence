@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from utils import mongo
-from data_models.influencers_models import Lobbyist
+from data_models.influencers_models import LobbyAgency
 from data_models.influencers_models import LobbyingClient
 from data_models.influencers_models import LobbyRelationship
 from data_models.influencers_models import LobbyEmployee
@@ -18,7 +18,7 @@ class GraphPrca():
         for doc in all_lobbyists:
             name = doc["lobbyist"]["name"]
             self._logger.debug("\nLobby Firm: %s" % name)
-            lobby_firm = Lobbyist(name)
+            lobby_firm = LobbyAgency(name)
             if not lobby_firm.exists:
                 lobby_firm.create()
             lobby_props = {

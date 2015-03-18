@@ -1,21 +1,88 @@
 from data_models.core import NamedEntity, BaseDataModel
 
 
-class Lobbyist(NamedEntity):
+class LobbyAgency(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.exists = False
-        self.label = "Lobbying Firm"
+        self.label = "Lobby Agency"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
             "Named Entity", self.primary_attribute, self.name
         )
+        if self.exists:
+            self.clients = self._get_clients()
+            self.employees = self._get_employees()
+            count = self._get_counts()
+            self.client_count = count[0]
+            self.employee_count = count[1]
+
+    def _get_clients(self):
+        results = []
+        search_string = u"""
+            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
+            MATCH (r)-[:HIRED]-(c) with f, r, c
+            MATCH (c)-[x]-() with f, r, c, x
+            RETURN c.name, labels(c), count(x) as weight
+            ORDER BY weight DESC
+        """.format(self.name)
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "name": entry["lob.name"],
+                "contact_details": entry["lob.contact_details"],
+                "address": entry["lob.address"],
+                "data_source": entry["lob.data_source"],
+            }
+            results.append(detail)
+        return results
+
+    def _get_employees(self):
+        pass
+
+    def _get_counts(self):
+        search_string = u"""
+            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
+            OPTIONAL MATCH (r)-[:HIRED]-(c) with f, r, c
+            OPTIONAL MATCH (r)-[:WORKS_FOR]-(e) with f, r, c, e
+            RETURN count(c) as clients, count(e) as employees
+        """.format(self.name)
+        output = self.query(search_string)
+        return output["clients"], output["employees"]
 
     def set_lobbyist_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
-        labels = ["Lobbying Firm", "Named Entity"]
+        labels = ["Lobby Agency", "Named Entity"]
         self.set_node_properties(properties, labels)
+
+
+class LobbyAgencies(BaseDataModel):
+    def __init__(self):
+        BaseDataModel.__init__(self)
+        self.count = self._get_count()
+
+    def get_all(self):
+        search_string = u"""
+            MATCH (f:`Lobbying Firm`)
+            MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
+            OPTIONAL MATCH (r)-[:HIRED]-(c) with f, r, c
+            OPTIONAL MATCH (r)-[:WORKS_FOR]-(e) with f, r, c, e
+            RETURN f.name, count(c) as clients, count(e) as employees, labels(f)
+            ORDER BY clients DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_count(self):
+        search_string = u"""
+            MATCH (f:`Lobbying Firm`)
+            RETURN count(f)
+        """
+        search_result = self.query(search_string)
+        return search_result[0][0]
 
 
 class LobbyEmployee(NamedEntity):
@@ -39,7 +106,7 @@ class LobbyingClient(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.exists = False
-        self.label = "Lobbyist Client"
+        self.label = "LobbyAgency Client"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
@@ -48,7 +115,7 @@ class LobbyingClient(NamedEntity):
 
     def set_client_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
-        labels = ["Lobbyist Client", "Named Entity"]
+        labels = ["LobbyAgency Client", "Named Entity"]
         self.set_node_properties(properties, labels)
 
 
@@ -229,7 +296,7 @@ class Influencer(BaseDataModel):
             MATCH (n)-[:HIRED]-(rel) with n, rel
             MATCH (rel)-[:REGISTERED_LOBBYIST]-(lob) with n, rel, lob
             RETURN lob.name, lob.data_source, lob.contact_details, lob.address
-        """.format(self.vertex["name"])
+        """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
@@ -247,7 +314,7 @@ class Influencer(BaseDataModel):
             MATCH (n)-[:HIRED]-(rel) with n, rel
             MATCH (rel)-[:REGISTERED_LOBBYIST]-(lob) with n, rel, lob
             RETURN count(lob) as total
-        """.format(self.vertex["name"])
+        """.format(self.name)
         count = self.query(search_string)[0]["total"]
         return {"lobbyist_hired": count}
 
@@ -262,7 +329,7 @@ class Influencer(BaseDataModel):
             RETURN p.name, p.party, cat.category, x.amount,
                 labels(p) as labels
             ORDER by x.reported_date DESC
-        """.format(self.vertex["name"])
+        """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
@@ -296,7 +363,7 @@ class Influencer(BaseDataModel):
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             RETURN count(rel) as count
-        """.format(self.vertex["name"])
+        """.format(self.name)
         return self.query(query)[0]["count"]
 
     def _remuneration_total(self):
@@ -306,7 +373,7 @@ class Influencer(BaseDataModel):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
             RETURN sum(x.amount) as total
-        """.format(self.vertex["name"])
+        """.format(self.name)
         return self.query(query)[0]["total"]
 
     def _remuneration_count(self):
@@ -316,7 +383,7 @@ class Influencer(BaseDataModel):
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
             RETURN count(x) as count
-        """.format(self.vertex["name"])
+        """.format(self.name)
         return self.query(query)[0]["count"]
 
     def _get_donations(self):
@@ -330,7 +397,7 @@ class Influencer(BaseDataModel):
             x.amount, x.reported_date,x.received_date, x.nature,
             x.purpose, x.accepted_date, x.ec_reference,x.recd_by, labels(donr) as labels
             ORDER by x.reported_date DESC
-        """.format(self.vertex["name"])
+        """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
@@ -370,7 +437,7 @@ class Influencer(BaseDataModel):
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (rel)-[:DONATION_RECEIVED]-(x)
             RETURN sum(x.amount) as total
-        """.format(self.vertex["name"])
+        """.format(self.name)
         return self.query(query)[0]["total"]
 
     def _donation_count(self):
@@ -379,7 +446,7 @@ class Influencer(BaseDataModel):
             MATCH (inf)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (rel)-[:DONATION_RECEIVED]-(x)
             RETURN count(x) as count
-        """.format(self.vertex["name"])
+        """.format(self.name)
         return self.query(query)[0]["count"]
 
 

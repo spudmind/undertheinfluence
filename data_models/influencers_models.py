@@ -119,7 +119,7 @@ class LobbyingClient(NamedEntity):
     def __init__(self, name=None):
         NamedEntity.__init__(self)
         self.exists = False
-        self.label = "LobbyAgency Client"
+        self.label = "Lobby Agency Client"
         self.primary_attribute = "name"
         self.name = name
         self.exists = self.fetch(
@@ -128,7 +128,7 @@ class LobbyingClient(NamedEntity):
 
     def set_client_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)
-        labels = ["LobbyAgency Client", "Named Entity"]
+        labels = ["Lobby Agency Client", "Named Entity"]
         self.set_node_properties(properties, labels)
 
 
@@ -470,7 +470,7 @@ class Influencers(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Client` with inf
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Agency Client` with inf
             MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED]-(x)
             RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC
@@ -480,7 +480,7 @@ class Influencers(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobbyist Client`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Agency Client`
             RETURN count(inf)
         """
         search_result = self.query(search_string)

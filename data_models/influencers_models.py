@@ -25,22 +25,35 @@ class LobbyAgency(NamedEntity):
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             MATCH (r)-[:HIRED]-(c) with f, r, c
             MATCH (c)-[x]-() with f, r, c, x
-            RETURN c.name, labels(c), count(x) as weight
+            RETURN c.name as name, labels(c) as labels, count(x) as weight
             ORDER BY weight DESC
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
-                "name": entry["lob.name"],
-                "contact_details": entry["lob.contact_details"],
-                "address": entry["lob.address"],
-                "data_source": entry["lob.data_source"],
+                "name": entry["name"],
+                "weight": entry["weight"],
+                "labels": entry["labels"]
             }
             results.append(detail)
         return results
 
     def _get_employees(self):
-        pass
+        results = []
+        search_string = u"""
+            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
+            MATCH (r)-[:WORKS_FOR]-(e) with f, r, e
+            RETURN e.name as name, labels(e) as labels
+        """.format(self.name)
+        output = self.query(search_string)
+        for entry in output:
+            detail = {
+                "name": entry["name"],
+                "labels": entry["labels"]
+            }
+            results.append(detail)
+        return results
 
     def _get_counts(self):
         search_string = u"""
@@ -51,7 +64,7 @@ class LobbyAgency(NamedEntity):
             RETURN count(c) as clients, count(e) as employees
         """.format(self.name)
         output = self.query(search_string)
-        return output["clients"], output["employees"]
+        return output[0]["clients"], output[0]["employees"]
 
     def set_lobbyist_details(self, properties=None):
         properties = self._add_namedentity_properties(properties)

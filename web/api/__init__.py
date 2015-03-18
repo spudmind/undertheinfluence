@@ -17,7 +17,7 @@ class BaseAPI:
                 #api = u"/api/v0.1/getLord?name={0}".format(name)
                 api = url_for('getLord', name=name, _external=True)
                 web = url_for('show_lord', name=name, _external=True)
-            elif "Donor" in labels or "Registered Interest" in labels:
+            elif "Donor" in labels or "Registered Interest" or "Lobbyist Client" in labels:
                 #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
                 api = url_for('getInfluencer', name=name, _external=True)
                 web = url_for('show_influencer', name=name, _external=True)

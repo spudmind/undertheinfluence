@@ -9,6 +9,7 @@ from web.api import get_parties_function
 from web.api import get_party_function
 from web.api import get_politicians_function
 from web.api import get_departments_function
+from web.api import get_lobbyists_function
 from web.api import find_entity_function
 import os
 
@@ -202,6 +203,21 @@ class GetPoliticalParty(Resource):
         return get_party_function.PoliticalPartyApi().request(args)
 
 
+class GetLobbyists(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int)
+        self.reqparse.add_argument('name', type=str)
+        super(GetLobbyists, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        # set a default for 'page'
+        args['page'] = (args['page'], 1)[args['page'] is None]
+        # print "args:", args
+        return get_lobbyists_function.LobbyistsApi().request(**args)
+
+
 class GetInfluencers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -262,6 +278,7 @@ api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
 api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
 api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
+api.add_resource(GetLobbyists, '/api/v0.1/getLobbyAgencies', endpoint='getLobbyAgencies')
 api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
 api.add_resource(GetGovernmentDepartments, '/api/v0.1/getGovernmentDepartments', endpoint='getGovernmentDepartments')

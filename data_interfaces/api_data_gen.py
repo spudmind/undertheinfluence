@@ -24,16 +24,19 @@ class PopulateLobbyAgenciesApi():
 
     def _get_stats(self, record):
         name = record[0]
-        clients = record[1]
-        employees = record[2]
+        client_count = record[1]
+        employee_count = record[2]
         labels = record[3]
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
 
+        agency = LobbyAgency(name)
         data_sources = {
             "lobbying_registers": {
-                "client_count": clients,
-                "employee_count": employees
+                "client_count": client_count,
+                "employee_count": employee_count,
+                "clients": agency.clients,
+                "employees": agency.employees
             }
         }
         agency_data = {

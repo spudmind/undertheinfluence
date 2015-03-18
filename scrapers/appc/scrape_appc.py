@@ -16,6 +16,7 @@ class ScrapeAPPC:
         self.PREFIX = "appc"
 
     def run(self):
+        self._logger.info("Scraping APPC")
         metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
         for meta in metas:
             if meta["description"] == "current":
@@ -27,6 +28,7 @@ class ScrapeAPPC:
                 pass
 
     def scrape_current(self, meta):
+        self._logger.debug("... %s" % meta["filename"])
         full_path = os.path.join(self.current_path, self.STORE_DIR, meta["date_to"], meta["filename"])
         with open(full_path) as f:
             html = f.read()

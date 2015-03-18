@@ -166,6 +166,7 @@ class ScrapePRCA():
     #     agency["contact"][-1][key] = value
 
     def parse_file(self, meta):
+        self._logger.debug("... %s" % meta["filename"])
         filename = meta["filename"]
         current_path = os.path.dirname(os.path.abspath(__file__))
         full_path = os.path.join(current_path, self.STORE_DIR, filename)
@@ -187,7 +188,7 @@ class ScrapePRCA():
 
     def run(self):
         metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
-
+        self._logger.info("Scraping PRCA")
         for meta in metas:
             if not meta["filename"].endswith(".pdf"):
                 continue

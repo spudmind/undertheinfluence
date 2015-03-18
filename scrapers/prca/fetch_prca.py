@@ -95,6 +95,7 @@ class FetchPRCA():
         self.db.save(self.COLLECTION_NAME, record)
 
     def run(self):
+        self._logger.info("Fetching PRCA")
         links = self.scrape_index()
         for anchor_text, rel_url in links:
             current = self.parse_text(anchor_text)

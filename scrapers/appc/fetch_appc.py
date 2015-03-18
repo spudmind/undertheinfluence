@@ -25,11 +25,13 @@ class FetchAPPC:
         self.COLLECTION_NAME = "appc_fetch"
 
     def run(self):
+        self._logger.info("Fetching APPC")
         self.fetch_html_register()
         self.fetch_pdfs()
 
     def fetch_html_register(self):
         index_url = "%s/members/register/" % self.BASE_URL
+        self._logger.debug("... %s" % index_url)
         r = requests.get(index_url)
         time.sleep(0.5)
         soup = BeautifulSoup(r.text)

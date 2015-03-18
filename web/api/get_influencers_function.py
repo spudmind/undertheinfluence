@@ -15,6 +15,7 @@ class InfluencersApi(BaseAPI):
         self.query = {}
 
     def request(self, **args):
+        pager = {}
         page = args.get('page', 1)
 
         self._filter_labels(args)
@@ -27,7 +28,13 @@ class InfluencersApi(BaseAPI):
             next_query = args
             next_query['page'] = page + 1
             response['next_url'] = url_for('getInfluencers', _external=True, **next_query)
+            pager["next"] = url_for('show_influencers', _external=True, **next_query)
+        if page > 1:
+            previous_query = args
+            previous_query['page'] = page - 1
+            pager["previous"] = url_for('show_influencers', _external=True, **previous_query)
 
+        response['pager'] = pager
         response["results"] = [{
             "name": entry["name"],
             "image_url": None,

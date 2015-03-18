@@ -480,7 +480,7 @@ class Influencers(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Client`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobbyist Client`
             RETURN count(inf)
         """
         search_result = self.query(search_string)

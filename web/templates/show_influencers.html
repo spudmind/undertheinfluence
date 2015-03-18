@@ -3,7 +3,11 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h1>The Influencers</h1>
+            {% if title %}
+                <h1><h1>The Influencers: {{ title }}</h1>
+            {% else %}
+                <h1>The Influencers</h1>
+            {% endif %}
             <hr>
         </div >
     </div>
@@ -26,9 +30,7 @@
                                 <i class="icon-material-folder" ></i>
                             </div>
                             <div class="row-content">
-
                                 <div class="col-md-10">
-                                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
                                     <div class="least-content ">
                                         {% for label in entry["labels"] %}
                                             <span class="label label-success">{{ label }}</span>
@@ -36,7 +38,7 @@
                                     </div>
 
 
-
+                                    <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
 
                                     <div class="row">
 

@@ -69,14 +69,33 @@ def show_politicians():
     )
 
 
-@app.route('/influencers')
-def show_influencers():
+@app.route('/lobbyists')
+def show_lobbyists():
     try:
         page = int(request.args.get('page', 1))
     except ValueError:
         page = 1
-    influencers = get_influencers_function.InfluencersApi().request(page=page)['results']
-    return render_template('show_influencers.html', influencers=influencers, page=page)
+    lobbyists = get_lobbyists_function.LobbyistsApi().request(page=page)['results']
+    return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
+
+
+@app.route('/influencers')
+def show_influencers():
+    args = {}
+    title = None
+    args["page"] = int(request.args.get('page', 1))
+    args["labels"] = request.args.get('labels', None)
+    if args["labels"]:
+        title = args["labels"]
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    reply = get_influencers_function.InfluencersApi().request(**args)
+    influencers, pager = reply['results'], reply['pager']
+    return render_template(
+        'show_influencers.html', influencers=influencers, page=page, title=title
+    )
 
 
 @app.route('/influencer/<name>')

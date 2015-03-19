@@ -470,7 +470,8 @@ class Influencers(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Agency Client` with inf
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
+                OR inf:`LobbyAgency Client` OR inf:`Lobby Agency Client` with inf
             MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED]-(x)
             RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC

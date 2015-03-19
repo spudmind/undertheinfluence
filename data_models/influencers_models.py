@@ -21,7 +21,7 @@ class LobbyAgency(NamedEntity):
     def _get_clients(self):
         results = []
         search_string = u"""
-            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             MATCH (r)-[:HIRED]-(c) with f, r, c
             MATCH (c)-[x]-() with f, r, c, x
@@ -41,7 +41,7 @@ class LobbyAgency(NamedEntity):
     def _get_employees(self):
         results = []
         search_string = u"""
-            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             MATCH (r)-[:WORKS_FOR]-(e) with f, r, e
             RETURN e.name as name, labels(e) as labels
@@ -57,7 +57,7 @@ class LobbyAgency(NamedEntity):
 
     def _get_counts(self):
         search_string = u"""
-            MATCH (f:`Lobbying Firm` {{name: "{0}"}})
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             OPTIONAL MATCH (r)-[:HIRED]-(c) with f, r, c
             OPTIONAL MATCH (r)-[:WORKS_FOR]-(e) with f, r, c, e
@@ -79,7 +79,7 @@ class LobbyAgencies(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (f:`Lobbying Firm`)
+            MATCH (f:`Lobby Agency`)
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             OPTIONAL MATCH (r)-[:HIRED]-(c) with f, r, c
             OPTIONAL MATCH (r)-[:WORKS_FOR]-(e) with f, r, c, e
@@ -91,7 +91,7 @@ class LobbyAgencies(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (f:`Lobbying Firm`)
+            MATCH (f:`Lobby Agency`)
             RETURN count(f)
         """
         search_result = self.query(search_string)

@@ -18,7 +18,9 @@ class PrcaParser:
         for document in all_entries:
             clients = []
             staff = []
-            name = self._normalize_text(document["name"])
+            name = self.resolver.map_lobby_agency(
+                self._normalize_text(document["name"])
+            )
             self._logger.debug("\nLobbying Firm: %s" % name)
             meta = document["meta"]
             meta["date_range"] = {

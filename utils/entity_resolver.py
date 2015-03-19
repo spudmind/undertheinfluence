@@ -23,6 +23,7 @@ class MasterEntitiesResolver:
         self.donor_entities = config.donor_entities
         self.party_entities = config.party_entities
         self.mapped_parties = config.mapped_parties
+        self.mapped_lobbyists = config.mapped_lobbyists
         self.prefixes = config.prefixes
         self.sufixes = config.sufixes
 
@@ -138,6 +139,12 @@ class MasterEntitiesResolver:
                 else:
                     name = guess
                     break
+        return name
+
+    def map_lobby_agency(self, name):
+        for incorrect, correct in self.mapped_lobbyists:
+            if incorrect in name or incorrect == name:
+                return correct
         return name
 
     def _find_mapped_entity(self, search_string):

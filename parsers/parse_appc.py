@@ -15,7 +15,7 @@ class AppcParser:
         self._logger.debug("\n\nParsing APPC")
         all_entries = self.db.fetch_all("appc_scrape", paged=False)
         for document in all_entries:
-            name = self._normalize_text(document["name"])
+            name = self.resolver.map_lobby_agency(document["name"])
             self._logger.debug("\nLobbying Firm: %s" % name)
             meta = document["meta"]
             meta["date_range"] = {

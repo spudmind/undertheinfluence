@@ -98,6 +98,25 @@ def show_influencers():
     )
 
 
+@app.route('/influencers/detail')
+def show_influencers_detail():
+    args = {}
+    title = None
+    args["page"] = int(request.args.get('page', 1))
+    args["labels"] = request.args.get('labels', None)
+    if args["labels"]:
+        title = args["labels"]
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    reply = get_influencers_function.InfluencersApi().request(**args)
+    influencers, pager = reply['results'], reply['pager']
+    return render_template(
+        'show_influencers_detail.html', influencers=influencers, page=page, title=title
+    )
+
+
 @app.route('/influencer/<name>')
 def show_influencer(name):
     args = {"name": name}

@@ -58,6 +58,17 @@ class MongoInterface:
         result = q.aggregate(pipe)
         return result["result"][0]["total"]
 
+    def top(self, _collection, **kwargs):
+        field = kwargs.get('field', None)
+        q = collection.Collection(self.db, _collection)
+        pipe = [
+            {'$group': {'_id': '$name', 'total': {'$sum': field}}},
+            {'$sort': {'total': -1}}
+        ]
+        result = q.aggregate(pipe)
+        print result["result"][:10]
+        return result["result"][0]["total"]
+
     def count(self, _collection):
         q = collection.Collection(self.db, _collection)
         return q.count()

@@ -57,9 +57,9 @@
                     <a href="/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Influence & Lobbying<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url_for('show_influencers')}}">All Influencers</a></li>
-                        <li><a href="{{ url_for('show_influencers', labels="Donor" )}}">Funding & Donors</a></li>
-                        <li><a href="{{ url_for('show_influencers', labels="Registered Interest" )}}">Registered Interests</a></li>
-                        <li><a href="{{ url_for('show_influencers', labels="Lobbyist Client" )}}">Lobbying Agency Clients</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Funding & Donors</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Lobbyist Client" )}}">Lobbying Agency Clients</a></li>
                         <li class="divider"></li>
                         <li><a href="{{ url_for('show_lobbyists' )}}">Lobbying Agencies</a></li>
                     </ul>

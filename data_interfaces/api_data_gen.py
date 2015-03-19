@@ -24,7 +24,6 @@ class PopulateLobbyAgenciesApi():
 
     def _get_stats(self, record):
         name = record[0]
-        self._logger.debug("... %s" % name)
         client_count = record[1]
         employee_count = record[2]
         labels = record[3]

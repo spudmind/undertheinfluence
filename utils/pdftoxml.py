@@ -3,12 +3,13 @@ from collections import defaultdict
 import lxml.etree
 import scraperwiki
 
-
 '''
 Wrapper around scraperwiki.pdftoxml. This file is
 currently a mess of various different ideas, none
 of which currently works.
 '''
+
+
 class PDFtoXML():
     def __init__(self, filename):
         # load the pdf
@@ -17,6 +18,7 @@ class PDFtoXML():
         # convert to xml
         xml_string = scraperwiki.pdftoxml(pdf_string)
         # parse xml
+        print xml_string
         self._xml = lxml.etree.fromstring(xml_string)
         self._pages = [self._page_to_blocks(page_num) for page_num in range(1, self.page_count() + 1)]
 
@@ -49,8 +51,6 @@ class PDFtoXML():
         #         idx = col_locations.index(x[1]["left"])
         #         rows[-1][idx] = x[0]
         #     else:
-
-
 
     # For a dict of dicts and some vertical value delta,
     # merge nearby rows together, returning a list of dicts
@@ -120,11 +120,6 @@ class PDFtoXML():
             prev = x
         return [[''.join([x.get(c, '') for c in mc]) for mc in merged_cols] for x in a]
 
-
-
-
-
-
     def _page_to_blocks(self, page_num):
         page = self._xml.xpath('//page[@number="%d"]' % (page_num))[0]
         blocks = self._get_text(page)
@@ -167,6 +162,7 @@ class PDFtoXML():
             text += child_text
             properties = dict(properties.items() + child_properties.items())
         return text, properties
+
 
 def from_file(filename):
     return PDFtoXML(filename)

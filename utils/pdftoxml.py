@@ -18,7 +18,7 @@ class PDFtoXML():
         # convert to xml
         xml_string = scraperwiki.pdftoxml(pdf_string)
         # parse xml
-        print xml_string
+        print "xml_string", xml_string
         self._xml = lxml.etree.fromstring(xml_string)
         self._pages = [self._page_to_blocks(page_num) for page_num in range(1, self.page_count() + 1)]
 

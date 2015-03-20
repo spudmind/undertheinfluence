@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+from web.api import BaseAPI
 from utils import mongo
 from flask import url_for
 
 
-class SummaryApi:
+class SummaryApi(BaseAPI):
     def __init__(self):
+        BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
         self.fields = {
             "donation_count": "$influences.electoral_commission.donation_count",
@@ -14,24 +15,24 @@ class SummaryApi:
             "lord_interest_relationships": "$influences.register_of_interests.interest_relationships",
             "remuneration_count": "$influences.register_of_interests.remuneration_count",
             "remuneration_total_int": "$influences.register_of_interests.remuneration_total_int",
+            "lobbyists_hired": "$influences.lobby_registers.lobbyist_hired"
         }
 
     def request(self):
         apis = {
-            "political_parties": url_for('getPoliticalParties', _external=True),
             "influencers": url_for('getInfluencers', _external=True),
+            "lobby_agencies": url_for('getLobbyAgencies', _external=True),
+            "political_parties": url_for('getPoliticalParties', _external=True),
             "politicians": url_for('getPoliticians', _external=True),
             "government_departments": url_for('getGovernmentDepartments', _external=True),
-            "lobby_agencies": url_for('getLobbyAgencies', _external=True),
         }
         summary = {
             "influencers": self._influencers_aggregate(),
+            #"lobby_agencies": self._influencers_aggregate(),
             "political_parties": self._party_aggregate(),
             "mps": self._mp_aggregate(),
             "lords": self._lord_aggregate()
         }
-
-        self._influencers_top()
 
         content = {"summary": summary, "api_detail": apis}
         response = {
@@ -42,66 +43,87 @@ class SummaryApi:
         }
         return response
 
-    def _party_aggregate(self):
-        _db_table = 'api_political_parties'
-        result = {}
-
-        result["count"] = _format_number(self._db.count(_db_table), currency=False)
-        result["donation_total_int"] = self._db.sum(
-            _db_table, field=self.fields["donation_total_int"]
-        )
-        result["donation_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_count"]),
-            currency=False
-        )
-        result["donation_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_total_int"])
-        )
-        return result
-
-    def _influencers_top(self):
-        _db_table = 'api_influencers'
-         # get electoral commission data
-
-        print "top:", self._db.top(_db_table, field=self.fields["donation_total_int"])
-
     def _influencers_aggregate(self):
         _db_table = 'api_influencers'
         categories, result, ec, reg = {}, {}, {}, {}
 
-        result["count"] = _format_number(self._db.count(_db_table), currency=False)
+        result["count"] = self._format_number(self._db.count(_db_table), currency=False)
 
         # get electoral commission data
-        ec["donation_total_int"] = self._db.sum(
-            _db_table, field=self.fields["donation_total_int"]
-        )
-        ec["donation_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_total_int"])
-        )
-        ec["donation_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_count"]),
-            currency=False
-        )
+        ec_fields = ["donation_total_int", "donation_count"]
+        aggregates = self._get_aggregate(_db_table, ec_fields)
+        aggregate_total = aggregates[0]
+        aggregate_count = aggregates[1]
+
+        ec["donation_total_int"] = aggregate_total
+        ec["donation_total"] = self._format_number(aggregate_total)
+        ec["donation_count"] = self._format_number(aggregate_count, currency=False)
+
+        top_total, top_count = self._get_top(_db_table, ec_fields)
+        ec["top"] = {
+            "donation_total": self._format_top(top_total),
+            "donation_count": self._format_top(top_count, monetary=False)
+        }
         categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg["remuneration_total_int"] = self._db.sum(
-            _db_table, field=self.fields["remuneration_total_int"]
-        )
-        reg["remuneration_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["remuneration_total_int"])
-        )
-        reg["interest_relationships"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["mp_interest_relationships"]),
+        reg_fields = [
+            "remuneration_total_int",
+            "mp_interest_relationships",
+            "remuneration_count"
+        ]
+        aggregates = self._get_aggregate(_db_table, reg_fields)
+        aggregate_total = aggregates[0]
+        aggregate_relationships = aggregates[1]
+        aggregate_count = aggregates[2]
+
+        reg["remuneration_total_int"] = aggregate_total
+        reg["remuneration_total"] = self._format_number(aggregate_total)
+        reg["interest_relationships"] = self._format_number(
+            aggregate_relationships,
             currency=False
         )
-        reg["remuneration_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["remuneration_count"]),
+        reg["remuneration_count"] = self._format_number(
+            aggregate_count,
             currency=False
         )
+        top_total, top_relationships, top_count = self._get_top(_db_table, reg_fields)
+        reg["top"] = {
+            "remuneration_total": self._format_top(top_total),
+            "interest_relationships": self._format_top(
+                top_relationships, monetary=False
+            ),
+            "remuneration_count": self._format_top(
+                top_count, monetary=False
+            )
+        }
         categories["register_of_interests"] = reg
 
         result.update(categories)
+        return result
+
+    def _party_aggregate(self):
+        _db_table = 'api_political_parties'
+        result = {}
+
+        result["count"] = self._format_number(self._db.count(_db_table), currency=False)
+
+        ec_fields = ["donation_total_int", "donation_count"]
+        aggregates = self._get_aggregate(_db_table, ec_fields)
+        aggregate_total = aggregates[0]
+        aggregate_count = aggregates[1]
+
+        result["donation_total_int"] = aggregate_total
+        result["donation_total"] = self._format_number(aggregate_total)
+        result["donation_count"] = self._format_number(
+            aggregate_count,
+            currency=False
+        )
+        top_total, top_count = self._get_top(_db_table, ec_fields)
+        result["top"] = {
+            "donation_total": self._format_top(top_total),
+            "donation_count": self._format_top(top_count, monetary=False)
+        }
         return result
 
     def _mp_aggregate(self):
@@ -111,33 +133,51 @@ class SummaryApi:
         result = {"count": self._db.count(_db_table)}
 
         # get electoral commission data
-        ec["donation_total_int"] = self._db.sum(
-            _db_table, field=self.fields["donation_total_int"]
-        )
-        ec["donation_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_total_int"])
-        )
-        ec["donor_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donor_count"]),
-            currency=False
-        )
+        ec_fields = ["donation_total_int", "donor_count"]
+        aggregates = self._get_aggregate(_db_table, ec_fields)
+        aggregate_total = aggregates[0]
+        aggregate_count = aggregates[1]
+        ec["donation_total_int"] = aggregate_total
+        ec["donation_total"] = self._format_number(aggregate_total)
+        ec["donor_count"] = self._format_number(aggregate_count, currency=False)
+        top_total, top_count = self._get_top(_db_table, ec_fields)
+        ec["top"] = {
+            "donation_total": self._format_top(top_total),
+            "donor_count": self._format_top(top_count, monetary=False)
+        }
         categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg["remuneration_total_int"] = self._db.sum(
-            _db_table, field=self.fields["remuneration_total_int"]
-        )
-        reg["remuneration_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["remuneration_total_int"])
-        )
-        reg["interest_relationships"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["lord_interest_relationships"]),
+        reg_fields = [
+            "remuneration_total_int",
+            "lord_interest_relationships",
+            "remuneration_count"
+        ]
+        aggregates = self._get_aggregate(_db_table, reg_fields)
+        aggregate_total = aggregates[0]
+        aggregate_relationships = aggregates[1]
+        aggregate_count = aggregates[2]
+
+        reg["remuneration_total_int"] = aggregate_total
+        reg["remuneration_total"] = self._format_number(aggregate_total)
+        reg["interest_relationships"] = self._format_number(
+            aggregate_relationships,
             currency=False
         )
-        reg["remuneration_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["remuneration_count"]),
+        reg["remuneration_count"] = self._format_number(
+            aggregate_count,
             currency=False
         )
+        top_total, top_relationships, top_count = self._get_top(_db_table, reg_fields)
+        reg["top"] = {
+            "remuneration_total": self._format_top(top_total),
+            "interest_relationships": self._format_top(
+                top_relationships, monetary=False
+            ),
+            "remuneration_count": self._format_top(
+                top_count, monetary=False
+            )
+        }
         categories["register_of_interests"] = reg
 
         result.update(categories)
@@ -150,33 +190,53 @@ class SummaryApi:
         result = {"count": self._db.count(_db_table)}
 
         # get electoral commission data
-        ec["donation_total_int"] = self._db.sum(
-            _db_table, field=self.fields["donation_total_int"]
-        )
-        ec["donation_total"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_total_int"])
-        )
-        ec["donation_count"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["donation_count"]), currency=False
-        )
+        ec_fields = ["donation_total_int", "donation_count"]
+        aggregates = self._get_aggregate(_db_table, ec_fields)
+        aggregate_total = aggregates[0]
+        aggregate_count = aggregates[1]
+        ec["donation_total_int"] = aggregate_total
+        ec["donation_total"] = self._format_number(aggregate_total)
+        ec["donation_count"] = self._format_number(aggregate_count, currency=False)
+        top_total, top_count = self._get_top(_db_table, ec_fields)
+        ec["top"] = {
+            "donation_total": self._format_top(top_total),
+            "donation_count": self._format_top(top_count, monetary=False)
+        }
         categories["electoral_commission"] = ec
 
         # get register of interests data
-        reg["interest_relationships"] = _format_number(
-            self._db.sum(_db_table, field=self.fields["lord_interest_relationships"]),
+        reg_fields = ["lord_interest_relationships"]
+        aggregate_relationships = self._get_aggregate(_db_table, reg_fields)[0]
+
+        reg["interest_relationships"] = self._format_number(
+            aggregate_relationships,
             currency=False
         )
+        top_relationships = self._get_top(_db_table, reg_fields)[0]
+        reg["top"] = {
+            "interest_relationships": self._format_top(
+                top_relationships, monetary=False
+            )
+        }
         categories["register_of_interests"] = reg
 
         result.update(categories)
         return result
 
+    def _get_aggregate(self, table, field_list):
+        return [self._db.sum(table, field=self.fields[x]) for x in field_list]
 
-def _format_number(number, currency=True):
-    if isinstance(number, int):
-        if currency:
-            return u'£{:20,}'.format(number)
-        else:
-            return u'{:20,}'.format(number)
-    else:
-        return 0
+    def _get_top(self, table, field_list):
+        return [self._db.top(table, field=self.fields[x]) for x in field_list]
+
+    def _format_top(self, results, monetary=True):
+        updated = []
+        for entry in results:
+            new = {"name": entry["_id"]}
+            if monetary:
+                new["total_int"] = entry["total"]
+                new["total"] = self._format_number(entry["total"])
+            else:
+                new["total"] = entry["total"]
+            updated.append(new)
+        return updated

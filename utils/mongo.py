@@ -67,7 +67,7 @@ class MongoInterface:
             {'$sort': {'total': -1}}
         ]
         result = q.aggregate(pipe)
-        return result["result"][count]
+        return result["result"][:count]
 
     def count(self, _collection):
         q = collection.Collection(self.db, _collection)

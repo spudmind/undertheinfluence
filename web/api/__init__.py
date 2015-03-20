@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import url_for
 
 
@@ -93,3 +94,13 @@ class BaseAPI:
         if field in record:
             result = record[field]
         return result
+
+    @staticmethod
+    def _format_number(number, currency=True):
+        if isinstance(number, int):
+            if currency:
+                return u'£{:20,}'.format(number)
+            else:
+                return u'{:20,}'.format(number)
+        else:
+            return 0

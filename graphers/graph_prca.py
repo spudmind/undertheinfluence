@@ -22,8 +22,8 @@ class GraphPrca():
             if not lobby_firm.exists:
                 lobby_firm.create()
             lobby_props = {
-                "pa_contact": doc["pa_contact"],
-                "contact_details": doc["contact_details"],
+                "pa_contact": doc["lobbyist"]["pa_contact"],
+                "contact_details": doc["lobbyist"]["contact_details"],
                 "data_source": "prca"
             }
             lobby_firm.set_lobbyist_details()

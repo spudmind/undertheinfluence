@@ -16,24 +16,24 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="alert alert-dismissable alert-success">
-                        <p>
+                        <h4>
                             <strong>{{ summary["influencers"]["count"] }} <a href="{{ url_for('show_influencers')}}">Influencers</a></strong> have made
                             {{ summary["influencers"]["electoral_commission"]["donation_count"] }} donations
                             to the value of {{ summary["influencers"]["electoral_commission"]["donation_total"] }}
                             and have {{ summary["influencers"]["register_of_interests"]["interest_relationships"] }} relationships with politicans
                             to the value of {{ summary["influencers"]["register_of_interests"]["remuneration_total"] }}
-                        </p>
+                        </h4>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="alert alert-dismissable alert-success">
-                        <p>
+                        <h4>
                             <strong>{{ summary["mps"]["count"] }} <a href="{{ url_for('show_politicians')}}">Members of Parliament</a></strong> received
                             {{ summary["mps"]["electoral_commission"]["donor_count"] }} donations
                             to the value of {{ summary["mps"]["electoral_commission"]["donation_total"] }}
                             and have {{ summary["mps"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
                             to the value of {{ summary["mps"]["register_of_interests"]["remuneration_total"] }}
-                        </p>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -41,25 +41,22 @@
 
                 <div class="col-md-6">
                     <div class="alert alert-dismissable alert-success">
-                        <p>
+                        <h4>
                             <strong>{{ summary["political_parties"]["count"] }} <a href="{{ url_for('show_parties')}}">Political Parties</a></strong> received
                             {{ summary["political_parties"]["donation_count"] }} donations
                             to the value of {{ summary["political_parties"]["donation_total"] }}
-                        </p>
+                        </h4>
                     </div>
                 </div>
 
-
-
-
                 <div class="col-md-6">
                     <div class="alert alert-dismissable alert-success">
-                        <p>
+                        <h4>
                             <strong>{{ summary["lords"]["count"] }} <a href="{{ url_for('show_politicians')}}">Lords</a></strong> have made
                             {{ summary["lords"]["electoral_commission"]["donation_count"] }} donations
                             to the value of {{ summary["lords"]["electoral_commission"]["donation_total"] }}
                             and have {{ summary["lords"]["register_of_interests"]["interest_relationships"] }} relationships with Influencers
-                        </p>
+                        </h4>
 
                     </div>
                 </div>

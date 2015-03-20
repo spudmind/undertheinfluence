@@ -40,7 +40,7 @@ class GraphMPs():
             "number_of_terms": mp["number_of_terms"],
             # TODO change mp["guardian_image"] to mp["image_url"]
             # set to image_url for live version which is refreshed
-            "image_url": mp["image_url"],
+            "image_url": mp["guardian_image"],
             "data_source": "theyworkforyou"
         }
         if "guardian_url" in mp:

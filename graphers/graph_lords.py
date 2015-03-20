@@ -42,7 +42,7 @@ class GraphLords():
             "number_of_terms": lord["number_of_terms"],
             # TODO change mp["guardian_image"] to mp["image_url"]
             # set to image_url for live version which is refreshed
-            "image_url": lord["image_url"],
+            "image_url": lord["guardian_image"],
             "data_source": "theyworkforyou"
         }
         if not new_lord.exists:

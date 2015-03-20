@@ -61,8 +61,8 @@ class SummaryApi(BaseAPI):
 
         top_total, top_count = self._get_top(_db_table, ec_fields)
         ec["top"] = {
-            "donation_total": self._format_top(top_total),
-            "donation_count": self._format_top(top_count, monetary=False)
+            "donation_total": self._format_top(top_total, "influencer"),
+            "donation_count": self._format_top(top_count, "influencer", monetary=False)
         }
         categories["electoral_commission"] = ec
 
@@ -89,12 +89,12 @@ class SummaryApi(BaseAPI):
         )
         top_total, top_relationships, top_count = self._get_top(_db_table, reg_fields)
         reg["top"] = {
-            "remuneration_total": self._format_top(top_total),
+            "remuneration_total": self._format_top(top_total, "influencer"),
             "interest_relationships": self._format_top(
-                top_relationships, monetary=False
+                top_relationships, "influencer", monetary=False
             ),
             "remuneration_count": self._format_top(
-                top_count, monetary=False
+                top_count, "influencer", monetary=False
             )
         }
         categories["register_of_interests"] = reg
@@ -121,8 +121,8 @@ class SummaryApi(BaseAPI):
         )
         top_total, top_count = self._get_top(_db_table, ec_fields)
         result["top"] = {
-            "donation_total": self._format_top(top_total),
-            "donation_count": self._format_top(top_count, monetary=False)
+            "donation_total": self._format_top(top_total, "party"),
+            "donation_count": self._format_top(top_count, "party", monetary=False)
         }
         return result
 
@@ -142,8 +142,8 @@ class SummaryApi(BaseAPI):
         ec["donor_count"] = self._format_number(aggregate_count, currency=False)
         top_total, top_count = self._get_top(_db_table, ec_fields)
         ec["top"] = {
-            "donation_total": self._format_top(top_total),
-            "donor_count": self._format_top(top_count, monetary=False)
+            "donation_total": self._format_top(top_total, "mp"),
+            "donor_count": self._format_top(top_count, "mp", monetary=False)
         }
         categories["electoral_commission"] = ec
 
@@ -170,12 +170,12 @@ class SummaryApi(BaseAPI):
         )
         top_total, top_relationships, top_count = self._get_top(_db_table, reg_fields)
         reg["top"] = {
-            "remuneration_total": self._format_top(top_total),
+            "remuneration_total": self._format_top(top_total, "mp"),
             "interest_relationships": self._format_top(
-                top_relationships, monetary=False
+                top_relationships, "mp", monetary=False
             ),
             "remuneration_count": self._format_top(
-                top_count, monetary=False
+                top_count, "mp", monetary=False
             )
         }
         categories["register_of_interests"] = reg
@@ -199,8 +199,8 @@ class SummaryApi(BaseAPI):
         ec["donation_count"] = self._format_number(aggregate_count, currency=False)
         top_total, top_count = self._get_top(_db_table, ec_fields)
         ec["top"] = {
-            "donation_total": self._format_top(top_total),
-            "donation_count": self._format_top(top_count, monetary=False)
+            "donation_total": self._format_top(top_total, "lord"),
+            "donation_count": self._format_top(top_count, "lord", monetary=False)
         }
         categories["electoral_commission"] = ec
 
@@ -215,7 +215,7 @@ class SummaryApi(BaseAPI):
         top_relationships = self._get_top(_db_table, reg_fields)[0]
         reg["top"] = {
             "interest_relationships": self._format_top(
-                top_relationships, monetary=False
+                top_relationships, "lord", monetary=False
             )
         }
         categories["register_of_interests"] = reg
@@ -229,10 +229,15 @@ class SummaryApi(BaseAPI):
     def _get_top(self, table, field_list):
         return [self._db.top(table, field=self.fields[x]) for x in field_list]
 
-    def _format_top(self, results, monetary=True):
+    def _format_top(self, results, label, monetary=True):
         updated = []
         for entry in results:
-            new = {"name": entry["_id"]}
+            new = {
+                "name": entry["_id"],
+                "details_url": self.named_entity_resources(
+                    entry["_id"], label
+                )[0]
+            }
             if monetary:
                 new["total_int"] = entry["total"]
                 new["total"] = self._format_number(entry["total"])

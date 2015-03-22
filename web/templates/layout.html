@@ -59,7 +59,7 @@
                         <li><a href="{{ url_for('show_influencers')}}">All Influencers</a></li>
                         <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Funding & Donors</a></li>
                         <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a></li>
-                        <li><a href="{{ url_for('show_influencers_detail', labels="Lobbyist Client" )}}">Lobbying Agency Clients</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Agency Clients</a></li>
                         <li class="divider"></li>
                         <li><a href="{{ url_for('show_lobbyists' )}}">Lobbying Agencies</a></li>
                     </ul>
@@ -112,23 +112,19 @@
 
 <script src="{{ url_for('static', filename='js/lib/jquery.js') }}"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/lib/d3/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='material/scripts/ripples.js') }}"></script>
+<script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
+<script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/app/main.js') }}"></script> -->
+
+<script type="text/javascript">
+    $.material.init()
+</script>
 <script type="text/javascript">
     $(document).ready(function() {
         $("[data-toggle=tooltip]").tooltip();
     });
-</script>
-<script type="text/javascript">
-    function formatMoney(n, currency) {
-        return currency + "" + n.toFixed(2).replace(/./g, function(c, i, a) {
-            return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-        });
-    }
-</script>
-<script src="{{ url_for('static', filename='js/lib/d3/d3.min.js') }}"></script>
-<script src="{{ url_for('static', filename='material/scripts/ripples.js') }}"></script>
-<script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
-<script type="text/javascript">
-    $.material.init()
 </script>
 </body>
 </html>

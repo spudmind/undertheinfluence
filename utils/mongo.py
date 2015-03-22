@@ -60,7 +60,7 @@ class MongoInterface:
 
     def top(self, _collection, **kwargs):
         field = kwargs.get('field', None)
-        count = kwargs.get('count', 10)
+        count = kwargs.get('count', 5)
         q = collection.Collection(self.db, _collection)
         pipe = [
             {'$group': {'_id': '$name', 'total': {'$sum': field}}},

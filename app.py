@@ -58,6 +58,15 @@ def show_contact():
 @app.route('/politicians')
 def show_politicians():
     args = {}
+    reply = get_summary_function.SummaryApi().request()
+    mps_summary = reply["results"]["summary"]["mps"]
+    lords_summary = reply["results"]["summary"]["lords"]
+    return render_template(
+        'politicians_summary.html', mps=mps_summary, lords=lords_summary)
+
+@app.route('/politicians/detail')
+def show_politicians_detail():
+    args = {}
     title = None
     args["page"] = int(request.args.get('page', 1))
     args["government_department"] = request.args.get('government_department', None)
@@ -66,7 +75,7 @@ def show_politicians():
     reply = get_politicians_function.PoliticiansApi().request(**args)
     politicians, pager = reply['results'], reply['pager']
     return render_template(
-        'show_politicians.html', politicians=politicians, pager=pager, title=title
+        'politicians_detail.html', politicians=politicians, pager=pager, title=title
     )
 
 
@@ -83,13 +92,10 @@ def show_lobbyists():
 @app.route('/influencers')
 def show_influencers():
     args = {}
-    title = None
     args["labels"] = request.args.get('labels', None)
-    if args["labels"]:
-        title = args["labels"]
     reply = get_summary_function.SummaryApi().request()
     influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('show_influencers_summary.html', influencers=influencer_summary)
+    return render_template('influencers_summary.html', influencers=influencer_summary)
 
 
 @app.route('/influencers/detail')
@@ -107,7 +113,7 @@ def show_influencers_detail():
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
-        'show_influencers_detail.html', influencers=influencers, page=page, title=title
+        'influencers_detail.html', influencers=influencers, page=page, title=title
     )
 
 

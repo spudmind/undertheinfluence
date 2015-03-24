@@ -45,7 +45,7 @@ class SummaryApi(BaseAPI):
 
     def _influencers_aggregate(self):
         _db_table = 'api_influencers'
-        result, ec, reg = {}, {}, {}
+        result, ec, reg, lobby = {}, {}, {}, {}
 
         result["count"] = self._format_number(self._db.count(_db_table), currency=False)
 
@@ -96,7 +96,24 @@ class SummaryApi(BaseAPI):
                 top_count, "influencer", monetary=False
             )
         }
-        categories = {"electoral_commission": ec, "register_of_interests": reg}
+
+        # get lobby register data
+        lobby_fields = ["lobbyists_hired"]
+        aggregates = self._get_aggregate(_db_table, lobby_fields)
+        lobby["lobbyists_hired"] = aggregates
+
+        top_lobby = self._get_top(_db_table, lobby_fields)
+        lobby["top"] = {
+            "lobbyists_hired": self._format_top(
+                top_lobby, "influencer", monetary=False
+            ),
+        }
+
+        categories = {
+            "electoral_commission": ec,
+            "register_of_interests": reg,
+            "lobby_registers": lobby
+        }
         result.update(categories)
         return result
 
@@ -207,7 +224,7 @@ class SummaryApi(BaseAPI):
             aggregate_relationships,
             currency=False
         )
-        top_relationships = self._get_top(_db_table, reg_fields)[0]
+        top_relationships = self._get_top(_db_table, reg_fields)
         reg["top"] = {
             "interest_relationships": self._format_top(
                 top_relationships, "lord", monetary=False
@@ -222,7 +239,8 @@ class SummaryApi(BaseAPI):
         return [self._db.sum(table, field=self.fields[x]) for x in field_list]
 
     def _get_top(self, table, field_list):
-        return [self._db.top(table, field=self.fields[x]) for x in field_list]
+        result = [self._db.top(table, field=self.fields[x]) for x in field_list]
+        return result[0] if len(result) == 1 else result
 
     def _format_top(self, results, label, monetary=True):
         updated = []

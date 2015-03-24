@@ -25,6 +25,7 @@ class SummaryApi(BaseAPI):
             "political_parties": url_for('getPoliticalParties', _external=True),
             "politicians": url_for('getPoliticians', _external=True),
             "government_departments": url_for('getGovernmentDepartments', _external=True),
+            "find_entity": url_for('findEntity', _external=True),
         }
         summary = {
             "influencers": self._influencers_aggregate(),

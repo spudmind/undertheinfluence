@@ -39,6 +39,17 @@
                                 </h4>
                                 <div class="row">
                                     <div class="col-md-12">
+                                        {% if "Lobby Agency" in entry["labels"] %}
+                                            <div class="well well-sm">
+                                                {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
+                                                    <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
+                                                    {% for client in entry.influences_summary.lobbying_registers.clients %}
+                                                        * <a href="{{ client.details_url }}">{{ client.name }}</a>
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                            </div >
+                                        {% endif %}
                                         {% if "Lord" in entry["labels"] %}
                                             {% if "register_of_interests" in entry.influences_summary %}
                                                 <div class="well well-sm">
@@ -96,6 +107,20 @@
 
                                         {% if "Donor" in entry["labels"] or "Registered Interest" in entry["labels"] %}
                                             {% if "register_of_interests" in entry.influences_summary %}
+
+                                                {% if "lobby_registers" in entry.influences_summary %}
+                                                    {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
+                                                        <div class="well well-sm">
+                                                            <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="well well-sm">
+                                                            <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+
+
                                                 <div class="well well-sm">
                                                     <b>Register of Interests</b><br>
                                                     {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}

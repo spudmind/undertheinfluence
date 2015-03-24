@@ -7,7 +7,12 @@ class SearchInterface:
         self._db = "spud"
 
     def search(self, field, search):
-        api_collections = ["api_politicians", "api_influencers", "api_government"]
+        api_collections = [
+            "api_politicians",
+            "api_influencers",
+            "api_government",
+            "api_lobbyists"
+        ]
         search_query = {
             "query": {
                 "match": {

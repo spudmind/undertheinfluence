@@ -17,6 +17,19 @@
             <div class="alert alert-dismissable alert-success">
                 <p>It's been a year since the Lobbying Bill passed into law – amid howls of protest from charities, derision from transparency campaigners, and warnings from Parliament. Is it delivering on its promises to clean up politics?</p>
             </div >
+            <div class="well well-sm">
+                <strong>{{ mps["count"] }} <a href="{{ url_for('show_politicians_detail', type="mp" )}}">Members of Parliament</a></strong> received
+                {{ mps["electoral_commission"]["donor_count"] }} donations
+                to the value of {{ mps["electoral_commission"]["donation_total"] }}
+                and have {{ mps["register_of_interests"]["interest_relationships"] }} relationships with Influencers
+                to the value of {{ mps["register_of_interests"]["remuneration_total"] }}
+            </div>
+            <div class="well well-sm">
+                <strong>{{ lords["count"] }} <a href="{{ url_for('show_politicians_detail', type="lords" )}}">Lords</a></strong> have made
+                {{ lords["electoral_commission"]["donation_count"] }} donations
+                to the value of {{ lords["electoral_commission"]["donation_total"] }}
+                and have {{ lords["register_of_interests"]["interest_relationships"] }} relationships with Influencers
+            </div>
         </div >
         <div class="col-md-8">
             <div id="government-container">

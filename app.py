@@ -11,6 +11,7 @@ from web.api import get_politicians_function
 from web.api import get_departments_function
 from web.api import get_lobbyists_function
 from web.api import find_entity_function
+from web.api import get_summary_data
 import os
 
 template_dir = os.path.join(
@@ -57,6 +58,15 @@ def show_contact():
 @app.route('/politicians')
 def show_politicians():
     args = {}
+    reply = get_summary_function.SummaryApi().request()
+    mps_summary = reply["results"]["summary"]["mps"]
+    lords_summary = reply["results"]["summary"]["lords"]
+    return render_template(
+        'politicians_summary.html', mps=mps_summary, lords=lords_summary)
+
+@app.route('/politicians/detail')
+def show_politicians_detail():
+    args = {}
     title = None
     args["page"] = int(request.args.get('page', 1))
     args["government_department"] = request.args.get('government_department', None)
@@ -65,7 +75,7 @@ def show_politicians():
     reply = get_politicians_function.PoliticiansApi().request(**args)
     politicians, pager = reply['results'], reply['pager']
     return render_template(
-        'show_politicians.html', politicians=politicians, pager=pager, title=title
+        'politicians_detail.html', politicians=politicians, pager=pager, title=title
     )
 
 
@@ -82,6 +92,15 @@ def show_lobbyists():
 @app.route('/influencers')
 def show_influencers():
     args = {}
+    args["labels"] = request.args.get('labels', None)
+    reply = get_summary_function.SummaryApi().request()
+    influencer_summary = reply["results"]["summary"]["influencers"]
+    return render_template('influencers_summary.html', influencers=influencer_summary)
+
+
+@app.route('/influencers/detail')
+def show_influencers_detail():
+    args = {}
     title = None
     args["page"] = int(request.args.get('page', 1))
     args["labels"] = request.args.get('labels', None)
@@ -94,7 +113,7 @@ def show_influencers():
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
-        'show_influencers.html', influencers=influencers, page=page, title=title
+        'influencers_detail.html', influencers=influencers, page=page, title=title
     )
 
 
@@ -291,6 +310,20 @@ class FindEntity(Resource):
         return find_entity_function.EntityApi().request(args)
 
 
+class GetData(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('type', type=str)
+        self.reqparse.add_argument('category', type=str)
+        self.reqparse.add_argument('field', type=str)
+        super(GetData, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_summary_data.DataApi().request(**args)
+
+
+
 api.add_resource(GetSummary, '/api/v0.1/', endpoint='getSummary')
 api.add_resource(GetPoliticians, '/api/v0.1/getPoliticians', endpoint='getPoliticians')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')
@@ -302,8 +335,8 @@ api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint=
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
 api.add_resource(GetGovernmentDepartments, '/api/v0.1/getGovernmentDepartments', endpoint='getGovernmentDepartments')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
+api.add_resource(GetData, '/api/v0.1/data', endpoint='data')
 
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0')
-    app.run()

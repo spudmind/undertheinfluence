@@ -8,6 +8,50 @@ from data_models.influencers_models import LobbyAgencies
 from data_models import government_models
 
 
+class PopulateInfluencersApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_influencers")
+        all_influencers = Influencers().get_all()
+        self._logger.debug("\nPopulating Influencers Api")
+        self._logger.debug("Total: %s" % len(all_influencers))
+        for doc in all_influencers:
+            self._logger.debug("%s - %s" % (doc[0], doc[1]))
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        donor_type = record[1]
+        labels = record[2]
+        weight = record[3]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+
+        influencer = Influencer(name)
+        register = influencer.interests_summary
+        ec = influencer.donations_summary
+        lobby = influencer.lobbyists_summary
+
+        data_sources = {}
+        if register["relationship_count"] > 0:
+            data_sources["register_of_interests"] = register
+        if ec["donation_count"] > 0:
+            data_sources["electoral_commission"] = ec
+        if lobby["lobbyist_hired"] > 0:
+            data_sources["lobby_registers"] = lobby
+        influencer_data = {
+            "name": name,
+            "labels": labels,
+            "weight": weight,
+            "donor_type": donor_type,
+            "influences": data_sources
+        }
+        self.db.save("api_influencers", influencer_data)
+
+
 class PopulateLobbyAgenciesApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
@@ -195,50 +239,6 @@ class PopulateLordsApi():
             "influences": data_sources
         }
         self.db.save("api_lords", lord_data)
-
-
-class PopulateInfluencersApi():
-    def __init__(self):
-        self._logger = logging.getLogger('spud')
-        self.db = mongo.MongoInterface()
-
-    def run(self):
-        self.db.drop("api_influencers")
-        all_influencers = Influencers().get_all()
-        self._logger.debug("\nPopulating Influencers Api")
-        self._logger.debug("Total: %s" % len(all_influencers))
-        for doc in all_influencers:
-            self._logger.debug("%s - %s" % (doc[0], doc[1]))
-            self._get_stats(doc)
-
-    def _get_stats(self, record):
-        name = record[0]
-        donor_type = record[1]
-        labels = record[2]
-        weight = record[3]
-        if labels and "Named Entity" in labels:
-            labels.remove("Named Entity")
-
-        influencer = Influencer(name)
-        register = influencer.interests_summary
-        ec = influencer.donations_summary
-        lobby = influencer.lobbyists_summary
-
-        data_sources = {}
-        if register["relationship_count"] > 0:
-            data_sources["register_of_interests"] = register
-        if ec["donation_count"] > 0:
-            data_sources["electoral_commission"] = ec
-        if lobby["lobbyist_hired"] > 0:
-            data_sources["lobby_registers"] = lobby
-        influencer_data = {
-            "name": name,
-            "labels": labels,
-            "weight": weight,
-            "donor_type": donor_type,
-            "influences": data_sources
-        }
-        self.db.save("api_influencers", influencer_data)
 
 
 class PopulatePoliticalPartyApi():

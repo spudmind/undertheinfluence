@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import url_for
 
 
@@ -9,19 +10,20 @@ class BaseAPI:
     def named_entity_resources(name, labels):
         api, web = None, None
         if name:
-            if "Member of Parliament" in labels:
+            if "mp" in labels or "Member of Parliament" in labels:
                 #api = u"/api/v0.1/getMp?name={0}".format(name)
                 api = url_for('getMp', name=name, _external=True)
                 web = url_for('show_mp', name=name, _external=True)
-            elif "Lord" in labels:
+            elif "lord" in labels or "Lord" in labels:
                 #api = u"/api/v0.1/getLord?name={0}".format(name)
                 api = url_for('getLord', name=name, _external=True)
                 web = url_for('show_lord', name=name, _external=True)
-            elif "Donor" in labels or "Registered Interest" or "Lobby Agency Client" in labels:
+            elif "influencer" in labels or "Donor" in labels \
+                    or "Registered Interest" or "Lobby Agency Client" in labels:
                 #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
                 api = url_for('getInfluencer', name=name, _external=True)
                 web = url_for('show_influencer', name=name, _external=True)
-            elif "Political Party" in labels:
+            elif "party" in labels or "Political Party" in labels:
                 #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
                 api = url_for('getPoliticalParty', name=name, _external=True)
                 web = url_for('show_party', name=name, _external=True)
@@ -93,3 +95,13 @@ class BaseAPI:
         if field in record:
             result = record[field]
         return result
+
+    @staticmethod
+    def _format_number(number, currency=True):
+        if isinstance(number, int):
+            if currency:
+                return u'£{:20,}'.format(number)
+            else:
+                return u'{:20,}'.format(number)
+        else:
+            return 0

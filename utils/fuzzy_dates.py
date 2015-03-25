@@ -3,10 +3,8 @@ import calendar
 from datetime import datetime
 import re
 
-class FuzzyDate():
-    def __init__(self):
-        self.date = None
 
+class FuzzyDate():
     def parse_date(self, date_text):
         # specify some directives to try
         directives = {
@@ -37,41 +35,34 @@ class FuzzyDate():
         # e.g. Jan 2010
         date_match = re.search(r"(%s).*?(\d{4})" % "|".join(calendar.month_abbr[1:]), text)
         if date_match:
-            self.start = date_match.start()
-            self.date = datetime.strptime("-".join(date_match.groups()), "%b-%Y")
-            return self
+            date = datetime.strptime("-".join(date_match.groups()), "%b-%Y")
+            return date, date_match.start()
 
-        date_match = re.search(r"\d{2}/(\d{2})/(\d{2})", text)
+        date_match = re.search(r"(\d{2})/(\d{2})/(\d{2})", text)
         if date_match:
-            self.start = date_match.start()
-            self.date = datetime.strptime("-".join(date_match.groups()), "%m-%y")
-            return self
-
-        date_match = re.search(r"\d{2}/(\d{2})/(\d{2})", text)
-        if date_match:
-            self.start = date_match.start()
-            self.date = datetime.strptime("-".join(date_match.groups()), "%m-%y")
-            return self
-
-        date_match = re.search(r"\d{2}/(\d{2})/(\d{2})", text)
-        if date_match:
-            self.start = date_match.start()
-            self.date = datetime.strptime("-".join(date_match.groups()), "%m-%y")
-            return self
+            date = datetime.strptime("-".join(date_match.groups()), "%d-%m-%y")
+            return date, date_match.start()
 
 def extract_date_range(text):
-    start = FuzzyDate().extract_date(text)
+    f = FuzzyDate()
+    start = f.extract_date(text)
     if start is None:
         return None
-    end = FuzzyDate().extract_date(text[start.start + 1:])
+    end = FuzzyDate().extract_date(text[start[1] + 1:])
     if end is None:
         return None
-    return start.date, end.date
+
+    # set the day to the end of the month
+    start = start[0]
+    end = end[0]
+    end_day = calendar.monthrange(end.year, end.month)[1]
+    end = end.replace(day=end_day)
+    return str(start.date()), str(end.date())
 
 def extract_date(text):
-    f = FuzzyDate().extract_date(text)
-    if f:
-        return f.date
+    d = FuzzyDate().extract_date(text)
+    if d:
+        return str(d[0].date())
 
 def parse_date(text):
     return FuzzyDate().parse_date(text)

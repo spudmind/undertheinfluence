@@ -1,0 +1,2 @@
+from fetch_lords_interests import fetch
+from scrape_lords_interests import scrape

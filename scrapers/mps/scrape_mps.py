@@ -5,8 +5,8 @@ import json
 from utils import mongo
 
 
-class ScrapeMPs():
-    def __init__(self):
+class ScrapeMPs:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
         # local directory to save fetched files to
@@ -111,5 +111,5 @@ class ScrapeMPs():
     def _print_out(self, key, value):
         self._logger.debug("  %-35s%-25s" % (key, value))
 
-def scrape():
-    ScrapeMPs().run()
+def scrape(**kwargs):
+    ScrapeMPs(**kwargs).run()

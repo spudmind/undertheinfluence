@@ -6,8 +6,8 @@ import json
 from data_interfaces import hansard
 
 
-class FetchMPs():
-    def __init__(self):
+class FetchMPs:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger("spud")
         self.hansard = hansard.TWFYHansard()
         # local directory to save fetched files to
@@ -44,5 +44,5 @@ class FetchMPs():
         with open(path, "w") as f:
             json.dump(info, f)
 
-def fetch():
-    FetchMPs().run()
+def fetch(**kwargs):
+    FetchMPs(**kwargs).run()

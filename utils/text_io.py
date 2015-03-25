@@ -1,6 +1,3 @@
-import csv
-import logging
-
 class MetricsOutput:
     def __init__(self):
         self.csv_header = \
@@ -35,19 +32,3 @@ class MetricsOutput:
             else:
                 line += "," + str(self.document_data[field])
         self.csv_output.write(line + "\n")
-
-
-class CsvInput:
-    def __init__(self):
-        self._logger = logging.getLogger('spud')
-        self._logger.info('inputting')
-
-    def open(self, file_name):
-        self.file = open(file_name)
-        self.all_rows = csv.reader(self.file, delimiter=',', quotechar='"')
-
-    def export_to_csv(self, filename, keys, data):
-        f = open(filename, 'wb')
-        dict_writer = csv.DictWriter(f, keys)
-        dict_writer.writer.writerow(keys)
-        dict_writer.writerows(data)

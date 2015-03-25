@@ -1,7 +1,7 @@
 APPC Scraper
 ============
 
-This scraper pulls data from [the current APPC register](http://www.appc.org.uk/members/register/), as well as [previous registers](http://www.appc.org.uk/previous-registers/).
+This scraper fetches data from [the current APPC register](http://www.appc.org.uk/members/register/), as well as [previous registers](http://www.appc.org.uk/previous-registers/). For the timebeing, it only scrapes the current register. At some point, we'll make it scrape the previous registers it has fetched.
 
 Fetching
 --------

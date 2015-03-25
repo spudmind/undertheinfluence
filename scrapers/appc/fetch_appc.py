@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import calendar
 from datetime import datetime
+import os
 import os.path
 import logging
 import re
@@ -13,7 +14,7 @@ from utils import mongo
 
 
 class FetchAPPC:
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
         # local directory to save fetched files to
         self.STORE_DIR = "store"
@@ -23,6 +24,10 @@ class FetchAPPC:
         # database stuff
         self.db = mongo.MongoInterface()
         self.COLLECTION_NAME = "appc_fetch"
+        if kwargs["refreshdb"]:
+            self.db.drop(self.COLLECTION_NAME)
+        # if True, avoid downloading where possible
+        self.dryrun = kwargs["dryrun"]
 
     def run(self):
         self._logger.info("Fetching APPC")
@@ -36,37 +41,50 @@ class FetchAPPC:
         r = requests.get(index_url)
         time.sleep(0.5)
         soup = BeautifulSoup(r.text)
-        date_from, date_to = self.get_dates(soup.h1.text)
 
-        companies = soup.find_all("input", {"name": "company"})
+        date_range = self.get_dates(soup.h1.text)
+
+        rel_path = os.path.join(self.STORE_DIR, date_range[1])
+        company_path = os.path.join(self.current_path, rel_path)
+        if not os.path.exists(company_path):
+            os.makedirs(company_path)
+
+        companies = [x["value"] for x in soup.find_all("input", {"name": "company"})]
         for company in companies:
-            filename = self.fetch_company(company["value"], date_to)
+            fetched = False
+            filename = os.path.join(rel_path, "%s.html" % self.filenamify(company))
+            spec = {"filename": filename, "date_range": date_range}
+            # Skip if we already have data for this company during this
+            # date range in the database
+            if self.db.find_one(self.COLLECTION_NAME, spec):
+                self._logger.info("  Skipping '%s'" % company)
+                continue
+
+            if not self.dryrun:
+                self.fetch_company(company, filename)
+                fetched = str(datetime.now())
+
             meta = {
                 "filename": filename,
-                "date_range": (date_from, date_to),
+                "date_range": date_range,
                 "source": {
                     "url": None,  # unfortunately we don't have a direct link
                     "linked_from_url": index_url,
-                    "fetched": str(datetime.now()),
+                    "fetched": fetched,
                 }
             }
+
             self.db.save(self.COLLECTION_NAME, meta)
         self._logger.info("Done fetching APPC HTML.")
 
-    def fetch_company(self, company, date_to):
-        rel_path = os.path.join(self.STORE_DIR, date_to)
-        filename = os.path.join(rel_path, "%s.html" % self.filenamify(company))
-
-        self._logger.debug("  Fetching HTML for '%s'" % company)
+    def fetch_company(self, company, filename):
+        self._logger.debug("  Fetching HTML for '%s' ..." % company)
 
         url = "%s/members/register/register-profile/" % self.BASE_URL
         headers = {'User-Agent': 'Mozilla/5.0'}
         r = requests.post(url, data={"company": company}, headers=headers)
         time.sleep(0.5)
 
-        company_path = os.path.join(self.current_path, rel_path)
-        if not os.path.exists(company_path):
-            os.makedirs(company_path)
         full_path = os.path.join(self.current_path, filename)
         with open(full_path, "w") as f:
             f.write(r.text.encode('utf-8'))
@@ -86,14 +104,24 @@ class FetchAPPC:
         for p in paras:
             if not p.a:
                 continue
+
             date_range = self.get_dates(p.text)
+
+            # Skip if we already have data for this date range in the database
+            if self.db.find_one(self.COLLECTION_NAME, {"date_range": date_range}):
+                self._logger.info("  Skipping '%s'" % p.text)
+                continue
+
             pdf_url = p.a["href"]
             filename = os.path.join(rel_path, pdf_url.split("/")[-1])
             full_path = os.path.join(self.current_path, filename)
+            fetched = False
 
-            self._logger.debug("  Fetching PDF '%s'" % p.text)
-            urllib.urlretrieve(pdf_url, full_path)
-            time.sleep(0.5)
+            if not self.dryrun:
+                self._logger.debug("  Fetching PDF '%s' ..." % p.text)
+                urllib.urlretrieve(pdf_url, full_path)
+                fetched = str(datetime.now())
+                time.sleep(0.5)
 
             meta = {
                 "filename": filename,
@@ -101,9 +129,10 @@ class FetchAPPC:
                 "source": {
                     "url": pdf_url,
                     "linked_from_url": pdf_index_url,
-                    "fetched": str(datetime.now()),
+                    "fetched": fetched,
                 }
             }
+
             self.db.save(self.COLLECTION_NAME, meta)
         self._logger.info("Done fetching APPC PDFs.")
 
@@ -117,8 +146,7 @@ class FetchAPPC:
     def get_dates(self, text):
         months = "|".join(calendar.month_name[1:])
         date_range = re.findall(r"(\d+).*?(%s) (\d{4})" % months, text)
-        return [datetime.strptime(" ".join(i for i in x), "%d %B %Y").strftime("%Y-%m-%d") for x in date_range]
+        return [str(datetime.strptime(" ".join(i for i in x), "%d %B %Y").date()) for x in date_range]
 
-
-def fetch():
-    FetchAPPC().run()
+def fetch(**kwargs):
+    FetchAPPC(**kwargs).run()

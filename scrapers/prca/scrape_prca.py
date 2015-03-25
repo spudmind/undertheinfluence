@@ -6,12 +6,15 @@ import os.path
 from utils import mongo, pdftoxml
 
 
-class ScrapePRCA():
-    def __init__(self):
+class ScrapePRCA:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-        self.db = mongo.MongoInterface()
         # prefix for database tables
         self.PREFIX = "prca"
+        # database stuff
+        self.db = mongo.MongoInterface()
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_scrape" % self.PREFIX)
         # directory where files are stored
         self.STORE_DIR = "store"
         # the y-position of the top of the footer
@@ -194,6 +197,5 @@ class ScrapePRCA():
                 continue
             self.parse_file(meta)
 
-
-def scrape():
-    ScrapePRCA().run()
+def scrape(**kwargs):
+    ScrapePRCA(**kwargs).run()

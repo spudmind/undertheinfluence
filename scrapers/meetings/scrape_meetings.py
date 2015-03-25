@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 import calendar
-import csv
 from datetime import datetime
 import logging
 import os.path
 import re
 import webbrowser
-from utils import mongo, fuzzy_dates
+from utils import mongo, fuzzy_dates, unicode_csv
 
-
-class ScrapeMeetings():
-    def __init__(self):
+class ScrapeMeetings:
+    def __init__(self, **kwargs):
         # fetch the logger
         self._logger = logging.getLogger("spud")
         # database stuff
         self.db = mongo.MongoInterface()
-        # local directory to save fetched files to
-        self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,18 +49,17 @@ class ScrapeMeetings():
 
     def extract_dates_from_title(self, title):
         date_range = fuzzy_dates.extract_date_range(title)
-        if date_range:
-            start, end = date_range
-            # set the day to the end of the month
-            end_day = calendar.monthrange(end.year, end.month)[1]
-            end = end.replace(day=end_day)
+        if not date_range:
+            return
+        start, end = date_range
+        return start.date(), end.date()
 
     def read_csv(self, filename):
-        full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
+        full_path = os.path.join(self.current_path, filename)
         with open(full_path, "rU") as csv_file:
-            csv_doc = csv.reader(csv_file, strict=True)
-            # read the whole csv in
-            return [[cell.strip() for cell in row] for row in csv_doc]
+            csv = unicode_csv.UnicodeReader(csv_file, encoding="latin1", strict=True)
+            # read in the whole csv
+            return [[cell.strip() for cell in row] for row in csv]
 
     # strip empty columns; standardize row length
     def normalise_csv(self, meetings):
@@ -129,10 +124,13 @@ class ScrapeMeetings():
     def scrape_csv(self, meta):
         meetings = self.read_csv(meta["filename"])
         meetings = self.normalise_csv(meetings)
+        # find index(es) of header rows
         header_rows = self.find_header_rows(meetings)
         if header_rows == []:
+            # doesn't look like this file contains meeting data
             return []
         meetings_dicts = []
+        # sometimes a file contains multiple groups of meetings
         for idx, header_row in enumerate(header_rows):
             if idx == len(header_rows) - 1:
                 meetings_block = meetings[header_row[0]+1:]
@@ -140,34 +138,36 @@ class ScrapeMeetings():
                 meetings_block = meetings[header_row[0]+1:header_rows[idx + 1][0]-1]
             block_dicts = self.csv_to_dicts(meetings_block, header_row[1])
             block_dicts = self.populate_empty_cells(block_dicts, header_row[1])
+            # further processing needed!
+            print self.extract_dates_from_title(meta["title"])
+
             meetings_dicts += block_dicts
-            if "name" not in header_row[1]:
-                webbrowser.open(meta["url"] + "/preview")
-                print meta
-                for x in block_dicts:
-                    print x
-                raw_input()
+            # if "name" not in header_row[1]:
+            webbrowser.open(meta["source"]["url"] + "/preview")
+            print meta
+            for x in block_dicts:
+                print x
+            raw_input()
         return meetings_dicts
 
     def run(self):
         page = 1
         while True:
-            not_scraped, meta = self.db.query("meetings_fetch", {"scraped": False}, page=page)
-            if not_scraped == []:
-                # we've finished scraping
-                break
-            for meta in not_scraped:
+            to_scrape, info = self.db.query("meetings_fetch", page=page)
+            for meta in to_scrape:
                 if meta["file_type"] == "CSV":
                     meetings = self.scrape_csv(meta)
                     meetings = self.parse_meetings(meetings)
                 elif meta["file_type"] == "PDF":
                     # TODO: Parse PDF
                     pass
+            if info["has_more"] == False:
+                # we've finished scraping
+                break
             page += 1
         for meeting in meetings:
             # self.db.save("meetings_scrape", meeting)
             pass
 
-def scrape():
-    ScrapeMeetings().run()
-
+def scrape(**kwargs):
+    ScrapeMeetings(**kwargs).run()

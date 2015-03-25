@@ -5,10 +5,7 @@ import sys
 import argparse
 import logging
 
-from scrapers import mps, lords, meetings, prca, party_funding, appc
-
-from scrapers import scrape_mps_interests
-from scrapers import scrape_lords_interests
+from scrapers import appc, lords, lords_interests, meetings, mps, mps_interests, party_funding, prca
 
 from parsers import master_entities
 from parsers import parse_mps
@@ -31,9 +28,11 @@ from data_interfaces import api_data_gen
 from data_models import core
 
 
-choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings", "prca", "appc"]
+choices = ["appc", "lords", "lords_interests", "meetings", "mps", "mps_interests", "party_funding", "prca"]
 arg_parser = argparse.ArgumentParser(description="Task runner for spud.")
 arg_parser.add_argument("--verbose", "-v", action="store_true", help="Noisy output")
+arg_parser.add_argument("--refreshdb", action="store_true", help="Refresh the db collection")
+arg_parser.add_argument("--dryrun", action="store_true", help="Avoid downloading files")
 arg_parser.add_argument("--fetch", nargs="+", choices=choices, help="Specify the fetcher(s) to run")
 arg_parser.add_argument("--scrape", nargs="+", choices=choices, help="Specify the scraper(s) to run")
 arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords"], help="Parse master entities")
@@ -55,25 +54,20 @@ if args.verbose:
 else:
     logger.setLevel(logging.ERROR)
 
+scraper_args = {
+    "refreshdb": args.refreshdb,
+    "dryrun": args.dryrun,
+}
+
 # run fetchers
 if args.fetch is not None:
     for fetcher in args.fetch:
-        sys.modules["scrapers.%s" % fetcher].fetch()
+        sys.modules["scrapers.%s" % fetcher].fetch(**scraper_args)
 
 # run scrapers
 if args.scrape is not None:
-    exec_scraper = {
-        "mps": mps,
-        "lords": lords,
-        "mps_interests": scrape_mps_interests.MPsInterestsScraper,
-        "lords_interests": scrape_lords_interests.LordsInterestsScraper,
-        "party_funding": party_funding,
-        "meetings": meetings,
-        "prca": prca,
-        "appc": appc,
-    }
     for scraper in args.scrape:
-        exec_scraper[scraper].scrape()
+        sys.modules["scrapers.%s" % scraper].scrape(**scraper_args)
 
 # parse master entities
 if args.master is not None:

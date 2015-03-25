@@ -9,8 +9,8 @@ from bs4 import BeautifulSoup
 from utils import mongo
 
 
-class FetchMeetings():
-    def __init__(self):
+class FetchMeetings:
+    def __init__(self, **kwargs):
         # fetch the logger
         self._logger = logging.getLogger("spud")
         self.BASE_URL = "https://www.gov.uk"
@@ -20,20 +20,26 @@ class FetchMeetings():
         # database stuff
         self.db = mongo.MongoInterface()
         self.COLLECTION_NAME = "meetings_fetch"
+        if kwargs["refreshdb"]:
+            self.db.drop(self.COLLECTION_NAME)
         # local directory to save fetched files to
         self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # if True, avoid downloading where possible
+        self.dryrun = kwargs["dryrun"]
 
     def fetch_all_publications(self):
+        self._logger.debug("Searching %s for '%s' with filter '%s' ..." % (self.BASE_URL, self.search_term, self.search_filter))
         search_tmpl = "%s/government/publications?keywords=%s&publication_filter_option=%s&page=%%d" % (self.BASE_URL, urllib.quote_plus(self.search_term), self.search_filter)
         page = 1
         collections = {}
         publications = {}
         while True:
+            # search gov.uk for results
+            self._logger.debug("  Fetching results page %d ..." % page)
             r = requests.get(search_tmpl % page)
-            # rate limit requests
-            # time.sleep(0.5)
+            time.sleep(0.5)
             soup = BeautifulSoup(r.text)
             publication_soups = soup.find_all(class_="document-row")
             if publication_soups == []:
@@ -41,6 +47,7 @@ class FetchMeetings():
                 break
 
             for pub_soup in publication_soups:
+                # find collections (we'll use these to find more publications)
                 collection_soup = pub_soup.find(class_="document-collections")
                 if collection_soup:
                     collection_text = collection_soup.a.text
@@ -51,6 +58,8 @@ class FetchMeetings():
                             "title": collection_soup.a.text,
                         }
                     continue
+
+                # any remaining publications are not part of a collection
                 pub_title = pub_soup.h3.a
                 pub_url = "%s%s" % (self.BASE_URL, pub_title["href"])
                 if self.search_term in pub_title.text.lower() and pub_url not in publications:
@@ -60,23 +69,25 @@ class FetchMeetings():
                     else:
                         department = department.text
                     publications[pub_url] = {
-                        "linked_from": pub_url,
+                        "source": {
+                            "linked_from_url": pub_url,
+                        },
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text.strip(),
                         "department": department,
                     }
 
             page += 1
-        self._logger.debug("Fetched %d collections, and %d publications not part of collections" % (len(collections), len(publications)))
+        self._logger.debug("Found %d collections, and %d publications not part of collections." % (len(collections), len(publications)))
 
-        publications = self.fetch_collections(collections.values(), publications)
+        publications = self.fetch_pubs_from_collections(collections.values(), publications)
         return publications.values()
 
-    def fetch_collections(self, collections, publications={}):
+    def fetch_pubs_from_collections(self, collections, publications={}):
+        self._logger.debug("Searching %d collections for more publications ..." % len(collections))
         for collection in collections:
             r = requests.get(collection["url"])
-            # rate limit requests
-            # time.sleep(0.5)
+            time.sleep(0.5)
             soup = BeautifulSoup(r.text)
             department = soup.find(class_="organisation-link").text
             publication_soups = soup.find_all(class_="publication")
@@ -85,31 +96,33 @@ class FetchMeetings():
                 pub_url = "%s%s" % (self.BASE_URL, pub_title["href"])
                 if self.search_term in pub_title.text.lower() and pub_url not in publications:
                     publications[pub_url] = {
-                        "linked_from": pub_url,
+                        "source": {
+                            "linked_from_url": pub_url,
+                        },
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text,
                         "department": department,
                     }
+        self._logger.debug("Done searching.")
         return publications
 
     def fetch_file(self, url, filename):
-        full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
+        self._logger.debug("  Fetching: %s" % url)
+        full_path = os.path.join(self.current_path, filename)
         urllib.urlretrieve(url, full_path)
-        # rate limit requests
         time.sleep(0.5)
 
     def save_to_db(self, publication):
-        publication["fetched"] = False
-        publication["scraped"] = False
-        existing = self.db.find_one(self.COLLECTION_NAME, {"url": publication["url"]})
-        if existing is None:
-            self.db.save(self.COLLECTION_NAME, publication, manipulate=False)
+        publication["source"]["fetched"] = False
+        # existing = self.db.find_one(self.COLLECTION_NAME, {"url": publication["source"]["url"]})
+        # if existing is None:
+        self.db.save(self.COLLECTION_NAME, publication, manipulate=False)
 
     def get_all_unfetched(self):
         all_not_fetched = []
         page = 1
         while True:
-            not_fetched, meta = self.db.query(self.COLLECTION_NAME, {"fetched": False}, page=page)
+            not_fetched, meta = self.db.query(self.COLLECTION_NAME, query={"source.fetched": False}, page=page)
             all_not_fetched += not_fetched
             page += 1
             if not meta["has_more"]:
@@ -117,10 +130,10 @@ class FetchMeetings():
 
     def run(self):
         publications = self.fetch_all_publications()
+        self._logger.debug("Searching %d publication pages for attachments ..." % len(publications))
         for pub in publications:
-            r = requests.get(pub["linked_from"])
-            # rate limit requests
-            # time.sleep(0.5)
+            r = requests.get(pub["source"]["linked_from_url"])
+            time.sleep(0.5)
             soup = BeautifulSoup(r.text)
             attachment_soups = soup.find_all(class_="attachment")
             for attachment_soup in attachment_soups:
@@ -139,26 +152,33 @@ class FetchMeetings():
                     rel_url = attachment_soup.h2.a["href"]
                     attachment["file_type"] = attachment_soup.find(class_="type").text
                 else:
-                    print attachment_soup
+                    self._logger.error(attachment_soup)
                     raise Exception("Unknown attachment type.")
-                attachment["url"] = "%s%s" % (self.BASE_URL, rel_url)
-                attachment["filename"] = "-".join(rel_url.split("/")[-2:])
+                attachment["source"]["url"] = "%s%s" % (self.BASE_URL, rel_url)
+                attachment["filename"] = os.path.join(self.STORE_DIR, "-".join(rel_url.split("/")[-2:]))
                 self.save_to_db(attachment)
+
             if attachment_soups == []:
                 # the data is inline - embedded in the page.
                 # NB this is very unusual.
-                pub["url"] = pub["linked_from"]
-                pub["filename"] = "%s.html" % pub["url"].split("/")[-1]
+                pub["source"]["url"] = pub["source"]["linked_from_url"]
+                pub["filename"] = os.path.join(self.STORE_DIR, "%s.html" % pub["source"]["url"].split("/")[-1])
                 pub["file_type"] = "HTML"
                 self.save_to_db(pub)
-        not_fetched = self.get_all_unfetched()
-        for pub in not_fetched:
-            self.fetch_file(pub["url"], pub["filename"])
-            pub["fetched"] = str(datetime.now())
-            self.db.update(self.COLLECTION_NAME, {"url": pub["url"]}, pub)
 
-def fetch():
+        self._logger.debug("Found %d attachments in total." % self.db.count(self.COLLECTION_NAME))
+
+        if not self.dryrun:
+            not_fetched = self.get_all_unfetched()
+            self._logger.debug("Fetching %d attachments ..." % len(not_fetched))
+            for pub in not_fetched:
+                self.fetch_file(pub["source"]["url"], pub["filename"])
+                pub["source"]["fetched"] = str(datetime.now())
+                self.db.update(self.COLLECTION_NAME, {"source.url": pub["source"]["url"]}, pub)
+            self._logger.debug("Attachments fetched.")
+
+def fetch(**kwargs):
     # TODO! this is temporary!
-    import requests_cache
-    requests_cache.install_cache("meetings")
-    FetchMeetings().run()
+    # import requests_cache
+    # requests_cache.install_cache("meetings")
+    FetchMeetings(**kwargs).run()

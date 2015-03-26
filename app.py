@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_summary_function
@@ -23,6 +24,13 @@ static_dir = os.path.join(
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(__name__)
 api = Api(app)
+
+
+def _convert_to_currency(number):
+    if isinstance(number, int):
+        return u'£{:20,}'.format(number)
+    else:
+        return 0
 
 
 @app.route('/')
@@ -101,7 +109,6 @@ def show_influencers():
 @app.route('/influencers/detail', methods=['GET', 'POST'])
 def show_influencers_detail():
     args = {}
-    title = None
     page = int(request.args.get('page', 1))
     args["page"] = page
     if request.method == 'POST':
@@ -114,21 +121,50 @@ def show_influencers_detail():
             "lobbyists_lt",
             "labels"
         ]
+        print request.form.keys()
         for value in fields:
-            if len(request.form[value]) > 0:
+            if value in request.form.keys() and len(request.form[value]) > 0:
                 if value == "labels":
                     args[value] = ",".join(request.form.getlist(value))
                 else:
-                    args[value] = request.form[value]
+                    if request.form[value].isdigit():
+                        args[value] = request.form[value]
     elif request.method == 'GET':
         args["labels"] = request.args.get('labels', None)
-        if args["labels"]:
-            title = args["labels"]
+    title = _build_title(args)
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
         'influencers_detail.html', influencers=influencers, page=page, title=title, pager=pager
     )
+
+
+def _build_title(args):
+    filters = []
+    title = {"header": None}
+    if "labels" in args:
+        if args["labels"]:
+            title["header"] = args["labels"]
+            filters.append(" & ".join(args["labels"].split(",")))
+    if "interests_lt" in args:
+        value = _convert_to_currency(int(args["interests_lt"]))
+        filters.append("Interests less than: %s" % value)
+    if "interests_gt" in args:
+        value = _convert_to_currency(int(args["interests_gt"]))
+        filters.append("Interests greater than: %s" % value)
+    if "donations_lt" in args:
+        value = _convert_to_currency(int(args["interests_gt"]))
+        filters.append("Donations less than: %s" % value)
+    if "donations_gt" in args:
+        value = _convert_to_currency(int(args["donations_gt"]))
+        filters.append("Donations greater than: %s" % value)
+    if "lobbyists_lt" in args:
+        filters.append("Less than %s lobbyists hired" % args["lobbyists_lt"])
+    if "lobbyists_gt" in args:
+        filters.append("More than %s lobbyists hired" % args["lobbyists_gt"])
+    title["filter"] = "; ".join(filters)
+    return title
+
 
 
 @app.route('/influencer/<name>')

@@ -3,8 +3,8 @@
 
     <div class="row">
         <div class="col-md-12">
-            {% if title %}
-                <h1>Influence Detail: {{ title }}</h1>
+            {% if title.header %}
+                <h1>Influence Detail: {{ title.header }}</h1>
             {% else %}
                 <h1>All Influencers</h1>
             {% endif %}
@@ -74,6 +74,15 @@
         <div class="col-md-8">
             <div id="government-container">
                 <div class="list-group">
+                    {% if title.filter %}
+                        <div class="list-group-item" >
+                            <div class="row-content">
+                                <div class="alert alert-dismissable alert-warning">
+                                    <b>Filtering for: </b>{{ title.filter }}
+                                </div >
+                            </div >
+                        </div >
+                    {% endif %}
                     {% for entry in influencers %}
                         <div class="list-group-item" >
                             <div class="row-action-primary">

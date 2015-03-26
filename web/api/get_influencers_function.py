@@ -37,7 +37,7 @@ class InfluencersApi(BaseAPI):
             pager["previous"] = url_for('show_influencers_detail', _external=True, **previous_query)
 
         response['pager'] = pager
-        print "pager:", pager
+
         response["results"] = [{
             "name": entry["name"],
             "image_url": None,

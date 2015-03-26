@@ -98,22 +98,36 @@ def show_influencers():
     return render_template('influencers_summary.html', influencers=influencer_summary)
 
 
-@app.route('/influencers/detail')
+@app.route('/influencers/detail', methods=['GET', 'POST'])
 def show_influencers_detail():
     args = {}
     title = None
-    args["page"] = int(request.args.get('page', 1))
-    args["labels"] = request.args.get('labels', None)
-    if args["labels"]:
-        title = args["labels"]
-    try:
-        page = int(request.args.get('page', 1))
-    except ValueError:
-        page = 1
+    page = int(request.args.get('page', 1))
+    args["page"] = page
+    if request.method == 'POST':
+        fields = [
+            "interests_gt",
+            "interests_lt",
+            "donations_gt",
+            "donations_lt",
+            "lobbyists_gt",
+            "lobbyists_lt",
+            "labels"
+        ]
+        for value in fields:
+            if len(request.form[value]) > 0:
+                if value == "labels":
+                    args[value] = ",".join(request.form.getlist(value))
+                else:
+                    args[value] = request.form[value]
+    elif request.method == 'GET':
+        args["labels"] = request.args.get('labels', None)
+        if args["labels"]:
+            title = args["labels"]
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
-        'influencers_detail.html', influencers=influencers, page=page, title=title
+        'influencers_detail.html', influencers=influencers, page=page, title=title, pager=pager
     )
 
 

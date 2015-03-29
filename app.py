@@ -178,7 +178,7 @@ def _build_title(args):
             filters.append("Select Committee: %s" % args["government_department"])
     if "party" in args:
         if len(args["party"]) > 0:
-            filters.append("Party: %s" % args["party"])
+            filters.append("%s Members" % args["party"])
     if "interests_lt" in args:
         value = _convert_to_currency(int(args["interests_lt"]))
         filters.append("Interests less than: %s" % value)

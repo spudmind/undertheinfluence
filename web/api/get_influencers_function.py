@@ -17,20 +17,19 @@ class InfluencersApi(BaseAPI):
     def request(self, **args):
         pager = {}
         page = args.get('page', 1)
-        print "args:", args
+
         self._filter_labels(args)
         self._filter_interests(args)
         self._filter_funding(args)
         self._filter_lobbyists(args)
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
-        print "response:", response
+
         if response['has_more']:
             next_query = args
             next_query['page'] = page + 1
             response['next_url'] = url_for('getInfluencers', _external=True, **next_query)
             pager["next"] = url_for('show_influencers_detail', _external=True, **next_query)
-            print "next_query:", next_query
         if page > 1:
             previous_query = args
             previous_query['page'] = page - 1

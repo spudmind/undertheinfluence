@@ -9,6 +9,7 @@ class ScrapeMPs:
     def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
+        self.COLLECTION_NAME = "mps_scrape"
         # local directory to save fetched files to
         self.STORE_DIR = "store"
         # get the current path
@@ -19,7 +20,7 @@ class ScrapeMPs:
         mps = self.get_overview_data()
         for mp in mps:
             mp = self.get_mp_details(mp)
-            self.db.save("mps_scrape", mp)
+            self.db.save(self.COLLECTION_NAME, mp)
 
     def get_overview_data(self):
         publicwhip_tmpl = u"http://publicwhip.com/mp.php?mpid={0}"
@@ -75,6 +76,7 @@ class ScrapeMPs:
 
     def _update_cached_mp(self, id, key, value):
         self.cache_data.update({"_id": id}, {"$set": {key: value}})
+        self.db.update(self.COLLECTION_NAME, {"_id": id}, {"$set": {key: value}})
 
     def _get_office(self, positions):
         offices = []
@@ -110,6 +112,7 @@ class ScrapeMPs:
 
     def _print_out(self, key, value):
         self._logger.debug("  %-35s%-25s" % (key, value))
+
 
 def scrape(**kwargs):
     ScrapeMPs(**kwargs).run()

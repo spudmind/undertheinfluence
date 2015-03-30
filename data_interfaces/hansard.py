@@ -11,7 +11,7 @@ class TWFYHansard:
             self.twfy.api.getMPs(output="js", **kwargs)
         )
 
-    def get_mp_details(self, person_id, **kwargs):
+    def get_mp(self, person_id, **kwargs):
         return json.loads(
             self.twfy.api.getMP(output="js", id=person_id, **kwargs)
         )
@@ -26,7 +26,7 @@ class TWFYHansard:
             self.twfy.api.getLords(output="js", **kwargs)
         )
 
-    def get_lord_details(self, person_id, **kwargs):
+    def get_lord(self, person_id, **kwargs):
         return json.loads(
             self.twfy.api.getLord(output="js", id=person_id, **kwargs)
         )

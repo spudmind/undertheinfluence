@@ -14,6 +14,8 @@ class ScrapeMPs:
         self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        if kwargs["refreshdb"]:
+            self.db.drop(self.COLLECTION_NAME)
 
     def run(self):
         self._logger.info("Importing MPs")
@@ -52,8 +54,6 @@ class ScrapeMPs:
         mp["last_name"] = details[0]["last_name"]
         mp["image"] = "http://www.theyworkforyou.com%s" % image if image else None
         mp["number_of_terms"] = len(details)
-        self._print_out("first_name", mp["first_name"])
-        self._print_out("last_name", mp["last_name"])
 
         terms = []
         for entry in details:
@@ -70,15 +70,11 @@ class ScrapeMPs:
                     term["offices_held"] = offices
             terms.append(term)
         mp["terms"] = terms
-        #self._report(mp)
+        self._report(mp)
         return mp
-        # self._logger.debug("\n\n---")
 
-    def _update_cached_mp(self, id, key, value):
-        self.cache_data.update({"_id": id}, {"$set": {key: value}})
-        self.db.update(self.COLLECTION_NAME, {"_id": id}, {"$set": {key: value}})
-
-    def _get_office(self, positions):
+    @staticmethod
+    def _get_office(positions):
         offices = []
         for position in positions:
             office = {}
@@ -109,6 +105,7 @@ class ScrapeMPs:
                                 self._print_out(y, term[y])
                 else:
                     self._print_out(x, node[x])
+        self._logger.debug("\n\n---")
 
     def _print_out(self, key, value):
         self._logger.debug("  %-35s%-25s" % (key, value))

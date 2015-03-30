@@ -28,33 +28,43 @@ class FetchMPs:
         self._logger.info("Fetching MPs")
         mp_ids = self.get_overview_data()
         for mp_id in mp_ids:
-            self.get_mp_info(mp_id)
+            self.get_mp(mp_id)
 
     def get_overview_data(self):
         self._logger.info("Fetching MP data from TheyWorkForYou")
         mps = self.hansard.get_mps()
         time.sleep(0.5)
         path = os.path.join(self.current_path, self.STORE_DIR, "mps_overview.json")
-        with open(path, "w") as f:
-            json.dump(mps, f)
+        with open(path, "w") as local:
+            json.dump(mps, local)
         return [mp["person_id"] for mp in mps]
 
-    def get_mp_info(self, mp_id):
+    def get_mp(self, mp_id):
+        self._logger.debug("... getting mp info for %s" % mp_id)
         fetched = False
         filename = os.path.join(self.STORE_DIR, "%s.json" % mp_id)
 
         if not self.dryrun:
-            extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])
+            extra_fields = ", ".join(
+                [
+                    "wikipedia_url",
+                    "bbc_profile_url",
+                    "date_of_birth",
+                    "mp_website",
+                    "guardian_mp_summary",
+                    "journa_list_link"
+                ]
+            )
             info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
             time.sleep(0.5)
 
-            info["details"] = self.hansard.get_mp_details(mp_id)
+            info["details"] = self.hansard.get_mp(mp_id)
             fetched = str(datetime.now())
             time.sleep(0.5)
 
             path = os.path.join(self.current_path, filename)
-            with open(path, "w") as f:
-                json.dump(info, f)
+            with open(path, "w") as local:
+                json.dump(info, local)
 
         meta = {
             "filename": filename,
@@ -65,6 +75,7 @@ class FetchMPs:
             }
         }
         self.db.save(self.COLLECTION_NAME, meta)
+
 
 def fetch(**kwargs):
     FetchMPs(**kwargs).run()

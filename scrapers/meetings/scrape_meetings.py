@@ -13,6 +13,9 @@ class ScrapeMeetings:
         self._logger = logging.getLogger("spud")
         # database stuff
         self.db = mongo.MongoInterface()
+        self.PREFIX = "meetings"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_scrape" % self.PREFIX)
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -139,35 +142,39 @@ class ScrapeMeetings:
             block_dicts = self.csv_to_dicts(meetings_block, header_row[1])
             block_dicts = self.populate_empty_cells(block_dicts, header_row[1])
             # further processing needed!
-            print self.extract_dates_from_title(meta["title"])
+            # print self.extract_dates_from_title(meta["title"])
 
             meetings_dicts += block_dicts
             # if "name" not in header_row[1]:
-            webbrowser.open(meta["source"]["url"] + "/preview")
-            print meta
-            for x in block_dicts:
-                print x
-            raw_input()
+            # webbrowser.open(meta["source"]["url"] + "/preview")
+            # print meta
+            # for x in block_dicts:
+            #     print x
+            # raw_input()
         return meetings_dicts
 
     def run(self):
         page = 1
         while True:
-            to_scrape, info = self.db.query("meetings_fetch", page=page)
+            to_scrape, info = self.db.query("%s_fetch" % self.PREFIX, page=page)
             for meta in to_scrape:
+                meta["published_at"] = str(datetime.strptime(meta["published_at"], "%d %B %Y").date())
                 if meta["file_type"] == "CSV":
                     meetings = self.scrape_csv(meta)
                     meetings = self.parse_meetings(meetings)
                 elif meta["file_type"] == "PDF":
                     # TODO: Parse PDF
                     pass
+
+            for meeting in meetings:
+                for k in ["published_at", "department", "title", "source"]:
+                    meeting[k] = meta[k]
+                self.db.save("%s_scrape" % self.PREFIX, meeting)
+
             if info["has_more"] == False:
                 # we've finished scraping
                 break
             page += 1
-        for meeting in meetings:
-            # self.db.save("meetings_scrape", meeting)
-            pass
 
 def scrape(**kwargs):
     ScrapeMeetings(**kwargs).run()

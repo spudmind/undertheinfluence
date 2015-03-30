@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import os.path
 import logging
 import time
 import json
 from data_interfaces import hansard
+from utils import mongo
 
 
 class FetchMPs:
@@ -14,13 +16,18 @@ class FetchMPs:
         self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # database stuff
+        self.db = mongo.MongoInterface()
+        self.COLLECTION_NAME = "mps_fetch"
+        if kwargs["refreshdb"]:
+            self.db.drop(self.COLLECTION_NAME)
+        # if True, avoid downloading where possible
+        self.dryrun = kwargs["dryrun"]
 
     def run(self):
         self._logger.info("Fetching MPs")
         mp_ids = self.get_overview_data()
         for mp_id in mp_ids:
-            if os.path.exists(os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp_id)):
-                continue
             self.get_mp_info(mp_id)
 
     def get_overview_data(self):
@@ -33,16 +40,31 @@ class FetchMPs:
         return [mp["person_id"] for mp in mps]
 
     def get_mp_info(self, mp_id):
-        extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])
-        info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
-        time.sleep(0.5)
+        fetched = False
+        filename = os.path.join(self.STORE_DIR, "%s.json" % mp_id)
 
-        info["details"] = self.hansard.get_mp_details(mp_id)
-        time.sleep(0.5)
+        if not self.dryrun:
+            extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])
+            info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
+            time.sleep(0.5)
 
-        path = os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp_id)
-        with open(path, "w") as f:
-            json.dump(info, f)
+            info["details"] = self.hansard.get_mp_details(mp_id)
+            fetched = str(datetime.now())
+            time.sleep(0.5)
+
+            path = os.path.join(self.current_path, filename)
+            with open(path, "w") as f:
+                json.dump(info, f)
+
+        meta = {
+            "filename": filename,
+            "source": {
+                "url": "http://www.theyworkforyou.com/api/docs/getMP?id=%s#output" % mp_id,
+                "linked_from_url": None,
+                "fetched": fetched,
+            }
+        }
+        self.db.save(self.COLLECTION_NAME, meta)
 
 def fetch(**kwargs):
     FetchMPs(**kwargs).run()

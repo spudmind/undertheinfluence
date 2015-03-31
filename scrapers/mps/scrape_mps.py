@@ -1,4 +1,4 @@
-s# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import logging
 import os.path
 import json
@@ -36,7 +36,7 @@ class ScrapeMPs:
                 "twfy_id": mp["person_id"],
                 "party": mp["party"],
                 "publicwhip_id": mp["member_id"],
-                "publicwhip_url": publicwhip_tmpl.format(mp["person_id"]),
+                "publicwhip_url": publicwhip_tmpl.format(mp["member_id"]),
             })
             # self._logger.debug("\n")
         return data
@@ -68,7 +68,6 @@ class ScrapeMPs:
                     term["offices_held"] = offices
             terms.append(term)
         mp["terms"] = terms
-        self._report(mp)
         return mp
 
     @staticmethod
@@ -82,28 +81,6 @@ class ScrapeMPs:
                 office = {"position": position["position"]}
             offices.append(office)
         return offices
-
-    def _report(self, node):
-        for x in node:
-                if x == "terms":
-                    for term in node["terms"]:
-                        self._logger.debug("-")
-                        for y in term:
-                            if y == "offices_held":
-                                offices = term["offices_held"]
-                                if len(offices) > 1 and offices != "none":
-                                    for office in offices:
-                                        for z in office:
-                                            self._print_out(z, office[z])
-                                else:
-                                    if not offices == "none":
-                                        for z in offices[0]:
-                                            self._print_out(z, offices[0][z])
-                            else:
-                                self._print_out(y, term[y])
-                else:
-                    self._print_out(x, node[x])
-        self._logger.debug("\n\n---")
 
     def _print_out(self, key, value):
         self._logger.debug("  %-35s%-25s" % (key, value))

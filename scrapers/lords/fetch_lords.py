@@ -37,7 +37,7 @@ class FetchLords:
         time.sleep(0.5)
 
         if not self.dryrun:
-            path = os.path.join(self.current_path, self.STORE_DIR, "overview.json")
+            path = os.path.join(self.current_path, self.STORE_DIR, "lords_overview.json")
             with open(path, "w") as f:
                 json.dump(lords, f)
 
@@ -64,7 +64,7 @@ class FetchLords:
                 "fetched": fetched,
             }
         }
-        self.db.update(self.COLLECTION_NAME, {"filename": filename}, meta, upsert=True)
+        self.db.save(self.COLLECTION_NAME, meta)
 
 
 def fetch(**kwargs):

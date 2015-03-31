@@ -31,7 +31,6 @@ class ScrapeLords:
             lords = json.load(f)
         data = []
         for lord in lords:
-            self._print_out("Lord", lord["name"])
             data.append({
                 "full_name": lord["name"],
                 "twfy_id": lord["person_id"],
@@ -43,7 +42,9 @@ class ScrapeLords:
         return data
 
     def get_lord_details(self, meta):
-        with open(os.path.join(self.current_path, self.STORE_DIR, "%s.json" % meta["twfy_id"])) as f:
+        twfy_tmpl = u"http://www.theyworkforyou.com/api/docs/getLord?id={0}#output"
+        local = "%s.json" % meta["twfy_id"]
+        with open(os.path.join(self.current_path, self.STORE_DIR, local)) as f:
             details = json.load(f)
 
         image = details[0].get("image")
@@ -52,7 +53,7 @@ class ScrapeLords:
             # NB Lords' names appear to be broken in TWFY...
             "first_name": details[0]["first_name"],
             "last_name": details[0]["last_name"],
-            "full_name": [details[0]["full_name"]],
+            "full_name": details[0]["full_name"],
             "party": details[0]["party"],
             "twfy_id": details[0]["person_id"],
             "image": "http://www.theyworkforyou.com%s" % image if image else None,
@@ -63,10 +64,12 @@ class ScrapeLords:
                 "constituency": term['constituency'] if term['constituency'] != "" else None,
                 "party": term["party"],
             } for term in details],
-            "source": meta["source"],
+            "source": twfy_tmpl.format(meta["twfy_id"]),
+            "publicwhip_id": meta["publicwhip_id"],
+            "publicwhip_url": meta["publicwhip_url"],
         }
 
-        self._logger.debug(lord["name"])
+        self._logger.debug(lord["full_name"])
         self._logger.debug(lord["party"])
         self._logger.debug("\n---")
         return lord

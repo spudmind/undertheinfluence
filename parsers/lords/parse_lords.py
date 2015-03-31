@@ -22,13 +22,14 @@ class ParseLords():
         found = self.resolver.find_lord(node["full_name"])
         party = self.resolver.find_party(node["party"])
         self._logger.debug("\n..................")
-        self._logger.debug("%s x %s" % (found, node["number_of_terms"]))
+        self._logger.debug(node["full_name"])
         if node["full_name"] != found:
             self._logger.debug("*** also known as: %s" % node["full_name"])
             node["also_known_as"] = found
         if node["party"] != party:
             self._logger.debug("%s %% %s" % (node["party"], party))
             node["party"] = party
+        node["number_of_terms"] = len(node["terms"])
         self._logger.debug("..................")
         self.db.save("%s_parse" % self.PREFIX, node)
 

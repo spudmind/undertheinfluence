@@ -10,9 +10,10 @@ parse_mps.py outputs documents to the `mps_parse` collection, of the following f
 
 ```json
 {
-	"_id" : ObjectId("5519a0ec9145131e8338ef4e"),
-	"publicwhip_id" : "40323",
+	"first_name" : "Bridget",
 	"last_name" : "Phillipson",
+	"full_name" : "Bridget Phillipson",
+	"party" : "Labour",
 	"terms" : [
 		{
 			"left_reason" : "general_election",
@@ -33,10 +34,8 @@ parse_mps.py outputs documents to the `mps_parse` collection, of the following f
 	"wikipedia_url" : "http://en.wikipedia.org/wiki/Bridget_Phillipson",
 	"image" : "http://www.theyworkforyou.com/images/mpsL/24709.jpeg",
 	"twfy_id" : "24709",
-	"first_name" : "Bridget",
+	"publicwhip_id" : "40323",
 	"publicwhip_url" : "http://publicwhip.com/mp.php?mpid=24709",
-	"full_name" : "Bridget Phillipson",
-	"party" : "Labour",
 	"number_of_terms" : 1
 }```
 

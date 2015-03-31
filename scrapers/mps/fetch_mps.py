@@ -39,7 +39,7 @@ class FetchMPs:
         date = datetime.datetime.strptime(since, "%Y-%m-%d").date()
         while date < now:
             all_mps.update(self.get_overview_data(date=date))
-            print "MPs found so far: %s" % len(all_mps)
+            print "  MPs found so far: %s" % len(all_mps)
             date += datetime.timedelta(increment)
         all_mps.update(self.get_overview_data(date=now))
         return all_mps
@@ -49,23 +49,22 @@ class FetchMPs:
         self._logger.info("  Fetching MP overview data from TheyWorkForYou (%s) ..." % date_str)
 
         path = os.path.join(self.current_path, self.STORE_DIR, "mps_overview_%s.json" % str(date))
-        if not os.path.exists(path):
+        if os.path.exists(path) and self.dryrun:
+            with open(path) as f:
+                mps = json.load(f)
+        else:
             mps = self.hansard.get_mps(date=date_str)
             time.sleep(0.5)
             with open(path, "w") as local:
                 json.dump(mps, local)
-        else:
-            with open(path) as f:
-                mps = json.load(f)
 
         return [mp["person_id"] for mp in mps]
 
     def get_mp_info(self, mp_id):
         path = os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp_id)
 
-        if os.path.exists(path):
+        if os.path.exists(path) and self.dryrun:
             # if the MP file exists, we bail out
-            # this isn't quite right... but it's faster
             return
 
         extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])

@@ -25,14 +25,16 @@ class FetchMPs:
         self.dryrun = kwargs["dryrun"]
 
     def run(self):
-        self._logger.info("Fetching MPs")
+        self._logger.info("Fetching MPs ...")
         mp_ids = self.get_overview_data()
+        self._logger.info("  Fetching individual MP data ...")
         for mp_id in mp_ids:
             self.get_mp_info(mp_id)
+        self._logger.info("Done.")
 
-    def get_overview_data(self):
-        self._logger.info("Fetching MP data from TheyWorkForYou")
-        mps = self.hansard.get_mps()
+    def get_overview_data(self, date="01/01/2015"):
+        self._logger.info("  Fetching MP overview data from TheyWorkForYou ...")
+        mps = self.hansard.get_mps(date=date)
         time.sleep(0.5)
         path = os.path.join(self.current_path, self.STORE_DIR, "mps_overview.json")
         with open(path, "w") as f:

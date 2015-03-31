@@ -10,18 +10,18 @@ class ScrapeLords:
         self._logger = logging.getLogger('spud')
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
-        self.PREFIX = "lords"
+        self.COLLECTION_NAME = "lords_scrape"
         # database stuff
         self.db = mongo.MongoInterface()
         if kwargs["refreshdb"]:
-            self.db.drop("%s_scrape" % self.PREFIX)
+            self.db.drop(self.COLLECTION_NAME)
 
     def run(self):
         self._logger.info("Importing Lords ...")
-        lords = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
+        lords = self.db.fetch_all(self.COLLECTION_NAME, paged=False)
         for lord in lords:
             lord = self.get_lord_details(lord)
-            self.db.update("%s_scrape" % self.PREFIX, {"twfy_id": lord["twfy_id"]}, lord, upsert=True)
+            self.db.save(self.COLLECTION_NAME, lord)
         self._logger.info("Done importing Lords.")
 
     def get_lord_details(self, meta):
@@ -47,9 +47,11 @@ class ScrapeLords:
             "source": meta["source"],
         }
 
-        self._logger.debug(lord)
-        self._logger.debug("\n\n---")
+        self._logger.debug(lord["name"])
+        self._logger.debug(lord["party"])
+        self._logger.debug("\n---")
         return lord
+
 
 def scrape(**kwargs):
     ScrapeLords(**kwargs).run()

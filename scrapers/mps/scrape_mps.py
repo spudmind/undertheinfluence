@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+s# -*- coding: utf-8 -*-
 import logging
 import os.path
 import json
@@ -31,8 +31,6 @@ class ScrapeMPs:
         data = []
         for mp in mps:
             self._print_out("MP", mp["name"])
-            self._print_out("Party", mp["party"])
-            self._print_out("person_id", mp["person_id"])
             data.append({
                 "full_name": mp["name"],
                 "twfy_id": mp["person_id"],

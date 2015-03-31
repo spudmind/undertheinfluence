@@ -6,18 +6,38 @@ This parser fetches the Members of Parliament list from MySociety's [TheyWorkFor
 Parsing
 -------
 
-fetch_mps.py outputs documents to the `mps_fetch` collection, of the following form:
+parse_mps.py outputs documents to the `mps_parse` collection, of the following form:
 
 ```json
 {
-    "filename": "relative link to the fetched file - either HTML or PDF",
-    "date_range": ["YYYY-MM-DD", "YYYY-MM-DD"],
-    "source": {
-        "url": "Source URL. For the HTML, this is null because there is no direct link (it requires a POST request)",
-        "linked_from_url": "Index page URL, from which the source documents are linked",
-        "fetched": "Timestamp when the document (HTML or PDF) was fetched"
-    }
-}
-```
+	"_id" : ObjectId("5519a0ec9145131e8338ef4e"),
+	"publicwhip_id" : "40323",
+	"last_name" : "Phillipson",
+	"terms" : [
+		{
+			"left_reason" : "general_election",
+			"left_house" : "2015-03-30",
+			"entered_house" : "2010-05-06",
+			"offices_held" : [
+				{
+					"position" : "Opposition Whip (Commons)"
+				},
+				{
+					"department" : "Speaker's Committee on the Electoral Commission"
+				}
+			],
+			"party" : "Labour",
+			"constituency" : "Houghton and Sunderland South"
+		}
+	],
+	"wikipedia_url" : "http://en.wikipedia.org/wiki/Bridget_Phillipson",
+	"image" : "http://www.theyworkforyou.com/images/mpsL/24709.jpeg",
+	"twfy_id" : "24709",
+	"first_name" : "Bridget",
+	"publicwhip_url" : "http://publicwhip.com/mp.php?mpid=24709",
+	"full_name" : "Bridget Phillipson",
+	"party" : "Labour",
+	"number_of_terms" : 1
+}```
 
-The mongo command: `db.mps_fetch.findOne()` is helpful for seeing a real example of this.
+The mongo command: `db.mps_parse.findOne()` is helpful for seeing a real example of this.

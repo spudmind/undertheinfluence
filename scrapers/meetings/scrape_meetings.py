@@ -7,6 +7,7 @@ import re
 import webbrowser
 from utils import mongo, fuzzy_dates, unicode_csv
 
+
 class ScrapeMeetings:
     def __init__(self, **kwargs):
         # fetch the logger

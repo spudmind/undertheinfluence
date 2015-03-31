@@ -49,7 +49,7 @@ class FetchLords:
 
         if not self.dryrun:
             self._logger.info("  Fetching data for Lord with person ID '%s'" % lord_id)
-            details = self.hansard.get_lord_details(lord_id)
+            details = self.hansard.get_lord(lord_id)
             fetched = str(datetime.now())
             time.sleep(0.5)
             full_path = os.path.join(self.current_path, filename)
@@ -65,6 +65,7 @@ class FetchLords:
             }
         }
         self.db.update(self.COLLECTION_NAME, {"filename": filename}, meta, upsert=True)
+
 
 def fetch(**kwargs):
     FetchLords(**kwargs).run()

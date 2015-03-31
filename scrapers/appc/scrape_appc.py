@@ -92,5 +92,6 @@ class ScrapeAPPC:
             "source": meta["source"],
         }
 
+
 def scrape(**kwargs):
     ScrapeAPPC(**kwargs).run()

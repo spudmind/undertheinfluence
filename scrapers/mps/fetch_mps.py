@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+import datetime
 import os.path
 import logging
+import sets
 import time
 import json
 from data_interfaces import hansard
@@ -26,47 +27,56 @@ class FetchMPs:
 
     def run(self):
         self._logger.info("Fetching MPs ...")
-        mp_ids = self.get_overview_data()
+        mp_ids = self.get_mps_since("2000-01-01", 180)
         self._logger.info("  Fetching individual MP data ...")
         for mp_id in mp_ids:
             self.get_mp_info(mp_id)
         self._logger.info("Done.")
 
-    def get_overview_data(self, date="01/01/2015"):
-        self._logger.info("  Fetching MP overview data from TheyWorkForYou ...")
-        mps = self.hansard.get_mps(date=date)
-        time.sleep(0.5)
-        path = os.path.join(self.current_path, self.STORE_DIR, "mps_overview.json")
-        with open(path, "w") as f:
-            json.dump(mps, f)
+    def get_mps_since(self, since, increment):
+        all_mps = sets.Set()
+        now = datetime.date.today()
+        date = datetime.datetime.strptime(since, "%Y-%m-%d").date()
+        while date < now:
+            all_mps.update(self.get_overview_data(date=date))
+            print "MPs found so far: %s" % len(all_mps)
+            date += datetime.timedelta(increment)
+        all_mps.update(self.get_overview_data(date=now))
+        return all_mps
+
+    def get_overview_data(self, date):
+        date_str = date.strftime("%d/%m/%Y")
+        self._logger.info("  Fetching MP overview data from TheyWorkForYou (%s) ..." % date_str)
+
+        path = os.path.join(self.current_path, self.STORE_DIR, "mps_overview_%s.json" % str(date))
+        if not os.path.exists(path):
+            mps = self.hansard.get_mps(date=date_str)
+            time.sleep(0.5)
+            with open(path, "w") as local:
+                json.dump(mps, local)
+        else:
+            with open(path) as f:
+                mps = json.load(f)
+
         return [mp["person_id"] for mp in mps]
 
     def get_mp_info(self, mp_id):
-        fetched = False
-        filename = os.path.join(self.STORE_DIR, "%s.json" % mp_id)
+        path = os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp_id)
 
-        if not self.dryrun:
-            extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])
-            info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
-            time.sleep(0.5)
+        if os.path.exists(path):
+            # if the MP file exists, we bail out
+            # this isn't quite right... but it's faster
+            return
 
-            info["details"] = self.hansard.get_mp_details(mp_id)
-            fetched = str(datetime.now())
-            time.sleep(0.5)
+        extra_fields = ", ".join(["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"])
+        info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
+        time.sleep(0.5)
 
-            path = os.path.join(self.current_path, filename)
-            with open(path, "w") as f:
-                json.dump(info, f)
+        info["details"] = self.hansard.get_mp_details(mp_id)
+        time.sleep(0.5)
 
-        meta = {
-            "filename": filename,
-            "source": {
-                "url": "http://www.theyworkforyou.com/api/docs/getMP?id=%s#output" % mp_id,
-                "linked_from_url": None,
-                "fetched": fetched,
-            }
-        }
-        self.db.save(self.COLLECTION_NAME, meta)
+        with open(path, "w") as f:
+            json.dump(info, f)
 
 def fetch(**kwargs):
     FetchMPs(**kwargs).run()

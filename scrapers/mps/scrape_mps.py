@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import logging
+import os
 import os.path
 import json
+import re
 from utils import mongo
 
 
@@ -10,36 +13,47 @@ class ScrapeMPs:
         self._logger = logging.getLogger('spud')
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # local directory where fetched files are stored
+        self.STORE_DIR = "store"
         # database stuff
         self.db = mongo.MongoInterface()
-        self.PREFIX = "mps"
+        self.COLLECTION_NAME = "mps_scrape"
         if kwargs["refreshdb"]:
-            self.db.drop("%s_scrape" % self.PREFIX)
+            self.db.drop(self.COLLECTION_NAME)
 
     def run(self):
         self._logger.info("Scraping MPs ...")
-        metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
-        for meta in metas:
-            mp = self.get_mp_details(meta)
-            self.db.save("%s_scrape" % self.PREFIX, mp)
+        path = os.path.join(self.current_path, self.STORE_DIR)
+        filenames = os.listdir(path)
+        for filename in filenames:
+            if not re.match(r"^\d+\.json$", filename):
+                continue
+            with open(os.path.join(path, filename)) as f:
+                mp = json.load(f)
+            mp = self.get_mp_details(mp)
+            self.db.save(self.COLLECTION_NAME, mp)
         self._logger.info("Done scraping MPs.")
 
-    def get_mp_details(self, meta):
+    def get_mp_details(self, mp):
         publicwhip_tmpl = u"http://publicwhip.com/mp.php?mpid={0}"
-        with open(os.path.join(self.current_path, meta["filename"])) as f:
-            mp = json.load(f)
-        details = mp.pop("details")
+
+        details = mp["details"]
+        mp = {x: mp.get(x, None) for x in ["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"]}
 
         mp["twfy_id"] = details[0]["person_id"]
-        # we set the party and member ID using the most recent
-        # information
         mp["first_name"] = details[0]["first_name"]
         mp["last_name"] = details[0]["last_name"]
+        # we set the party and member ID using the most recent
+        # information
         mp["party"] = details[0]["party"]
         mp["publicwhip_id"] = details[0]["member_id"]
         mp["publicwhip_url"] = publicwhip_tmpl.format(mp["twfy_id"])
 
-        mp["source"] = meta["source"]
+        mp["source"] = {
+            "url": "http://www.theyworkforyou.com/api/docs/getMP?id=%s&output=js#output" % mp["twfy_id"],
+            "linked_from_url": None,
+            "fetched": str(datetime.strptime(details[0]["lastupdate"], "%Y-%m-%d %H:%M:%S")),
+        }
 
         mp["aliases"] = []
         for x in details:

@@ -64,7 +64,7 @@ class FetchPRCA():
         end = self.DATE_RE.search(anchor_text[start.start()+1:])
         end_date = datetime.strptime("-".join(end.groups()), "%B-%Y").date()
         # set the day to the end of the month
-        end_day = calendar.monthrange(end_dt.year, end_dt.month)[1]
+        end_day = calendar.monthrange(end_date.year, end_date.month)[1]
         end_date = end_date.replace(day=end_day)
         # ensure start date is before end date!
         if start_date > end_date:
@@ -83,10 +83,12 @@ class FetchPRCA():
 
     def fetch_file(self, record):
         # name the file
-        full_path = os.path.join(self.current_path, record["filename"])
+
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        full_path = os.path.join(current_path, self.STORE_DIR, record["filename"])
         # fetch from URL and save locally
         try:
-            self._logger.info("Fetching '%s' ..." % filename)
+            self._logger.info("Fetching '%s' ..." % full_path)
             _ = urllib.urlretrieve(record["source"]["url"], full_path)
             record["source"]["fetched"] = str(datetime.now())
             time.sleep(0.5)
@@ -107,8 +109,13 @@ class FetchPRCA():
                 rel_url = self.URL_CORRECTION[1]
 
             file_type = rel_url[-3:]
-            filename = "%s_%s_%s.%s" % (current["description"], current["date_from"][:7], current["date_to"][:7], file_type)
-            current["filename"] = os.path.join(self.STORE_DIR, filename)
+            filename = "%s_%s_%s.%s" % (
+                current["description"],
+                current["date_range"][0][:7],
+                current["date_range"][1][:7],
+                file_type
+            )
+            current["filename"] = filename
 
             if self.db.find_one(self.COLLECTION_NAME, current):
                 self._logger.info("Skipping '%s' ..." % filename)
@@ -124,6 +131,7 @@ class FetchPRCA():
                 current = self.fetch_file(current)
 
             self.db.save(self.COLLECTION_NAME, current)
+
 
 def fetch(**kwargs):
     FetchPRCA(**kwargs).run()

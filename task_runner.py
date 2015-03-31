@@ -6,7 +6,7 @@ import argparse
 import logging
 
 from scrapers import appc, lords, lords_interests, meetings, mps, mps_interests, party_funding, prca
-from parsers import mps, lords, appc, prca
+from parsers import mps, lords, appc, prca, meetings
 
 from parsers import master_entities
 

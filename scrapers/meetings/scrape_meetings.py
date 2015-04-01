@@ -46,7 +46,7 @@ class ScrapeMeetings:
                 if "name" not in found_header and 0 not in column_mappings.values():
                     # take a guess that the first column is the name
                     column_mappings["name"] = 0
-                    found_headers.append((row_idx, column_mappings))
+                found_headers.append((row_idx, column_mappings))
 
         return found_headers
 

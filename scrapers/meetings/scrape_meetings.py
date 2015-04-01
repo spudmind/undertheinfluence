@@ -158,21 +158,19 @@ class ScrapeMeetings:
 
     def run(self):
         self._logger.info("Scraping Meetings")
-        page = 1
         _all_meetings = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
         for meta in _all_meetings:
             meta["published_at"] = str(datetime.strptime(meta["published_at"], "%d %B %Y").date())
             if meta["file_type"] == "CSV":
                 meetings = self.scrape_csv(meta)
                 meetings = self.parse_meetings(meetings)
+                for meeting in meetings:
+                    for k in ["published_at", "department", "title", "source"]:
+                        meeting[k] = meta[k]
+                    self.db.save("%s_scrape" % self.PREFIX, meeting)
             elif meta["file_type"] == "PDF":
                 # TODO: Parse PDF
                 pass
-
-        for meeting in meetings:
-            for k in ["published_at", "department", "title", "source"]:
-                meeting[k] = meta[k]
-            self.db.save("%s_scrape" % self.PREFIX, meeting)
 
 
 def scrape(**kwargs):

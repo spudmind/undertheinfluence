@@ -15,12 +15,15 @@ class ParseMeetings():
 
     def run(self):
         _all_meetings = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
+        titles = []
         for doc in _all_meetings:
             print "---"
+            titles.append(doc["title"])
+            for field in ["title", "department", "organisation", "name"]:
+                if field in doc:
+                    print "%s: " % field, doc[field]
             print doc["title"]
-            print doc["department"]
-            print doc["organisation"]
-            print doc["name"]
+        print "\n\ntitle count:", set(titles)
 
 
 def parse(**kwargs):

@@ -113,14 +113,14 @@ class ScrapeMeetings:
 
         for meeting in meetings:
             if "date" not in meeting:
-                self._logger.error("Something went wrong here.")
+                self._logger.warning("Date missing from the following row:", meeting)
                 continue
             meeting_date = fuzzy_dates.parse_date(meeting["date"], date_format=date_format, date_range=date_range)
             if meeting_date:
                 meeting["date"] = str(meeting_date.date)
                 date_format = meeting_date.date_format
             else:
-                self._logger.error("Couldn't find '%s' in range %s" % (meeting["date"], date_range))
+                self._logger.warning("Couldn't find '%s' in range %s" % (meeting["date"], date_range))
         return meetings
 
     def scrape_csv(self, meta):

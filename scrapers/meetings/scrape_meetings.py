@@ -52,13 +52,6 @@ class ScrapeMeetings:
 
         return found_headers
 
-    def extract_dates_from_title(self, title):
-        date_range = fuzzy_dates.extract_date_range(title)
-        if not date_range:
-            return
-        start, end = date_range
-        return start.date(), end.date()
-
     def read_csv(self, filename):
         full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
         with open(full_path, "rU") as csv_file:
@@ -92,7 +85,7 @@ class ScrapeMeetings:
 
         pop_meetings = [meetings[0]]
         for idx, row in enumerate(meetings[1:]):
-            pop_meeting = {k: row.get(k) if row.get(k) is not None else pop_meetings[idx-1].get(k, "") for k in header_mappings.keys()}
+            pop_meeting = {k: row.get(k) if row.get(k) is not None else pop_meetings[idx].get(k, "") for k in header_mappings.keys()}
             pop_meetings.append(pop_meeting)
 
         return pop_meetings
@@ -111,19 +104,25 @@ class ScrapeMeetings:
                 meeting_dicts.append(meeting)
         return meeting_dicts
 
-    def parse_meetings(self, meetings):
-        date_format = ""
+    def parse_meetings(self, meetings, meta):
+        date_format = None
+        date_range = fuzzy_dates.extract_date_range(meta["title"])
+        # print meta
+        # for x in meetings:
+        #     print x
+        # webbrowser.open(meta["source"]["url"] + "/preview")
+        # raw_input()
+
         for meeting in meetings:
             if "date" not in meeting:
+                self._logger.error("Something went wrong here.")
                 continue
-            try:
-                meeting["date"] = datetime.strptime(meeting["date"], date_format)
-            except ValueError:
-                date_format = fuzzy_dates.parse_date(meeting["date"])
-                if date_format is None:
-                    date_format = ""
-                else:
-                    meeting["date"] = datetime.strptime(meeting["date"], date_format)
+            meeting_date = fuzzy_dates.parse_date(meeting["date"], date_format=date_format, date_range=date_range)
+            if meeting_date:
+                meeting["date"] = str(meeting_date.date)
+                date_format = meeting_date.date_format
+            else:
+                self._logger.error("Couldn't find '%s' in range %s" % (meeting["date"], date_range))
         return meetings
 
     def scrape_csv(self, meta):
@@ -144,16 +143,9 @@ class ScrapeMeetings:
                 meetings_block = meetings[header_row[0]+1:header_rows[idx + 1][0]-1]
             block_dicts = self.csv_to_dicts(meetings_block, header_row[1])
             block_dicts = self.populate_empty_cells(block_dicts, header_row[1])
-            # further processing needed!
-            # print self.extract_dates_from_title(meta["title"])
 
             meetings_dicts += block_dicts
             # if "name" not in header_row[1]:
-            # webbrowser.open(meta["source"]["url"] + "/preview")
-            # print meta
-            # for x in block_dicts:
-            #     print x
-            # raw_input()
         return meetings_dicts
 
     def run(self):
@@ -164,6 +156,7 @@ class ScrapeMeetings:
             if meta["file_type"] == "CSV":
                 meetings = self.scrape_csv(meta)
                 meetings = self.parse_meetings(meetings)
+
                 for meeting in meetings:
                     for k in ["published_at", "department", "title", "source"]:
                         meeting[k] = meta[k]

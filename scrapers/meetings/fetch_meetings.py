@@ -108,7 +108,7 @@ class FetchMeetings:
 
     def fetch_file(self, url, filename):
         self._logger.debug("  Fetching: %s" % url)
-        full_path = os.path.join(self.current_path, filename)
+        full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
         urllib.urlretrieve(url, full_path)
         time.sleep(0.5)
 
@@ -155,14 +155,14 @@ class FetchMeetings:
                     self._logger.error(attachment_soup)
                     raise Exception("Unknown attachment type.")
                 attachment["source"]["url"] = "%s%s" % (self.BASE_URL, rel_url)
-                attachment["filename"] = os.path.join(self.STORE_DIR, "-".join(rel_url.split("/")[-2:]))
+                attachment["filename"] = os.path.join("-".join(rel_url.split("/")[-2:]))
                 self.save_to_db(attachment)
 
             if attachment_soups == []:
                 # the data is inline - embedded in the page.
                 # NB this is very unusual.
                 pub["source"]["url"] = pub["source"]["linked_from_url"]
-                pub["filename"] = os.path.join(self.STORE_DIR, "%s.html" % pub["source"]["url"].split("/")[-1])
+                pub["filename"] = os.path.join("%s.html" % pub["source"]["url"].split("/")[-1])
                 pub["file_type"] = "HTML"
                 self.save_to_db(pub)
 
@@ -176,6 +176,7 @@ class FetchMeetings:
                 pub["source"]["fetched"] = str(datetime.now())
                 self.db.update(self.COLLECTION_NAME, {"source.url": pub["source"]["url"]}, pub)
             self._logger.debug("Attachments fetched.")
+
 
 def fetch(**kwargs):
     # TODO! this is temporary!

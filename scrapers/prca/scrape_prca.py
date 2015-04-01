@@ -54,7 +54,7 @@ class ScrapePRCA:
         return all_blocks
 
     def scrape_blocks_from_pdf(self, filename):
-        self._logger.info("parsing: %s" % filename)
+        #self._logger.info("parsing: %s" % filename)
         # convert to xml
         pdf = pdftoxml.from_file(filename)
         all_blocks = []
@@ -135,23 +135,18 @@ class ScrapePRCA:
             for cat in self.CATEGORIES.keys():
                 if cat not in agency:
                     continue
-                agency[cat] = sorted(agency[cat], key=lambda x: (x[1]["left"], x[1]["page"], x[1]["top"]))
+                agency[cat] = sorted(
+                    agency[cat], key=lambda x: (x[1]["left"], x[1]["page"], x[1]["top"])
+                )
                 agency[cat] = [x[0] for x in agency[cat]]
         return agencies
 
     def save_to_db(self, agencies, meta):
         for agency in agencies:
-            m = {k: v for k, v in meta.items() if k in ['linked_from', 'fetched', 'url']}
-            agency["meta"] = dict(agency["meta"].items() + m.items())
-            agency["date_from"] = meta["date_from"]
-            agency["date_to"] = meta["date_to"]
-
-            for k, v in agency.items():
-                self._logger.debug("%s:      %s" % (k, v))
-            self._logger.debug("---")
-
-            agency_entity = self.db.save("%s_scrape" % self.PREFIX, agency)
-
+            agency["source"] = meta["source"]
+            agency["date_range"] = meta["date_range"]
+            self._logger.debug("... %s" % agency["name"])
+            self.db.save("%s_scrape" % self.PREFIX, agency)
 
     # # TODO! This is wrong at the moment
     # def parse_contact(self, agency):
@@ -169,7 +164,7 @@ class ScrapePRCA:
     #     agency["contact"][-1][key] = value
 
     def parse_file(self, meta):
-        self._logger.debug("... %s" % meta["filename"])
+        self._logger.debug("\nParsing: %s" % meta["filename"])
         filename = meta["filename"]
         current_path = os.path.dirname(os.path.abspath(__file__))
         full_path = os.path.join(current_path, self.STORE_DIR, filename)
@@ -196,6 +191,7 @@ class ScrapePRCA:
             if not meta["filename"].endswith(".pdf"):
                 continue
             self.parse_file(meta)
+
 
 def scrape(**kwargs):
     ScrapePRCA(**kwargs).run()

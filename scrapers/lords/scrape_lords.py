@@ -8,32 +8,52 @@ from utils import mongo
 class ScrapeLords:
     def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+        self.COLLECTION_NAME = "lords_scrape"
+        # local directory to save fetched files to
+        self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
-        self.PREFIX = "lords"
-        # database stuff
-        self.db = mongo.MongoInterface()
         if kwargs["refreshdb"]:
-            self.db.drop("%s_scrape" % self.PREFIX)
+            self.db.drop(self.COLLECTION_NAME)
 
     def run(self):
         self._logger.info("Importing Lords ...")
-        lords = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
+        lords = self.get_overview_data()
         for lord in lords:
             lord = self.get_lord_details(lord)
-            self.db.update("%s_scrape" % self.PREFIX, {"twfy_id": lord["twfy_id"]}, lord, upsert=True)
+            self.db.save(self.COLLECTION_NAME, lord)
         self._logger.info("Done importing Lords.")
 
+    def get_overview_data(self):
+        publicwhip_tmpl = u"http://publicwhip.com/mp.php?mpid={0}"
+        with open(os.path.join(self.current_path, self.STORE_DIR, "lords_overview.json")) as f:
+            lords = json.load(f)
+        data = []
+        for lord in lords:
+            data.append({
+                "full_name": lord["name"],
+                "twfy_id": lord["person_id"],
+                "party": lord["party"],
+                "publicwhip_id": lord["member_id"],
+                "publicwhip_url": publicwhip_tmpl.format(lord["member_id"]),
+            })
+
+        return data
+
     def get_lord_details(self, meta):
-        with open(os.path.join(self.current_path, meta["filename"])) as f:
+        twfy_tmpl = u"http://www.theyworkforyou.com/api/docs/getLord?id={0}#output"
+        local = "%s.json" % meta["twfy_id"]
+        with open(os.path.join(self.current_path, self.STORE_DIR, local)) as f:
             details = json.load(f)
 
         image = details[0].get("image")
         lord = {
             "title": details[0]["title"],
             # NB Lords' names appear to be broken in TWFY...
-            "name": ("%s %s" % (details[0]["first_name"], details[0]["last_name"])).strip(),
-            "aliases": [details[0]["full_name"]],
+            "first_name": details[0]["first_name"],
+            "last_name": details[0]["last_name"],
+            "full_name": details[0]["full_name"],
             "party": details[0]["party"],
             "twfy_id": details[0]["person_id"],
             "image": "http://www.theyworkforyou.com%s" % image if image else None,
@@ -44,12 +64,19 @@ class ScrapeLords:
                 "constituency": term['constituency'] if term['constituency'] != "" else None,
                 "party": term["party"],
             } for term in details],
-            "source": meta["source"],
+            "source": twfy_tmpl.format(meta["twfy_id"]),
+            "publicwhip_id": meta["publicwhip_id"],
+            "publicwhip_url": meta["publicwhip_url"],
         }
 
-        self._logger.debug(lord)
-        self._logger.debug("\n\n---")
+        self._logger.debug(lord["full_name"])
+        self._logger.debug(lord["party"])
+        self._logger.debug("\n---")
         return lord
+
+    def _print_out(self, key, value):
+        self._logger.debug("  %-35s%-25s" % (key, value))
+
 
 def scrape(**kwargs):
     ScrapeLords(**kwargs).run()

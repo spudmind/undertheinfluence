@@ -71,11 +71,12 @@ class FetchMPs:
         info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
         time.sleep(0.5)
 
-        info["details"] = self.hansard.get_mp_details(mp_id)
+        info["details"] = self.hansard.get_mp_info(mp_id)
         time.sleep(0.5)
 
         with open(path, "w") as f:
             json.dump(info, f)
+
 
 def fetch(**kwargs):
     FetchMPs(**kwargs).run()

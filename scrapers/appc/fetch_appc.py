@@ -137,16 +137,19 @@ class FetchAPPC:
         self._logger.info("Done fetching APPC PDFs.")
 
     # make a string filename-safe
-    def filenamify(self, text):
+    @staticmethod
+    def filenamify(text):
         allowed_chars = "-_%s%s" % (string.ascii_letters, string.digits)
         return "".join(c if c in allowed_chars else "-" for c in text.lower())
 
     # parse out a pair of dates (with a known format) from a string
     # returns a tuple of dates in the form YYYY-MM-DD
-    def get_dates(self, text):
+    @staticmethod
+    def get_dates(text):
         months = "|".join(calendar.month_name[1:])
         date_range = re.findall(r"(\d+).*?(%s) (\d{4})" % months, text)
         return [str(datetime.strptime(" ".join(i for i in x), "%d %B %Y").date()) for x in date_range]
+
 
 def fetch(**kwargs):
     FetchAPPC(**kwargs).run()

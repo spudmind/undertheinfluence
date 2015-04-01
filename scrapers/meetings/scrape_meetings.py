@@ -7,6 +7,7 @@ import re
 import webbrowser
 from utils import mongo, fuzzy_dates, unicode_csv
 
+
 class ScrapeMeetings:
     def __init__(self, **kwargs):
         # fetch the logger
@@ -18,6 +19,7 @@ class ScrapeMeetings:
             self.db.drop("%s_scrape" % self.PREFIX)
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        self.STORE_DIR = "store"
 
     def find_header_rows(self, meetings):
         found_headers = []
@@ -51,7 +53,7 @@ class ScrapeMeetings:
         return found_headers
 
     def read_csv(self, filename):
-        full_path = os.path.join(self.current_path, filename)
+        full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
         with open(full_path, "rU") as csv_file:
             csv = unicode_csv.UnicodeReader(csv_file, encoding="latin1", strict=True)
             # read in the whole csv
@@ -124,6 +126,7 @@ class ScrapeMeetings:
         return meetings
 
     def scrape_csv(self, meta):
+        self._logger.info("... %s" % meta["filename"])
         meetings = self.read_csv(meta["filename"])
         meetings = self.normalise_csv(meetings)
         # find index(es) of header rows
@@ -146,28 +149,23 @@ class ScrapeMeetings:
         return meetings_dicts
 
     def run(self):
-        page = 1
-        while True:
-            to_scrape, info = self.db.query("%s_fetch" % self.PREFIX, page=page)
-            for meta in to_scrape:
-                meetings = []
-                meta["published_at"] = str(datetime.strptime(meta["published_at"], "%d %B %Y").date())
-                if meta["file_type"] == "CSV":
-                    meetings = self.scrape_csv(meta)
-                    meetings = self.parse_meetings(meetings, meta)
-                elif meta["file_type"] == "PDF":
-                    # TODO: Parse PDF
-                    pass
+        self._logger.info("Scraping Meetings")
+        _all_meetings = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
+        for meta in _all_meetings:
+            meetings = []
+            meta["published_at"] = str(datetime.strptime(meta["published_at"], "%d %B %Y").date())
+            if meta["file_type"] == "CSV":
+                meetings = self.scrape_csv(meta)
+                meetings = self.parse_meetings(meetings)
+            elif meta["file_type"] == "PDF":
+                # TODO: Parse PDF
+                pass
 
-                for meeting in meetings:
-                    for k in ["published_at", "department", "title", "source"]:
-                        meeting[k] = meta[k]
-                    self.db.save("%s_scrape" % self.PREFIX, meeting)
+            for meeting in meetings:
+                for k in ["published_at", "department", "title", "source"]:
+                    meeting[k] = meta[k]
+                self.db.save("%s_scrape" % self.PREFIX, meeting)
 
-            if info["has_more"] == False:
-                # we've finished scraping
-                break
-            page += 1
 
 def scrape(**kwargs):
     ScrapeMeetings(**kwargs).run()

@@ -5,16 +5,18 @@ from utils import mongo
 from utils import entity_resolver
 
 
-class PrcaParser:
-    def __init__(self):
+class ParsePrca:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+        self.resolver = entity_resolver.MasterEntitiesResolver()
+        self.PREFIX = "prca"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_parse" % self.PREFIX)
 
     def run(self):
-        self.resolver = entity_resolver.MasterEntitiesResolver()
-        self.db = mongo.MongoInterface()
         self._logger.debug("\n\nParsing PRCA")
-        all_entries = self.db.fetch_all('prca_scrape', paged=False)
-
+        all_entries = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for document in all_entries:
             clients = []
             staff = []
@@ -22,23 +24,18 @@ class PrcaParser:
                 self._normalize_text(document["name"])
             )
             self._logger.debug("\nLobbying Firm: %s" % name)
-            meta = document["meta"]
-            meta["date_range"] = {
-                "to": document["date_to"],
-                "from": document["date_from"]
-            }
             if "clients" in document:
                 clients = self._parse_clients(document["clients"])
             if "staff" in document:
                 staff = self._parse_staff(document["staff"])
             entry = {
-                "lobbyist": {
-                    "name": name,
-                    "contact_details": " ".join(document["contact"]),
-                    "pa_contact": self._fill_empty_field("pa_contact", document)
-                },
+                "name": name,
+                "contact_details": " ".join(document["contact"]),
+                "pa_contact": self._fill_empty_field("pa_contact", document),
                 "clients": clients,
                 "staff": staff,
+                "date_range": document["date_range"],
+                "source": document["source"],
                 "meta": document["meta"]
             }
             self.db.save("prca_parse", entry)
@@ -166,4 +163,5 @@ class PrcaParser:
         return result
 
 
-
+def parse(**kwargs):
+    ParsePrca(**kwargs).run()

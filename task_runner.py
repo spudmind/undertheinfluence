@@ -6,15 +6,10 @@ import argparse
 import logging
 
 from scrapers import appc, lords, lords_interests, meetings, mps, mps_interests, party_funding, prca
+from parsers import mps, lords, appc, prca, meetings
 
 from parsers import master_entities
-from parsers import parse_mps
-from parsers import parse_lords
-from parsers import parse_mps_interests
-from parsers import parse_lords_interests
-from parsers import parse_party_funding
-from parsers import parse_prca
-from parsers import parse_appc
+
 
 from graphers import graph_mps
 from graphers import graph_lords
@@ -59,6 +54,10 @@ scraper_args = {
     "dryrun": args.dryrun,
 }
 
+parser_args = {
+    "refreshdb": args.refreshdb
+}
+
 # run fetchers
 if args.fetch is not None:
     for fetcher in args.fetch:
@@ -79,17 +78,8 @@ if args.master is not None:
 
 # run parsers
 if args.parse is not None:
-    exec_parser = {
-        "mps": parse_mps.MPsParser,
-        "lords": parse_lords.LordsParser,
-        "mps_interests": parse_mps_interests.MPsInterestsParser,
-        "lords_interests": parse_lords_interests.LordsInterestsParser,
-        "party_funding": parse_party_funding.PartyFundingParser,
-        "prca": parse_prca.PrcaParser,
-        "appc": parse_appc.AppcParser,
-    }
     for parser in args.parse:
-        exec_parser[parser]().run()
+        sys.modules["parsers.%s" % parser].parse(**parser_args)
 
 # run graphers
 if args.graph is not None:

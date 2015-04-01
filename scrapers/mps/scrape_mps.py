@@ -11,13 +11,12 @@ from utils import mongo
 class ScrapeMPs:
     def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-        # get the current path
-        self.current_path = os.path.dirname(os.path.abspath(__file__))
-        # local directory where fetched files are stored
-        self.STORE_DIR = "store"
-        # database stuff
         self.db = mongo.MongoInterface()
         self.COLLECTION_NAME = "mps_scrape"
+        # local directory to save fetched files to
+        self.STORE_DIR = "store"
+        # get the current path
+        self.current_path = os.path.dirname(os.path.abspath(__file__))
         if kwargs["refreshdb"]:
             self.db.drop(self.COLLECTION_NAME)
 
@@ -36,7 +35,6 @@ class ScrapeMPs:
 
     def get_mp_details(self, mp):
         publicwhip_tmpl = u"http://publicwhip.com/mp.php?mpid={0}"
-
         details = mp["details"]
         mp = {x: mp.get(x, None) for x in ["wikipedia_url", "bbc_profile_url", "date_of_birth", "mp_website", "guardian_mp_summary", "journa_list_link"]}
 
@@ -82,7 +80,8 @@ class ScrapeMPs:
         mp["terms"] = terms
         return mp
 
-    def _get_office(self, positions):
+    @staticmethod
+    def _get_office(positions):
         offices = []
         for position in positions:
             office = {}
@@ -92,6 +91,10 @@ class ScrapeMPs:
                 office = {"position": position["position"]}
             offices.append(office)
         return offices
+
+    def _print_out(self, key, value):
+        self._logger.debug("  %-35s%-25s" % (key, value))
+
 
 def scrape(**kwargs):
     ScrapeMPs(**kwargs).run()

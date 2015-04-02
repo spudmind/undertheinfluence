@@ -9,6 +9,8 @@ from utils import mongo
 class ScrapeLordsInterests:
     def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        # local directory to save fetched files to
+        self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
         self.PREFIX = "lords_interests"
@@ -21,7 +23,7 @@ class ScrapeLordsInterests:
         self._logger.info("Importing Lords interests ...")
         metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
         for meta in metas:
-            full_path = os.path.join(self.current_path, meta["filename"])
+            full_path = os.path.join(self.current_path, self.STORE_DIR, meta["filename"])
             with open(full_path) as f:
                 j = simplejson.load(f)["Members"]
             j = {} if j is None else j

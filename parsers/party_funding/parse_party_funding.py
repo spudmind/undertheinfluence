@@ -6,16 +6,18 @@ from utils import config
 from utils import entity_resolver
 
 
-class PartyFundingParser():
-    def __init__(self):
+class ParsePartyFunding():
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-
-    def run(self):
         self.db = mongo.MongoInterface()
         self.resolver = entity_resolver.MasterEntitiesResolver()
+        self.PREFIX = "party_funding"
         self.lords_titles = config.lords_titles
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_parse" % self.PREFIX)
 
-        _all_entries = self.db.fetch_all('scraped_party_funding', paged=False)
+    def run(self):
+        _all_entries = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for doc in _all_entries:
             parsed = {}
             parsed["recipient"] = self._get_recipient(
@@ -50,9 +52,10 @@ class PartyFundingParser():
                 self._print_out("donor_type", parsed["donor_type"])
                 self._print_out("value", parsed["value"])
                 self._logger.debug("---\n")
-                self.db.save('parsed_party_funding', parsed)
+                self.db.save("%s_parse" % self.PREFIX, parsed)
 
     def _get_recipient(self, entry, entry_type, recipient_type):
+        # TODO Veify entity extraction is working as expected
         result = self._remove_extraneous(entry)
         if entry_type == "MP - Member of Parliament":
             result = self.resolver.find_mp(result)
@@ -72,7 +75,7 @@ class PartyFundingParser():
             else:
                 result = self.resolver.get_entities(result)
         else:
-            result = self.resolver.find_donor(
+            result = self.resolver.find_influencer(
                 entry, delimiter=",", fuzzy_delimit=False
             )
         if result and isinstance(result, list):
@@ -98,3 +101,7 @@ class PartyFundingParser():
     def _print_dic(self, dictionary):
         for keys, values in dictionary.items():
             self._logger.debug(" %-20s:%-25s" % (keys, values))
+
+
+def parse(**kwargs):
+    ParsePartyFunding(**kwargs).run()

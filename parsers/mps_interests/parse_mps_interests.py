@@ -10,15 +10,17 @@ money_search = ur'([£$€])(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
 date_search = ur'(\d{1,2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4})'
 
 
-class MPsInterestsParser:
-    def __init__(self):
+class ParseMPsInterests:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-
-    def run(self):
         self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
+        self.PREFIX = "mps_interests"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_parse" % self.PREFIX)
 
-        all_interests, _ = self.db.fetch_all('scraped_mps_interests')
+    def run(self):
+        all_interests, _ = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for documents in all_interests:
             # each document contains one days recorded interests
             # document structure is:
@@ -36,7 +38,8 @@ class MPsInterestsParser:
                     "interests": categories,
                     "file_name": file_name
                 }
-                self.db.save('parsed_mps_interests', mp_data)
+
+                self.db.save("%s_parse" % self.PREFIX, mp_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -129,7 +132,7 @@ class MPsInterestsParser:
                     if len(record) > 1:
                         # if record[0] use next line as first record
                         first = record[1]
-                interest_name = self.resolver.find_donor(first)
+                interest_name = self.resolver.find_influencer(first)
                 if interest_name:
                     # if no interest is found, skip record
                     payments = [self._find_money(item) for item in record]
@@ -165,7 +168,7 @@ class MPsInterestsParser:
             interest_name, amount, destination = None, None, None
             visit_dates, purpose, registered = None, None, None
             if len(record) == 7:
-                interest_name = self.resolver.find_donor(record[0])
+                interest_name = self.resolver.find_influencer(record[0])
                 if not interest_name:
                     interest_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
@@ -178,7 +181,7 @@ class MPsInterestsParser:
                 # parse each line for interest details when this is the case
                 for item in record:
                     if "Name of donor" in item:
-                        interest_name = self.resolver.find_donor(record[0])
+                        interest_name = self.resolver.find_influencer(record[0])
                         if not interest_name:
                             interest_name = self._split_if_colon(record[0])
                     elif "Amount of donation" in item:
@@ -223,7 +226,7 @@ class MPsInterestsParser:
                 if "(of " == item[:4].lower() or "of " == item[:3].lower():
                     continue
                 else:
-                    interest_name = self.resolver.find_donor(item)
+                    interest_name = self.resolver.find_influencer(item)
                     dates = self._find_dates(item)
                     if interest_name:
                         # if no interest is found, skip record
@@ -252,7 +255,7 @@ class MPsInterestsParser:
             if len(record) == 1:
                 continue
             elif len(record) == 5:
-                interest_name = self.resolver.find_donor(record[0])
+                interest_name = self.resolver.find_influencer(record[0])
                 if not interest_name and ":" in record[0]:
                     interest_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
@@ -263,7 +266,7 @@ class MPsInterestsParser:
                     # this interest record is typically 5 lines but there are exceptions
                     # parse each line for interest details when this is the case
                     if "Name of donor" in item:
-                        interest_name = self.resolver.find_donor(record[0])
+                        interest_name = self.resolver.find_influencer(record[0])
                         if not interest_name and ":" in item:
                             interest_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
@@ -301,7 +304,7 @@ class MPsInterestsParser:
             donor_status, registered, receipt = None, None, None
             full_record = u"\n".join([item for item in record])
             if len(record) == 7:
-                interest_name = self.resolver.find_donor(record[0])
+                interest_name = self.resolver.find_influencer(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
                 nature = self._split_if_colon(record[2])
                 receipt = self._find_dates(record[3])
@@ -313,7 +316,7 @@ class MPsInterestsParser:
                     # this interest record is typically 7 lines but there are exceptions
                     # parse each line for interest details when this is the case
                     if "Name of donor" in item:
-                        interest_name = self.resolver.find_donor(record[0])
+                        interest_name = self.resolver.find_influencer(record[0])
                         if not interest_name and ":" in item:
                             interest_name = self._split_if_colon(item)
                     elif "Amount of donation" in item:
@@ -393,6 +396,7 @@ class MPsInterestsParser:
         return money
 
     def _get_mp(self, entry):
+        # TODO Veify entity extraction is working as expected
         result = self.resolver.find_mp(entry)
         if not result:
             return entry
@@ -437,3 +441,7 @@ class MPsInterestsParser:
 
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))
+
+
+def parse(**kwargs):
+    ParseMPsInterests(**kwargs).run()

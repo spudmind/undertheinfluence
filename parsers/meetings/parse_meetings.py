@@ -18,6 +18,7 @@ class ParseMeetings():
             self.db.drop("%s_parse" % self.PREFIX)
 
     def run(self):
+        self._logger.debug("Parsing Ministerial Meetings")
         _all_meetings = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         titles = []
         for doc in _all_meetings:
@@ -26,7 +27,6 @@ class ParseMeetings():
                 #self._parse_secretarial(doc)
                 pass
             if "ministerial" in doc["title"].lower():
-                self._logger.debug("Parsing Ministerial Meetings")
                 self._parse_ministerial(doc)
 
         print "\n\ntitle count:", len(set(titles))
@@ -34,23 +34,48 @@ class ParseMeetings():
     def _parse_ministerial(self, meeting):
         orgs = []
         host = {}
+        problems = [
+            "London",
+            "UK Anti",
+            "doping",
+            "Sochi",
+            "Army",
+            "British",
+            "Home Enteraintment Gp",
+            "Justice",
+            "Co",
+            "Organisation for Economic Co",  # oecd
+            "AeroSpace",  # ADS
+            "Rolls"
+        ]
         if "organisation" in meeting:
             orgs = self._parse_organisation(meeting["organisation"].strip())
         for org in orgs:
             self._logger.debug("... %s" % org)
+            date = None
+            purpose = None
             if "name" in meeting:
                 host = self._parse_host(meeting["name"].strip())
+            if "date" in meeting and len(meeting["date"]) == 10 \
+                    and "-" in meeting["date"]:
+                date = meeting["date"]
+            if "purpose" in meeting:
+                purpose = meeting["purpose"]
             entry = {
                 "title": meeting["title"],
                 "department": meeting["department"],
                 "host_name": host["name"],
                 "host_position": host["position"],
                 "organisation": org,
-                "date": meeting["date"],
+                "date": date,
                 "source": meeting["source"],
+                "purpose": purpose,
                 "published_at": meeting["published_at"],
-                "meeting_type": "Ministerial Meeting",
+                "meeting_type": "Ministerial Meetings",
             }
+            for problem in problems:
+                if problem == org:
+                    print "\n\n", meeting, "\n\n"
             self.db.save("%s_parse" % self.PREFIX, entry)
 
     def _parse_secretarial(self, meeting):

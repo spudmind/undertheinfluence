@@ -9,6 +9,8 @@ from utils import mongo
 class ScrapeAPPC:
     def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        # local directory to save fetched files to
+        self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
         # database stuff
@@ -33,7 +35,7 @@ class ScrapeAPPC:
 
     def scrape_current(self, meta):
         self._logger.info("  Scraping '%s' ...." % meta["filename"])
-        full_path = os.path.join(self.current_path, meta["filename"])
+        full_path = os.path.join(self.current_path, self.STORE_DIR, meta["date_range"][1], meta["filename"])
         with open(full_path) as f:
             html = f.read()
         soup = BeautifulSoup(html).find(class_="member-profile")

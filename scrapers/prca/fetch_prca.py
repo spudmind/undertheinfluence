@@ -83,9 +83,7 @@ class FetchPRCA():
 
     def fetch_file(self, record):
         # name the file
-
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        full_path = os.path.join(current_path, self.STORE_DIR, record["filename"])
+        full_path = os.path.join(self.current_path, self.STORE_DIR, record["filename"])
         # fetch from URL and save locally
         try:
             self._logger.info("Fetching '%s' ..." % full_path)
@@ -104,7 +102,7 @@ class FetchPRCA():
         for anchor_text, rel_url in links:
             current = self.parse_text(anchor_text)
 
-            # hack to fix broken URL in source
+            # hack to fix incorrect URL in source
             if (current["date_range"], current["description"]) == self.URL_CORRECTION[0]:
                 rel_url = self.URL_CORRECTION[1]
 
@@ -118,7 +116,7 @@ class FetchPRCA():
             current["filename"] = filename
 
             if self.db.find_one(self.COLLECTION_NAME, current):
-                self._logger.info("Skipping '%s' ..." % filename)
+                self._logger.info("Skipping '%s' ..." % rel_url)
                 continue
 
             current["source"] = {

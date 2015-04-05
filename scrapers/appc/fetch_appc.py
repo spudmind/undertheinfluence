@@ -44,15 +44,14 @@ class FetchAPPC:
 
         date_range = self.get_dates(soup.h1.text)
 
-        rel_path = os.path.join(self.STORE_DIR, date_range[1])
-        company_path = os.path.join(self.current_path, rel_path)
+        company_path = os.path.join(self.current_path, self.STORE_DIR, date_range[1])
         if not os.path.exists(company_path):
             os.makedirs(company_path)
 
         companies = [x["value"] for x in soup.find_all("input", {"name": "company"})]
         for company in companies:
             fetched = False
-            filename = os.path.join(rel_path, "%s.html" % self.filenamify(company))
+            filename = "%s.html" % self.filenamify(company)
             spec = {"filename": filename, "date_range": date_range}
             # Skip if we already have data for this company during this
             # date range in the database
@@ -61,7 +60,8 @@ class FetchAPPC:
                 continue
 
             if not self.dryrun:
-                self.fetch_company(company, filename)
+                full_path = os.path.join(company_path, filename)
+                self.fetch_company(company, full_path)
                 fetched = str(datetime.now())
 
             meta = {
@@ -77,7 +77,7 @@ class FetchAPPC:
             self.db.save(self.COLLECTION_NAME, meta)
         self._logger.info("Done fetching APPC HTML.")
 
-    def fetch_company(self, company, filename):
+    def fetch_company(self, company, full_path):
         self._logger.debug("  Fetching HTML for '%s' ..." % company)
 
         url = "%s/members/register/register-profile/" % self.BASE_URL
@@ -85,16 +85,13 @@ class FetchAPPC:
         r = requests.post(url, data={"company": company}, headers=headers)
         time.sleep(0.5)
 
-        full_path = os.path.join(self.current_path, filename)
         with open(full_path, "w") as f:
             f.write(r.text.encode('utf-8'))
-        return filename
 
     def fetch_pdfs(self):
         self._logger.info("Fetching APPC PDFs ...")
         pdf_index_url = "%s/previous-registers/" % self.BASE_URL
-        rel_path = os.path.join(self.STORE_DIR, "archive")
-        archive_path = os.path.join(self.current_path, rel_path)
+        archive_path = os.path.join(self.current_path, self.STORE_DIR, "archive")
         if not os.path.exists(archive_path):
             os.makedirs(archive_path)
         r = requests.get(pdf_index_url)
@@ -113,8 +110,8 @@ class FetchAPPC:
                 continue
 
             pdf_url = p.a["href"]
-            filename = os.path.join(rel_path, pdf_url.split("/")[-1])
-            full_path = os.path.join(self.current_path, filename)
+            filename = pdf_url.split("/")[-1]
+            full_path = os.path.join(archive_path, filename)
             fetched = False
 
             if not self.dryrun:

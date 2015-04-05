@@ -17,17 +17,13 @@ class GraphMeetings():
         self.lords_titles = config.lords_titles
 
     def run(self):
-        self._logger.debug("\n\nGraphing Meetings")
+        self._logger.info("\n\nGraphing Meetings")
         all_meetings = self.db.fetch_all(self.COLLECTION_NAME, paged=False)
         for doc in all_meetings:
-            print "attendee:\t", doc["organisation"]
-            print "purpose:\t", doc["purpose"]
-            print "host name:\t", doc["host_name"]
-            print "meeting:\t", doc["title"]
-            print "host office:\t", doc["host_position"]
-            print "department:\t", doc["department"]
-            print "date:\t\t", doc["date"]
-            print "---\n"
+            self._logger.debug("attendee:\t%s" % doc["organisation"])
+            self._logger.debug("purpose:\t%s" % doc["purpose"])
+            self._logger.debug("host_name:\t%s" % doc["host_name"])
+            self._logger.debug("---\n")
             host = self._create_host(doc["host_name"])
             office = self._create_office(host, doc["host_position"])
             department = self._create_department(office, doc["department"])

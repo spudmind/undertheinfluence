@@ -109,6 +109,8 @@ class MemberOfParliament(NamedEntity):
             self.party, self.image_url = self._set_properties()
             self.positions = self._get_positions()
             self.departments = self._get_departments()
+            self.meetings = self._get_meetings()
+            self.meetings_summary = self._get_meeting_summary()
             self.interests = self._get_interests()
             self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
@@ -140,6 +142,49 @@ class MemberOfParliament(NamedEntity):
         output = self.query(search_string)
         for entry in output:
             results.append(entry[0])
+        return results
+
+    def _get_meeting_summary(self):
+        results = []
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}})
+            MATCH (mp)-[:SERVED_IN]-(p:`Government Office`) with mp, p
+            MATCH (p)-[:ATTENDED_BY]-(m) with mp, p, m
+            MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with mp, p, m, a
+            RETURN p.name, count(a), collect(a.name)
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            results.append(
+                {
+                    "position": entry[0],
+                    "meetings_count": entry[1],
+                    "influencers_met": list(set(entry[2]))
+                }
+            )
+        return results
+
+    def _get_meetings(self):
+        results = []
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}})
+            MATCH (mp)-[:SERVED_IN]-(p:`Government Office`) with mp, p
+            MATCH (p)-[:ATTENDED_BY]-(m) with mp, p, m
+            MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with mp, p, m, a
+            RETURN p.name as position, a.name as attendee, m.meeting as meeting,
+                m.purpose as purpose, m.date as date
+            ORDER BY date
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            meeting = {
+                "position": entry["position"],
+                "attendee": entry["attendee"],
+                "purpose": entry["purpose"],
+                "meeting": entry["meeting"],
+                "date": entry["date"],
+            }
+            results.append(meeting)
         return results
 
     def _get_interests(self):
@@ -290,7 +335,7 @@ class MemberOfParliament(NamedEntity):
 
     def link_position(self, position):
         self.create_relationship(
-            self.vertex, "IN_POSITION", position.vertex
+            self.vertex, "SERVED_IN", position.vertex
         )
 
     def link_department(self, department):
@@ -362,6 +407,8 @@ class Lord(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
         if self.exists:
+            self.meetings = self._get_meetings()
+            self.meetings_summary = self._get_meetings_summary()
             self.interests = self._get_interests()
             self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
@@ -395,6 +442,52 @@ class Lord(NamedEntity):
         self.create_relationship(
             self.vertex, "PEERAGE", peerage.vertex
         )
+
+    def link_position(self, position):
+        self.create_relationship(self.vertex, "SERVED_IN", position.vertex)
+
+    def _get_meetings_summary(self):
+        results = []
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:SERVED_IN]-(p:`Government Office`) with lord, p
+            MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
+            MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
+            RETURN p.name, count(a), collect(a.name)
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            results.append(
+                {
+                    "position": entry[0],
+                    "meetings_count": entry[1],
+                    "influencers_met": list(set(entry[2]))
+                }
+            )
+        return results
+
+    def _get_meetings(self):
+        results = []
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:SERVED_IN]-(p:`Government Office`) with lord, p
+            MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
+            MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
+            RETURN p.name as position, a.name as attendee, m.meeting as meeting,
+                m.purpose as purpose, m.date as date
+            ORDER BY date
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            meeting = {
+                "position": entry["position"],
+                "attendee": entry["attendee"],
+                "purpose": entry["purpose"],
+                "meeting": entry["meeting"],
+                "date": entry["date"],
+            }
+            results.append(meeting)
+        return results
 
     def _get_interests(self):
         results = []
@@ -678,15 +771,25 @@ class GovernmentOffice(NamedEntity):
             self.interests_summary, self.donation_summary =\
                 self._get_office_summary()
 
-    def is_department(self):
+    def is_committee(self):
         properties = {"image_url": None}
+        labels = ["Named Entity", "Government Committee"]
+        self.set_node_properties(properties=properties, labels=labels)
+
+    def is_department(self, office_type="Constituency"):
+        properties = {"image_url": None, "office_type": office_type}
         labels = ["Named Entity", "Government Department"]
         self.set_node_properties(properties=properties, labels=labels)
 
-    def is_position(self):
-        properties = {"image_url": None}
+    def is_position(self, office_type="Constituency"):
+        properties = {"image_url": None, "office_type": office_type}
         labels = ["Named Entity", "Government Position"]
         self.set_node_properties(properties=properties, labels=labels)
+
+    def link_department(self, department):
+        self.create_relationship(
+            self.vertex, "OFFICE_IN", department.vertex
+        )
 
     def _mp_count(self):
         query = u"""
@@ -737,6 +840,33 @@ class GovernmentOffice(NamedEntity):
             )
         }
         return register, donations
+
+
+class GovernmentMeeting(BaseDataModel):
+    def __init__(self, term=None):
+        BaseDataModel.__init__(self)
+        self.exists = False
+        self.label = "Government Meeting"
+        self.primary_attribute = "meeting"
+        self.term = term
+        self.exists = self.fetch(
+            self.label, self.primary_attribute, self.term
+        )
+
+    def create(self):
+        self.vertex = self.create_vertex(
+            self.label, self.primary_attribute, self.term
+        )
+        self.exists = True
+
+    def set_meeting_details(self, labels=None, properties=None):
+        self.set_node_properties(properties, labels)
+
+    def set_meeting_date(self, date):
+        self.set_date(date, "MEETING_HELD")
+
+    def link_participant(self, participant):
+        self.create_relationship(self.vertex, "ATTENDED_BY", participant.vertex)
 
 
 class TermInParliament(BaseDataModel):

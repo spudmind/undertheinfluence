@@ -46,7 +46,8 @@ class ParseMeetings():
             "Co",
             "Organisation for Economic Co",  # oecd
             "AeroSpace",  # ADS
-            "Rolls"
+            "Rolls",
+            "Beggars"
         ]
         if "organisation" in meeting:
             orgs = self._parse_organisation(meeting["organisation"].strip())

@@ -6,7 +6,7 @@ import argparse
 import logging
 
 from scrapers import appc, lords, lords_interests, meetings, mps, mps_interests, party_funding, prca
-from parsers import mps, lords, appc, prca, meetings
+from parsers import mps, lords, appc, prca, meetings, mps_interests, lords_interests, party_funding
 
 from parsers import master_entities
 
@@ -18,6 +18,7 @@ from graphers import graph_lords_interests
 from graphers import graph_party_funding
 from graphers import graph_prca
 from graphers import graph_appc
+from graphers import graph_meetings
 
 from data_interfaces import api_data_gen
 from data_models import core
@@ -91,6 +92,7 @@ if args.graph is not None:
         "party_funding": graph_party_funding.GraphPartyFunding,
         "prca": graph_prca.GraphPrca,
         "appc": graph_appc.GraphAppc,
+        "meetings": graph_meetings.GraphMeetings,
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()

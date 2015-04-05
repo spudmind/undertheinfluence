@@ -5,9 +5,14 @@ from utils import entity_resolver
 resolver = entity_resolver.MasterEntitiesResolver()
 
 #test_entry = "Lord na Lester"
-test_entry = "The Rt Hon Edward Milliband MP"
+test_entry = "The Rt Hon Vincent Cable MP"
 test_type = "MP"
 test_recipient = None
+
+
+def parse_entities(entry):
+    result = resolver.get_entities(entry)
+    return result
 
 
 def parse_recipient(entry, entry_type, recipient_type):
@@ -50,5 +55,6 @@ def node_properties_test():
     new_me.set_recipient_details(extra_details)
 
 print "found:", parse_recipient(test_entry, test_type, test_recipient)
+print "found:", parse_entities(test_entry)
 #node_properties_test()
 

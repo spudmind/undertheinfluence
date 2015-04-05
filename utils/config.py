@@ -285,6 +285,7 @@ mapped_influencers = [
     (u"BT plc", u"BT"),
     (u"British Telecom plc", u"BT"),
     (u"Everything Everywhere", u"EE"),
+    (u"EverythingEverywhere", u"EE"),
     (u"London Undergrouns and London Rail", u"London Underground and London Rail"),
     (u"Young Men's Christian Association", u"YMCA"),
     (u"British Phonographic Industries", u"British Phonographic Industry"),
@@ -296,6 +297,11 @@ mapped_influencers = [
     (u"SOAS", u"School of Oriental and African Studies"),
     (u"AA", u"The AA"),
     (u"TFL", u"Transport for London"),
+    (u"Guild HE", u"GuildHE"),
+    (u"Babcock", u"Babcock International Group"),
+    (u"Beggars", u"Beggars Group"),
+    (u"Talktalk", u"Talk Talk"),
+    (u"SERCO", u"Serco"),
 ]
 
 
@@ -393,6 +399,7 @@ mapped_mps = [
     (u"Susan Elan Jones", u"Susan Jones"),
     (u"Jeffrey M Donaldson", u"Jeffrey Donaldson"),
     (u"Edward Miliband", u"Ed Miliband"),
+    (u"Edward Milliband", u"Ed Miliband"),
     (u"Edward Balls", u"Ed Balls")
 ]
 

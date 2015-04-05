@@ -156,7 +156,7 @@ class ScrapeMeetings:
             meta["published_at"] = str(datetime.strptime(meta["published_at"], "%d %B %Y").date())
             if meta["file_type"] == "CSV":
                 meetings = self.scrape_csv(meta)
-                meetings = self.parse_meetings(meetings)
+                meetings = self.parse_meetings(meetings, meta)
             elif meta["file_type"] == "PDF":
                 # TODO: Parse PDF
                 pass

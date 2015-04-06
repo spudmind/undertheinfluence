@@ -65,7 +65,6 @@ def show_contact():
 
 @app.route('/politicians')
 def show_politicians():
-    args = {}
     reply = get_summary_function.SummaryApi().request()
     mps_summary = reply["results"]["summary"]["mps"]
     lords_summary = reply["results"]["summary"]["lords"]

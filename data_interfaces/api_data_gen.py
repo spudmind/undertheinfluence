@@ -19,7 +19,7 @@ class PopulateInfluencersApi():
         self._logger.debug("\nPopulating Influencers Api")
         self._logger.debug("Total: %s" % len(all_influencers))
         for doc in all_influencers:
-            self._logger.debug("%s - %s" % (doc[0], doc[1]))
+            self._logger.debug(" %-35s\t%-15s" % (doc[0], doc[2]))
             self._get_stats(doc)
 
     def _get_stats(self, record):
@@ -34,6 +34,7 @@ class PopulateInfluencersApi():
         register = influencer.interests_summary
         ec = influencer.donations_summary
         lobby = influencer.lobbyists_summary
+        meetings = influencer.meetings_summary
 
         data_sources = {}
         if register["relationship_count"] > 0:
@@ -42,6 +43,8 @@ class PopulateInfluencersApi():
             data_sources["electoral_commission"] = ec
         if lobby["lobbyist_hired"] > 0:
             data_sources["lobby_registers"] = lobby
+        if meetings["meeting_count"] > 0:
+            data_sources["meetings"] = meetings
         influencer_data = {
             "name": name,
             "labels": labels,
@@ -80,7 +83,8 @@ class PopulateLobbyAgenciesApi():
                 "client_count": client_count,
                 "employee_count": employee_count,
                 "clients": agency.clients,
-                "employees": agency.employees
+                "employees": agency.employees,
+                "meetings": agency.meetings_summary
             }
         }
         agency_data = {
@@ -124,10 +128,12 @@ class PopulatePoliticiansApi():
             role = politician.type
         register = politician.interests_summary
         ec = politician.donations_summary
+        meetings = politician.meetings_summary
 
         data_sources = {
             "register_of_interests": register,
-            "electoral_commission": ec
+            "electoral_commission": ec,
+            "meetings": meetings
         }
         politician_data = {
             "name": name,
@@ -179,10 +185,13 @@ class PopulateMpsApi():
         departments = mp.departments
         register = mp.interests_summary
         ec = mp.donations_summary
+        meetings = mp.meetings_summary
 
+        # TODO copy Lords and only add keys with data
         data_sources = {
             "register_of_interests": register,
-            "electoral_commission": ec
+            "electoral_commission": ec,
+            "meetings": meetings
         }
         mp_data = {
             "name": name,
@@ -224,12 +233,15 @@ class PopulateLordsApi():
         lord = government_models.Lord(name)
         register = lord.interests_summary
         ec = lord.donations_summary
+        meetings = lord.meetings_summary
 
         data_sources = {}
         if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
             data_sources["register_of_interests"] = register
         if ec["donation_total_int"] > 0 and ec["donation_count"] > 0:
             data_sources["electoral_commission"] = ec
+        if len(meetings) > 0:
+            data_sources["meetings"] = meetings
         lord_data = {
             "name": name,
             "party": party,

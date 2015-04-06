@@ -25,17 +25,19 @@ class InfluencersApi(BaseAPI):
         self._filter_lobbyists(args)
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
+
         if response['has_more']:
             next_query = args
             next_query['page'] = page + 1
             response['next_url'] = url_for('getInfluencers', _external=True, **next_query)
-            pager["next"] = url_for('show_influencers', _external=True, **next_query)
+            pager["next"] = url_for('show_influencers_detail', _external=True, **next_query)
         if page > 1:
             previous_query = args
             previous_query['page'] = page - 1
-            pager["previous"] = url_for('show_influencers', _external=True, **previous_query)
+            pager["previous"] = url_for('show_influencers_detail', _external=True, **previous_query)
 
         response['pager'] = pager
+
         response["results"] = [{
             "name": entry["name"],
             "image_url": None,
@@ -58,26 +60,26 @@ class InfluencersApi(BaseAPI):
     def _filter_interests(self, args):
         _remuneration_search = {}
         if args.get("interests_gt"):
-            _remuneration_search["$gt"] = args.get("interests_gt")
+            _remuneration_search["$gt"] = int(args.get("interests_gt"))
         if args.get("interests_lt"):
-            _remuneration_search["$lt"] = args.get("interests_lt")
+            _remuneration_search["$lt"] = int(args.get("interests_lt"))
         if _remuneration_search != {}:
             self.query[self._remuneration] = _remuneration_search
 
     def _filter_funding(self, args):
         _funding_search = {}
         if args.get("donations_gt"):
-            _funding_search["$gt"] = args.get("donations_gt")
+            _funding_search["$gt"] = int(args.get("donations_gt"))
         if args.get("donations_lt"):
-            _funding_search["$lt"] = args.get("donations_lt")
+            _funding_search["$lt"] = int(args.get("donations_lt"))
         if _funding_search != {}:
             self.query[self._funding] = _funding_search
 
     def _filter_lobbyists(self, args):
         _lobby_search = {}
         if args.get("lobbyists_gt"):
-            _lobby_search["$gt"] = args.get("lobbyists_gt")
+            _lobby_search["$gt"] = int(args.get("lobbyists_gt"))
         if args.get("lobbyists_lt"):
-            _lobby_search["$lt"] = args.get("lobbyists_lt")
+            _lobby_search["$lt"] = int(args.get("lobbyists_lt"))
         if _lobby_search != {}:
             self.query[self._lobbyists] = _lobby_search

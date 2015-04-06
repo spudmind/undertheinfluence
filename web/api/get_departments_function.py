@@ -28,7 +28,7 @@ class DepartmentsApi(BaseAPI):
                 ),
                 "mp_count": entry["mp_count"],
                 "detail_url": url_for(
-                    'show_politicians', government_department=entry["name"], _external=True
+                    'show_politicians_detail', government_department=entry["name"], _external=True
 
                 )
             }

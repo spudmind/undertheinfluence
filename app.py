@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_summary_function
@@ -23,6 +24,13 @@ static_dir = os.path.join(
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(__name__)
 api = Api(app)
+
+
+def _convert_to_currency(number):
+    if isinstance(number, int):
+        return u'£{:20,}'.format(number)
+    else:
+        return 0
 
 
 @app.route('/')
@@ -63,14 +71,35 @@ def show_politicians():
     return render_template(
         'politicians_summary.html', mps=mps_summary, lords=lords_summary)
 
-@app.route('/politicians/detail')
+
+@app.route('/politicians/detail', methods=['GET', 'POST'])
 def show_politicians_detail():
     args = {}
-    title = None
     args["page"] = int(request.args.get('page', 1))
-    args["government_department"] = request.args.get('government_department', None)
-    if args["government_department"]:
-        title = args["government_department"]
+    if request.method == 'POST':
+        fields = [
+            "interests_gt",
+            "interests_lt",
+            "donations_gt",
+            "donations_lt",
+            "party",
+            "type",
+            "labels"
+        ]
+        for value in fields:
+            if value in request.form.keys() and len(request.form[value]) > 0:
+                if value == "labels":
+                    args[value] = ",".join(request.form.getlist(value))
+                if value == "type" or value == "party":
+                    args[value] = request.form[value]
+                else:
+                    if request.form[value].isdigit():
+                        args[value] = request.form[value]
+    elif request.method == 'GET':
+        args["type"] = request.args.get('type', None)
+        args["government_department"] = request.args.get('government_department', None)
+
+    title = _build_title(args)
     reply = get_politicians_function.PoliticiansApi().request(**args)
     politicians, pager = reply['results'], reply['pager']
     return render_template(
@@ -97,23 +126,77 @@ def show_influencers():
     return render_template('influencers_summary.html', influencers=influencer_summary)
 
 
-@app.route('/influencers/detail')
+@app.route('/influencers/detail', methods=['GET', 'POST'])
 def show_influencers_detail():
     args = {}
-    title = None
-    args["page"] = int(request.args.get('page', 1))
-    args["labels"] = request.args.get('labels', None)
-    if args["labels"]:
-        title = args["labels"]
-    try:
-        page = int(request.args.get('page', 1))
-    except ValueError:
-        page = 1
+    page = int(request.args.get('page', 1))
+    args["page"] = page
+    if request.method == 'POST':
+        fields = [
+            "interests_gt",
+            "interests_lt",
+            "donations_gt",
+            "donations_lt",
+            "lobbyists_gt",
+            "lobbyists_lt",
+            "labels"
+        ]
+
+        for value in fields:
+            if value in request.form.keys() and len(request.form[value]) > 0:
+                if value == "labels":
+                    args[value] = ",".join(request.form.getlist(value))
+                else:
+                    if request.form[value].isdigit():
+                        args[value] = request.form[value]
+    elif request.method == 'GET':
+        args["labels"] = request.args.get('labels', None)
+    title = _build_title(args)
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
-        'influencers_detail.html', influencers=influencers, page=page, title=title
+        'influencers_detail.html', influencers=influencers, page=page, title=title, pager=pager
     )
+
+
+def _build_title(args):
+    filters = []
+    title = {"header": None}
+    if "labels" in args:
+        if args["labels"]:
+            title["header"] = args["labels"]
+            filters.append(" & ".join(args["labels"].split(",")))
+    if "type" in args:
+        if args["type"] == "mp":
+            title["header"] = "Members of Parliament"
+        if args["type"] == "lord":
+            title["header"] = "Lords"
+    if "government_department" in args:
+        if args["government_department"]:
+            title["header"] = args["government_department"]
+            filters.append("Select Committee: %s" % args["government_department"])
+    if "party" in args:
+        if len(args["party"]) > 0:
+            filters.append("Party: %s" % args["party"])
+    if "interests_lt" in args:
+        value = _convert_to_currency(int(args["interests_lt"]))
+        filters.append("Interests less than: %s" % value)
+    if "interests_gt" in args:
+        value = _convert_to_currency(int(args["interests_gt"]))
+        filters.append("Interests greater than: %s" % value)
+    if "donations_lt" in args:
+        value = _convert_to_currency(int(args["donations_lt"]))
+        filters.append("Donations less than: %s" % value)
+    if "donations_gt" in args:
+        value = _convert_to_currency(int(args["donations_gt"]))
+        filters.append("Donations greater than: %s" % value)
+    if "lobbyists_lt" in args:
+        filters.append("Less than %s lobbyists hired" % args["lobbyists_lt"])
+    if "lobbyists_gt" in args:
+        filters.append("More than %s lobbyists hired" % args["lobbyists_gt"])
+    title["filter"] = "; ".join(filters)
+    return title
+
 
 
 @app.route('/influencer/<name>')
@@ -178,6 +261,7 @@ class GetPoliticians(Resource):
         self.reqparse.add_argument('page', type=int)
         self.reqparse.add_argument('party', type=str)
         self.reqparse.add_argument('type', type=str)
+        self.reqparse.add_argument('labels', type=str)
         self.reqparse.add_argument('government_department', type=str)
         self.reqparse.add_argument('interests_gt', type=int)
         self.reqparse.add_argument('interests_lt', type=int)
@@ -251,7 +335,6 @@ class GetLobbyists(Resource):
         args = self.reqparse.parse_args()
         # set a default for 'page'
         args['page'] = (args['page'], 1)[args['page'] is None]
-        # print "args:", args
         return get_lobbyists_function.LobbyistsApi().request(**args)
 
 
@@ -272,7 +355,6 @@ class GetInfluencers(Resource):
         args = self.reqparse.parse_args()
         # set a default for 'page'
         args['page'] = (args['page'], 1)[args['page'] is None]
-        # print "args:", args
         return get_influencers_function.InfluencersApi().request(**args)
 
 

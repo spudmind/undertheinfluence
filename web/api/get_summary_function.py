@@ -15,7 +15,11 @@ class SummaryApi(BaseAPI):
             "lord_interest_relationships": "$influences.register_of_interests.interest_relationships",
             "remuneration_count": "$influences.register_of_interests.remuneration_count",
             "remuneration_total_int": "$influences.register_of_interests.remuneration_total_int",
-            "lobbyists_hired": "$influences.lobby_registers.lobbyist_hired"
+            "lobbyists_hired": "$influences.lobby_registers.lobbyist_hired",
+            "meetings_total": "$influences.meetings.meetings_total",
+            "meetings_influencers": "$influences.meetings.meeting_count",
+            "politician_count": "$influences.meetings.politician_count",
+            "department_count": "$influences.meetings.department_count"
         }
 
     def request(self):
@@ -46,9 +50,25 @@ class SummaryApi(BaseAPI):
 
     def _influencers_aggregate(self):
         _db_table = 'api_influencers'
-        result, ec, reg, lobby = {}, {}, {}, {}
+        meetings, result, ec, reg, lobby = {}, {}, {}, {}, {}
 
         result["count"] = self._format_number(self._db.count(_db_table), currency=False)
+
+        # get meetings data
+        meetings_fields = ["meetings_influencers", "politician_count", "department_count"]
+        aggregates = self._get_aggregate(_db_table, meetings_fields)
+        aggregate_total = aggregates[0]
+        politician_total = aggregates[1]
+        department_total = aggregates[2]
+        meetings["meetings_total"] = self._format_number(aggregate_total, currency=False)
+        meetings["politician_count"] = self._format_number(politician_total, currency=False)
+        meetings["department_count"] = self._format_number(department_total, currency=False)
+        top_total, pol_total, dept_total = self._get_top(_db_table, meetings_fields)
+        meetings["top"] = {
+            "meetings_total": self._format_top(top_total, "influencer", monetary=False),
+            "politician_count": self._format_top(pol_total, "influencer", monetary=False),
+            "department_count": self._format_top(dept_total, "influencer", monetary=False)
+        }
 
         # get electoral commission data
         ec_fields = ["donation_total_int", "donation_count"]
@@ -113,7 +133,8 @@ class SummaryApi(BaseAPI):
         categories = {
             "electoral_commission": ec,
             "register_of_interests": reg,
-            "lobby_registers": lobby
+            "lobby_registers": lobby,
+            "meetings": meetings
         }
         result.update(categories)
         return result
@@ -144,9 +165,20 @@ class SummaryApi(BaseAPI):
 
     def _mp_aggregate(self):
         _db_table = 'api_mps'
-        result, ec, reg = {}, {}, {}
+        meetings, result, ec, reg = {}, {}, {}, {}
 
         result = {"count": self._db.count(_db_table)}
+
+        # get meetings data
+        meetings_fields = ["meetings_total"]
+        aggregates = self._get_aggregate(_db_table, meetings_fields)
+        aggregate_total = aggregates[0]
+        meetings["meetings_total"] = self._format_number(aggregate_total, currency=False)
+        top_total = self._get_top(_db_table, meetings_fields)
+        meetings["top"] = {
+            "meetings_total": self._format_top(top_total, "mp", monetary=False)
+        }
+
 
         # get electoral commission data
         ec_fields = ["donation_total_int", "donor_count"]
@@ -154,7 +186,7 @@ class SummaryApi(BaseAPI):
         aggregate_total = aggregates[0]
         aggregate_count = aggregates[1]
         ec["donation_total_int"] = aggregate_total
-        ec["donation_total"] = self._format_number(aggregate_total)
+        ec["donation_total"] = self._format_number(aggregate_total, currency=False)
         ec["donor_count"] = self._format_number(aggregate_count, currency=False)
         top_total, top_count = self._get_top(_db_table, ec_fields)
         ec["top"] = {
@@ -193,15 +225,29 @@ class SummaryApi(BaseAPI):
                 top_count, "mp", monetary=False
             )
         }
-        categories = {"electoral_commission": ec, "register_of_interests": reg}
+        categories = {
+            "electoral_commission": ec,
+            "register_of_interests": reg,
+            "meetings": meetings
+        }
         result.update(categories)
         return result
 
     def _lord_aggregate(self):
         _db_table = 'api_lords'
-        result, ec, reg = {}, {}, {}
+        meetings, result, ec, reg = {}, {}, {}, {}
 
         result = {"count": self._db.count(_db_table)}
+
+        # get meetings data
+        meetings_fields = ["meetings_total"]
+        aggregates = self._get_aggregate(_db_table, meetings_fields)
+        aggregate_total = aggregates[0]
+        meetings["meetings_total"] = self._format_number(aggregate_total, currency=False)
+        top_total = self._get_top(_db_table, meetings_fields)
+        meetings["top"] = {
+            "meetings_total": self._format_top(top_total, "lord", monetary=False)
+        }
 
         # get electoral commission data
         ec_fields = ["donation_total_int", "donation_count"]
@@ -232,7 +278,11 @@ class SummaryApi(BaseAPI):
             )
         }
 
-        categories = {"electoral_commission": ec, "register_of_interests": reg}
+        categories = {
+            "electoral_commission": ec,
+            "register_of_interests": reg,
+            "meetings": meetings
+            }
         result.update(categories)
         return result
 

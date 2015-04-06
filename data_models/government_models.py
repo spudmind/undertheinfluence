@@ -58,6 +58,8 @@ class Politician(NamedEntity):
             politician = Lord(self.name)
         else:
             print "something wrong with:", self.name
+        self.meetings = politician.meetings
+        self.meetings_summary = politician.meetings_summary
         self.interests = politician.interests
         self.interests_summary = politician.interests_summary
         self.donations = politician.donations
@@ -146,10 +148,12 @@ class MemberOfParliament(NamedEntity):
 
     def _get_meeting_summary(self):
         results = []
+        meetings = {"meetings_total": 0}
         query = u"""
             MATCH (mp:`Member of Parliament` {{name: "{0}"}})
             MATCH (mp)-[:SERVED_IN]-(p:`Government Office`) with mp, p
             MATCH (p)-[:ATTENDED_BY]-(m) with mp, p, m
+                WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with mp, p, m, a
             RETURN p.name, count(a), collect(a.name)
         """.format(self.vertex["name"])
@@ -162,7 +166,9 @@ class MemberOfParliament(NamedEntity):
                     "influencers_met": list(set(entry[2]))
                 }
             )
-        return results
+        meetings["meetings_total"] = sum(m['meetings_count'] for m in results)
+        meetings["meetings_per_position"] = results
+        return meetings
 
     def _get_meetings(self):
         results = []
@@ -170,6 +176,7 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp:`Member of Parliament` {{name: "{0}"}})
             MATCH (mp)-[:SERVED_IN]-(p:`Government Office`) with mp, p
             MATCH (p)-[:ATTENDED_BY]-(m) with mp, p, m
+                WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with mp, p, m, a
             RETURN p.name as position, a.name as attendee, m.meeting as meeting,
                 m.purpose as purpose, m.date as date
@@ -448,10 +455,12 @@ class Lord(NamedEntity):
 
     def _get_meetings_summary(self):
         results = []
+        meetings = {"meetings_total": 0}
         query = u"""
             MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
             MATCH (lord)-[:SERVED_IN]-(p:`Government Office`) with lord, p
             MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
+                 WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
             RETURN p.name, count(a), collect(a.name)
         """.format(self.vertex["name"])
@@ -464,7 +473,9 @@ class Lord(NamedEntity):
                     "influencers_met": list(set(entry[2]))
                 }
             )
-        return results
+        meetings["meetings_total"] = sum(m['meetings_count'] for m in results)
+        meetings["meetings_per_position"] = results
+        return meetings
 
     def _get_meetings(self):
         results = []
@@ -472,6 +483,7 @@ class Lord(NamedEntity):
             MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
             MATCH (lord)-[:SERVED_IN]-(p:`Government Office`) with lord, p
             MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
+                WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
             RETURN p.name as position, a.name as attendee, m.meeting as meeting,
                 m.purpose as purpose, m.date as date

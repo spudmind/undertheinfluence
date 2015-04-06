@@ -52,8 +52,8 @@ class Influencer(BaseDataModel):
     def _get_meetings_summary(self):
         return {
             "meeting_count": self._meetings_total_count(),
-            "politician_count": len(self._politicians_met()),
-            "department_count": len(self._departments_met()),
+            "politician_count": len(set(self._politicians_met())),
+            "department_count": len(set(self._departments_met())),
             "politicians_met": self._politicians_met(),
             "departments_met": self._departments_met()
         }
@@ -71,9 +71,7 @@ class Influencer(BaseDataModel):
         query = u"""
             MATCH (a:`Named Entity` {{name: "{0}"}})
             MATCH (m)-[:ATTENDED_BY]-(a)with m, a
-            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
-                OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
-            RETURN DISTINCT mp.name as mp
+            RETURN DISTINCT m.host_name as mp
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
@@ -86,14 +84,12 @@ class Influencer(BaseDataModel):
         query = u"""
             MATCH (a:`Named Entity` {{name: "{0}"}})
             MATCH (m)-[:ATTENDED_BY]-(a)with m, a
-            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
-            RETURN DISTINCT g.name
+            RETURN DISTINCT m.department as dept
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
             if entry[0]:
                 results.append(entry[0])
-
         return results
 
     def _get_meetings(self):
@@ -257,9 +253,9 @@ class Influencers(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Meeting Attendee`
                 OR inf:`LobbyAgency Client` OR inf:`Lobby Agency Client` with inf
-            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED]-(x)
+            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED|ATTENDED_BY]-(x)
             RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC
         """
@@ -271,7 +267,8 @@ class Influencers(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Agency Client`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Meeting Attendee`
+                OR inf:`LobbyAgency Client` OR inf:`Lobby Agency Client` with inf
             RETURN count(inf)
         """
         search_result = self.query(search_string)
@@ -310,7 +307,7 @@ class LobbyAgency(NamedEntity):
             MATCH (r)-[:HIRED]-(c) with f, r, c
             MATCH (c)-[x]-() with f, r, c, x
             RETURN c.name as name, labels(c) as labels, count(x) as weight
-            ORDER BY weight DESC
+                ORDER BY weight DESC
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
@@ -374,6 +371,7 @@ class LobbyAgency(NamedEntity):
             MATCH (m)-[:ATTENDED_BY]-(f) with m, f
             MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with f, m, g
                 OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with f, m, g, mp
+                    WHERE mp.name = m.host_name
             RETURN DISTINCT mp.name as mp
         """.format(self.vertex["name"])
         output = self.query(query)
@@ -402,7 +400,8 @@ class LobbyAgency(NamedEntity):
             MATCH (f:`Lobby Agency` {{name: "{0}"}})
             MATCH (m)-[:ATTENDED_BY]-(f) with m, f
             MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with f, m, g
-            MATCH (mp)-[:SERVED_IN]-(g) with f, m, g, mp
+                OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with f, m, g, mp
+                    WHERE mp.name = m.host_name
             RETURN g.name as position, mp.name as host, m.meeting as meeting,
                 m.purpose as purpose, m.date as date
         """.format(self.vertex["name"])

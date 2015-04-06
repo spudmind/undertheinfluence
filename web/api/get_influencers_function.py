@@ -12,6 +12,7 @@ class InfluencersApi(BaseAPI):
         self._remuneration = "influences.register_of_interests.remuneration_total_int"
         self._funding = "influences.electoral_commission.donation_total_int"
         self._lobbyists = "influences.lobby_registers.lobbyist_hired"
+        self._meetings = "influences.meetings.meetings_total"
         self.query = {}
 
     def request(self, **args):

@@ -302,6 +302,10 @@ mapped_influencers = [
     (u"Beggars", u"Beggars Group"),
     (u"Talktalk", u"Talk Talk"),
     (u"SERCO", u"Serco"),
+    (u"Bbc", u"BBC"),
+    (u"Ministry of Sound Group Ltd", u"Ministry of Sound"),
+    (u"Ibm", u"IBM"),
+    (u"Unite", u"Unite the Union"),
 ]
 
 

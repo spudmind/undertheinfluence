@@ -51,7 +51,7 @@ class Influencer(BaseDataModel):
 
     def _get_meetings_summary(self):
         return {
-            "meeting_count": self._meetings_total_count(),
+            "meetings_count": self._meetings_total_count(),
             "politician_count": len(set(self._politicians_met())),
             "department_count": len(set(self._departments_met())),
             "politicians_met": self._politicians_met(),
@@ -100,13 +100,14 @@ class Influencer(BaseDataModel):
             MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
             MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
             RETURN g.name as position, mp.name as host, m.meeting as meeting,
-                m.purpose as purpose, m.date as date
+                m.title as title, m.purpose as purpose, m.date as date
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
             meeting = {
                 "position": entry["position"],
                 "host": entry["host"],
+                "title": entry["title"],
                 "purpose": entry["purpose"],
                 "meeting": entry["meeting"],
                 "date": entry["date"],

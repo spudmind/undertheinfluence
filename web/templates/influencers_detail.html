@@ -34,6 +34,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-lg-3 control-label">Meetings</label>
+                        <div class="col-lg-4">
+                            <input class="form-control floating-label" name="meetings_lt" id="focusedInput" type="text" placeholder="less than">
+                        </div>
+                        <div class="col-lg-4">
+                            <input class="form-control floating-label" name="meetings_gt" id="focusedInput" type="text" placeholder="greater than" >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-lg-3 control-label">Interests</label>
                         <div class="col-lg-4">
                             <input class="form-control floating-label" name="interests_lt" id="focusedInput" type="text" placeholder="less than">
@@ -97,6 +107,21 @@
                                     </div>
                                     <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
                                     <div class="row">
+
+                                        {% if "meetings" in entry.influences_summary %}
+                                            {% if entry.influences_summary.meetings.meeting_count > 1 %}
+                                                <div class="well well-sm">
+                                                    <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b> with:
+                                                    {% for politician in entry.influences_summary.meetings.politicians_met %}
+                                                        <a href="{{ politician.details_url }}">{{ politician.name }}</a>
+                                                        {% if not loop.last %}
+                                                            ,
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+
 
                                         {% if "lobby_registers" in entry.influences_summary %}
                                             {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}

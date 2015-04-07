@@ -28,8 +28,9 @@ class FetchMPs:
     def run(self):
         self._logger.info("Fetching MPs ...")
         mp_ids = self.get_mps_since("2000-01-01", 180)
-        self._logger.info("  Fetching individual MP data ...")
-        for mp_id in mp_ids:
+        self._logger.info("Fetching individual MP data ...")
+        for idx, mp_id in enumerate(mp_ids):
+            self._logger.info("  Fetching MP details for person ID %s ... (%d / %d)" % (mp_id, idx+1, len(mp_ids)))
             self.get_mp_info(mp_id)
         self._logger.info("Done.")
 

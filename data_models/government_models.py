@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from data_models.core import BaseDataModel, NamedEntity
+from data_models.core import BaseDataModel
 from data_models.core import NamedEntity
 from utils import config
 
@@ -766,7 +766,6 @@ class GovernmentOffice(NamedEntity):
         self.exists = False
         self.label = "Government Office"
         self.primary_attribute = "name"
-        #self.name = name.strip()
         self.name = name
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name

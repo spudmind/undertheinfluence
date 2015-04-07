@@ -31,7 +31,7 @@ arg_parser.add_argument("--refreshdb", action="store_true", help="Refresh the db
 arg_parser.add_argument("--dryrun", action="store_true", help="Avoid downloading files")
 arg_parser.add_argument("--fetch", nargs="+", choices=choices, help="Specify the fetcher(s) to run")
 arg_parser.add_argument("--scrape", nargs="+", choices=choices, help="Specify the scraper(s) to run")
-arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords"], help="Parse master entities")
+arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords", "positions"], help="Parse master entities")
 arg_parser.add_argument("--parse", nargs="+", choices=choices, help="Specify the parser(s) to run")
 arg_parser.add_argument("--graph", nargs="+", choices=choices, help="Specify the grapher(s) to run")
 arg_parser.add_argument("--api_gen", nargs="+", choices=["politicians", "lobbyists", "government", "influencers", "parties"], help="Create mongo database for API")
@@ -76,6 +76,8 @@ if args.master is not None:
         master.create_mps()
     if "lords" in args.master:
         master.create_lords()
+    if "positions" in args.master:
+        master.create_positions()
 
 # run parsers
 if args.parse is not None:

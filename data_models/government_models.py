@@ -751,12 +751,6 @@ class GovernmentOffices(BaseDataModel):
         search_result = self.query(search_string)
         return search_result
 
-    def test(self):
-        all_offices = self.get_all()
-        for dept, labels, weight in all_offices:
-            office = GovernmentOffice(dept)
-            print dept, office.mp_count
-
     def _get_count(self):
         search_string = u"""
             MATCH (p) where p:Lord OR p:`Member of Parliament` with p

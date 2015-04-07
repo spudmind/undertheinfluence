@@ -14,14 +14,54 @@
             <div id="government-container">
 
                 <div class="list-group">
+                    {% if influencer.influences_detail["meetings"] %}
+                        <div class="list-group-item">
+                            <div class="row-content">
 
+                                <h4 class="list-group-item-heading">Ministerial Meetings</h4>
+                                <p class="list-group-item-text">
+
+                                <p class="list-group-item-text">
+                                <table class="table table-striped table-hover ">
+                                    <colgroup>
+                                        <col span="1" style="width: 40%;">
+                                        <col span="1" style="width: 20%;">
+                                        <col span="1" style="width: 20%;">
+                                        <col span="1" style="width: 20%;">
+                                        <col span="1" style="width: 10%;">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Host</th>
+                                        <th>Meeting</th>
+                                        <th>Purpose</th>
+                                        <th>Date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for meeting in influencer.influences_detail.meetings %}
+                                        <tr>
+                                            <td><small>{{ meeting.position }}</small></td>
+                                            <td><small><a href="{{ meeting.host["details_url"] }}">{{ meeting.host["name"] }}</a></small></td>
+                                            <td><small>{{ meeting.meeting }}</small></td>
+                                            <td><small>{{ meeting.purpose }}</small></td>
+                                            <td><small>{{ meeting.date }}</small></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="list-group-separator"></div>
+                            </div>
+                        </div>
+                    {% endif %}
 
                     {% if influencer.influences_detail["lobby_registers"] %}
                         <div class="list-group-item">
                             <div class="row-content">
 
-                                    <h4 class="list-group-item-heading">Lobby Registers</h4>
-                                    <p class="list-group-item-text">
+                                <h4 class="list-group-item-heading">Lobby Registers</h4>
+                                <p class="list-group-item-text">
 
 
                                 <p class="list-group-item-text">
@@ -54,9 +94,6 @@
                         </div>
 
                     {% endif %}
-
-
-
 
                     {% if influencer.influences_detail["register_of_interests"] %}
                         <div class="list-group-item">

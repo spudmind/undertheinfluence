@@ -12,6 +12,7 @@ class PoliticiansApi(BaseAPI):
 
         self._remuneration = "influences.register_of_interests.remuneration_total_int"
         self._funding = "influences.electoral_commission.donation_total_int"
+        self._meetings = "influences.meetings.meetings_total"
 
     def request(self, **args):
         pager = {}
@@ -20,6 +21,7 @@ class PoliticiansApi(BaseAPI):
         self._filter_party(args)
         self._filter_type(args)
         self._filter_labels(args)
+        self._filter_meetings(args)
         self._filter_interests(args)
         self._filter_funding(args)
         self._filter_department(args)
@@ -55,7 +57,7 @@ class PoliticiansApi(BaseAPI):
                 "government_departments": self._department_detail_urls(
                     entry["government_departments"]
                 ),
-                "influences_summary": entry["influences"],
+                "influences_summary": self._influencer_urls(entry["influences"]),
                 "type": entry["type"]
             }
             for entry in results
@@ -74,6 +76,15 @@ class PoliticiansApi(BaseAPI):
         if args.get("labels"):
             label_args = [x.strip() for x in args.get("labels").split(",")]
             self.query["$and"] = [{"labels": {"$in": [label]}} for label in label_args]
+
+    def _filter_meetings(self, args):
+        _meetings_search = {}
+        if args.get("meetings_gt"):
+            _meetings_search["$gt"] = int(args.get("meetings_gt"))
+        if args.get("meetings_lt"):
+            _meetings_search["$lt"] = int(args.get("meetings_lt"))
+        if _meetings_search != {}:
+            self.query[self._meetings] = _meetings_search
 
     def _filter_interests(self, args):
         _remuneration_search = {}
@@ -102,3 +113,17 @@ class PoliticiansApi(BaseAPI):
                 }
             ]
 
+    def _influencer_urls(self, influences):
+        results = []
+        for position in influences["meetings"]["meetings_per_position"]:
+                updated = position
+                updated_influencers = [
+                    {
+                        "name": i,
+                        "details_url": self.named_entity_resources(i, "influencer")[0]
+                    } for i in position["influencers_met"]
+                ]
+                updated["influencers_met"] = updated_influencers
+                results.append(updated)
+        influences["meetings"]["meetings_per_position"] = results
+        return influences

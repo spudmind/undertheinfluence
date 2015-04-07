@@ -43,7 +43,7 @@ class PopulateInfluencersApi():
             data_sources["electoral_commission"] = ec
         if lobby["lobbyist_hired"] > 0:
             data_sources["lobby_registers"] = lobby
-        if meetings["meeting_count"] > 0:
+        if meetings["meetings_count"] > 0:
             data_sources["meetings"] = meetings
         influencer_data = {
             "name": name,

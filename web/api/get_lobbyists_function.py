@@ -36,7 +36,7 @@ class LobbyistsApi(BaseAPI):
         for entry in influences["lobbying_registers"]["clients"]:
             updated = {}
             updated["name"] = entry["name"]
-            updated["details_url"]= self.named_entity_resources(
+            updated["details_url"] = self.named_entity_resources(
                 entry["name"], entry["labels"]
             )[0]
             results.append(updated)

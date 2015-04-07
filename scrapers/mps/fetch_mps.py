@@ -62,7 +62,7 @@ class FetchMPs:
 
     def get_mp_info(self, mp_id):
         path = os.path.join(self.current_path, self.STORE_DIR, "%s.json" % mp_id)
-
+        self._logger.debug("... %s" % path)
         if os.path.exists(path) and self.dryrun:
             # if the MP file exists, we bail out
             return
@@ -71,7 +71,7 @@ class FetchMPs:
         info = self.hansard.get_mp_info(mp_id, fields=extra_fields)
         time.sleep(0.5)
 
-        info["details"] = self.hansard.get_mp_info(mp_id)
+        info["details"] = self.hansard.get_mp(mp_id)
         time.sleep(0.5)
 
         with open(path, "w") as f:

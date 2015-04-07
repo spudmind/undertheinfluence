@@ -33,18 +33,21 @@ class FetchMeetings:
         self._logger.debug("Searching %s for '%s' with filter '%s' ..." % (self.BASE_URL, self.search_term, self.search_filter))
         search_tmpl = "%s/government/publications?keywords=%s&publication_filter_option=%s&page=%%d" % (self.BASE_URL, urllib.quote_plus(self.search_term), self.search_filter)
         page = 1
+        total_pages = "unknown"
         collections = {}
         publications = {}
         while True:
+            if total_pages != "unknown" and page > total_pages:
+                # no more search results
+                break
             # search gov.uk for results
-            self._logger.debug("  Fetching results page %d ..." % page)
+            self._logger.debug("  Fetching results page %d / %s ..." % (page, total_pages))
             r = requests.get(search_tmpl % page)
             time.sleep(0.5)
             soup = BeautifulSoup(r.text)
+            if total_pages == "unknown":
+                total_pages = int(soup.find(class_="page-numbers").text[5:])
             publication_soups = soup.find_all(class_="document-row")
-            if publication_soups == []:
-                # no more search results
-                break
 
             for pub_soup in publication_soups:
                 # find collections (we'll use these to find more publications)

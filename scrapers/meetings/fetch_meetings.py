@@ -58,7 +58,7 @@ class FetchMeetings:
                     if collection_url not in collections and self.search_term in collection_text.lower():
                         collections[collection_url] = {
                             "url": collection_url,
-                            "title": collection_soup.a.text,
+                            "name": collection_text,
                         }
                     continue
 
@@ -75,6 +75,7 @@ class FetchMeetings:
                         "source": {
                             "linked_from_url": pub_url,
                         },
+                        "collection": None,
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text.strip(),
                         "department": department,
@@ -102,6 +103,7 @@ class FetchMeetings:
                         "source": {
                             "linked_from_url": pub_url,
                         },
+                        "collection": collection["name"],
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text,
                         "department": department,

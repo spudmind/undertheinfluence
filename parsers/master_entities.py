@@ -51,5 +51,32 @@ class MasterEntitiesParser:
                 self._logger.debug(full_name)
                 self.db.save('master_lords', {"name": full_name})
 
+    def create_positions(self):
+        self.db.drop("master_positions")
+        _all_mps = self.db.fetch_all('mps_scrape', paged=False)
+        all_positions = []
+        for mp in _all_mps:
+            if "terms" in mp:
+                for term in mp["terms"]:
+                    if "offices_held" in term:
+                        positions = self._get_offices(term["offices_held"])
+                        all_positions = all_positions + positions
+        all_positions = list(set(all_positions))
+        for position in all_positions:
+            self._print_out("position", position)
+            self.db.save('master_positions', {"position": position})
+
+    def _get_offices(self, offices):
+        positions = []
+        if len(offices) > 1 and offices != "none":
+            for office in offices:
+                if "position" in office and office["position"]:
+                    positions.append(office["position"])
+        else:
+            if not offices == "none":
+                if "position" in offices[0] and offices[0]["position"]:
+                    positions.append(offices[0]["position"])
+        return positions
+
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))

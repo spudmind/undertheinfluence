@@ -27,6 +27,10 @@ lords_titles = [
     u"Marquess"
 ]
 
+mapped_positions = [
+    (u"Nicholas Boles", u"Nick Boles"),
+]
+
 influencer_entities = [
     u"IPSOS Mori",
     u"Ipsos MORI",

@@ -63,6 +63,7 @@ class MasterEntitiesParser:
             "Minister for Tourism and Heritage",
             "Minister for Sport and the Olympics",
             "Minister for Culture, Communications and Creative Industries",
+            "Minister for Defence Equipment, Support and Technology"
         ]
         _all_mps = self.db.fetch_all('mps_scrape', paged=False)
         all_positions = []

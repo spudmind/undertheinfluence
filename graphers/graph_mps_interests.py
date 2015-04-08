@@ -34,7 +34,6 @@ class GraphMPsInterests():
     def _graph_interests(self, node):
         self.current_detail = {"mp": node["mp"]}
 
-        #TODO grab source detail here
         self.current_detail["recorded_date"] = node["date"]
         self.current_detail["source"] = node["source"]
 

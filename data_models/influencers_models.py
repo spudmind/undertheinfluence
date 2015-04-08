@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from data_models.core import NamedEntity, BaseDataModel
 
 
@@ -523,6 +524,34 @@ class LobbyRelationship(BaseDataModel):
         self.create_relationship(
             self.vertex, "HIRED", client.vertex
         )
+
+    def set_from_date(self, new_date):
+        new_datetime = self._make_datetime(new_date)
+        existing = self.vertex["from_date"]
+        if existing and len(existing) > 0:
+            existing_datetime = self._make_datetime(existing)
+            if new_datetime < existing_datetime:
+                self.vertex["from_date"] = new_date
+        else:
+            self.vertex["from_date"] = new_date
+        self.vertex.push()
+
+    def set_to_date(self, new_date):
+        new_datetime = self._make_datetime(new_date)
+        existing = self.vertex["to_date"]
+        if existing and len(existing) > 0:
+            existing_datetime = self._make_datetime(existing)
+            if new_datetime > existing_datetime:
+                self.vertex["to_date"] = new_date
+        else:
+            self.vertex["to_date"] = new_date
+        self.vertex.push()
+
+    @staticmethod
+    def _make_datetime(date):
+        if "-" in date:
+            t = date.split("-")
+            return datetime(int(t[0]), int(t[1]), int(t[2]))
 
 
 class Donor(NamedEntity):

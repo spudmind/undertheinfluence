@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import json
 from utils import mongo
 from data_models.influencers_models import LobbyAgency
 from data_models.influencers_models import LobbyingClient
@@ -10,42 +11,59 @@ from data_models.influencers_models import LobbyEmployee
 class GraphPrca():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-
-    def run(self):
         self.db = mongo.MongoInterface()
         self._logger.debug("\n\nGraphing PRCA")
-        all_lobbyists = self.db.fetch_all('prca_parse', paged=False)
+        self.PREFIX = "prca"
+
+    def run(self):
+        all_lobbyists = self.db.fetch_all("%s_parse" % self.PREFIX, paged=False)
         for doc in all_lobbyists:
-            name = doc["lobbyist"]["name"]
-            self._logger.debug("\nLobby Firm: %s" % name)
+
+            self.d = {
+                "lobby_agency": doc["mp"],
+                "source_url": doc["source"]["url"],
+                "source_linked_from": doc["source"]["linked_from_url"],
+                "source_fetched": doc["source"]["fetched"],
+                "meta": doc["meta"],
+                "from_date": doc["date_range"][0],
+                "to_date": doc["date_range"][1]
+            }
+            name = doc["name"]
+            self._logger.debug("\nLobby Agency: %s" % name)
+
             lobby_firm = LobbyAgency(name)
             if not lobby_firm.exists:
                 lobby_firm.create()
-            lobby_props = {
-                "pa_contact": doc["lobbyist"]["pa_contact"],
-                "contact_details": doc["lobbyist"]["contact_details"],
-                "data_source": "prca"
-            }
-            lobby_firm.set_lobbyist_details()
-            self._create_clients(lobby_firm, doc["clients"], doc["meta"])
-            self._create_staff(lobby_firm, doc["staff"], doc["meta"])
 
-    def _create_clients(self, firm, clients, meta):
+            lobby_props = {
+                "pa_contact": doc["pa_contact"],
+                "contact_details": doc["contact_details"]
+            }
+            lobby_firm.set_lobbyist_details(lobby_props)
+
+            self._create_clients(lobby_firm, doc["clients"])
+            self._create_staff(lobby_firm, doc["staff"])
+
+    def _create_clients(self, firm, clients):
         if clients:
             for entry in clients:
                 self._logger.debug("... client: %s" % entry)
+
                 client = LobbyingClient(entry)
                 if not client.exists:
                     client.create()
-                client.set_client_details({"data_source": "prca"})
+                client.set_client_details()
+
                 relationship = self._create_relationship(
                     firm.name, client.name, "client"
                 )
                 relationship.link_firm(firm)
                 relationship.link_client(client)
-                relationship.update_raw_record(self.meta_to_text(meta))
+                relationship.set_from_date(self.d["from_date"])
+                relationship.set_to_date(self.d["to_date"])
+                relationship.update_raw_record(json.dumps(self.d))
 
-    def _create_staff(self, firm, staff, meta):
+    def _create_staff(self, firm, staff):
         if staff:
             for entry in staff:
                 self._logger.debug("... staff: %s" % entry)
@@ -58,7 +76,9 @@ class GraphPrca():
                 )
                 relationship.link_firm(firm)
                 relationship.link_staff(staff)
-                relationship.update_raw_record(self.meta_to_text(meta))
+                relationship.set_from_date(self.d["from_date"])
+                relationship.set_to_date(self.d["to_date"])
+                relationship.update_raw_record(json.dumps(self.d))
 
     def _create_relationship(self, firm, name, connection):
         props = {"lobbying_firm": firm, connection: name}
@@ -68,16 +88,3 @@ class GraphPrca():
             new_relationship.create()
         new_relationship.set_relationship_details(props)
         return new_relationship
-
-    @staticmethod
-    def meta_to_text(meta):
-        text = u"""
-            linked_from: {0}\npage: {1}\nfetched: {2}\n
-            date_from: {3}\ndate_to: {4}\n""".format(
-            meta["linked_from"],
-            meta["page"],
-            meta["fetched"],
-            meta["date_range"]["to"],
-            meta["date_range"]["from"],
-        )
-        return text

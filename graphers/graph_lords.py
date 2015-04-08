@@ -7,19 +7,20 @@ from data_models import government_models
 class GraphLords():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-
-    def run(self):
         self.db = mongo.MongoInterface()
         self.data_models = government_models
+        self.PREFIX = "lords"
 
-        all_lords = self.db.fetch_all('parsed_lords_info', paged=False)
+    def run(self):
+        all_lords = self.db.fetch_all("%s_parse" % self.PREFIX, paged=False)
         for doc in all_lords:
             self._import(doc)
 
     def _import(self, node):
+        terms = node["terms"]
         lord = self.graph_lord(node)
-        if "terms" in node:
-            self.import_terms(lord, node["terms"])
+        if terms:
+            self.import_terms(lord, terms)
 
     def graph_lord(self, node):
         self._logger.debug("\n..................")
@@ -31,24 +32,23 @@ class GraphLords():
         # self._logger.debug(node["twfy_id"])
         return self._create_lord(node)
 
-    def _create_lord(self, lord):
-        new_lord = self.data_models.Lord(lord["full_name"])
-        lord_details = {
-            "first_name": lord["first_name"],
-            "last_name": lord["last_name"],
-            "party": lord["party"],
-            "title": lord["title"],
-            "twfy_id": lord["twfy_id"],
-            "number_of_terms": lord["number_of_terms"],
-            # TODO change mp["guardian_image"] to mp["image_url"]
-            # set to image_url for live version which is refreshed
-            "image_url": lord["guardian_image"],
-            "data_source": "theyworkforyou"
-        }
+    def _create_lord(self, lord_details):
+        new_lord = self.data_models.Lord(lord_details["full_name"])
         if not new_lord.exists:
             new_lord.create()
+
+        source = lord_details["source"]
+        del lord_details["_id"]
+        del lord_details["terms"]
+        del lord_details["source"]
+
+        lord_details["source_url"] = source
+        lord_details["source_linked_from"] = "http://www.theyworkforyou.com/api"
+        lord_details["source_fetched"] = None
+
         new_lord.set_lord_details(lord_details)
-        new_lord.link_party(lord["party"])
+        new_lord.link_party(lord_details["party"])
+
         return new_lord
 
     def import_terms(self, lord, terms):

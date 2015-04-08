@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import json
 from data_models.influencers_models import FundingRelationship
 from data_models.influencers_models import InterestCategory
 from data_models.influencers_models import RegisteredInterest
@@ -16,7 +17,6 @@ class GraphMPsInterests():
         self.PREFIX = "mps_interests"
         # database stuff
         self.db = mongo.MongoInterface()
-
         self.extra_details = [
             "donor_status",
             "purpose",
@@ -35,8 +35,8 @@ class GraphMPsInterests():
         self.current_detail = {"mp": node["mp"]}
 
         #TODO grab source detail here
-        #self.current_detail["recorded_date"] = node["date"]
-        #self.current_detail["source"] = node["source"]
+        self.current_detail["recorded_date"] = node["date"]
+        self.current_detail["source"] = node["source"]
 
         self._logger.debug("\n..................")
         self._logger.debug(node["mp"])
@@ -132,9 +132,17 @@ class GraphMPsInterests():
                     new_interest = self._create_interest(record["interest"])
                     new_interest.set_interest_details()
 
+                    d = {
+                        "recorded date": self.current_detail["recorded_date"],
+                        "source_url": self.current_detail["source"]["url"],
+                        "source_linked_from": self.current_detail["source"]["linked_from_url"],
+                        "source_fetched": str(self.current_detail["source"]["fetched"]),
+                        "raw_record": record["raw_record"]
+                    }
+
                     category.link_relationship(funding_relationship)
                     funding_relationship.link_donor(new_interest)
-                    funding_relationship.update_raw_record(record["raw_record"])
+                    funding_relationship.update_raw_record(json.dumps(d))
 
                     if self._is_remuneration(record):
                         for payment in record["remuneration"]:

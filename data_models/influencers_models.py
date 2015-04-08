@@ -1,3 +1,4 @@
+import json
 from data_models.core import NamedEntity, BaseDataModel
 
 
@@ -564,7 +565,7 @@ class FundingRelationship(BaseDataModel):
     def update_raw_record(self, raw_record):
         existing = self.vertex["raw_record"]
         if existing and len(existing) > 0:
-            new = u"{}\n---\n\n{}".format(existing, raw_record)
+            new = u"{}\n,\n{}".format(existing, raw_record)
         else:
             new = raw_record
         self.vertex["raw_record"] = new

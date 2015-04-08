@@ -20,26 +20,27 @@ class ParseMPsInterests:
             self.db.drop("%s_parse" % self.PREFIX)
 
     def run(self):
-        all_interests, _ = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
-        for documents in all_interests:
-            # each document contains one days recorded interests
+        all_interests = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
+        for doc in all_interests:
+            # each document contains a days recorded interests
             # document structure is:
             #   contents > mp > interests / categories > interest
             # parsed output is a document per mp structured:
             #   mp > interests / categories > interest
 
-            file_name = documents["file_name"]
-            for entry in documents["contents"]:
-                resolved_name = self._get_mp(entry["mp"])
-                self._logger.debug("\n%s" % resolved_name)
-                categories = self._get_category_data(entry["interests"])
-                mp_data = {
-                    "mp": resolved_name,
-                    "interests": categories,
-                    "file_name": file_name
-                }
 
-                self.db.save("%s_parse" % self.PREFIX, mp_data)
+            resolved_name = self._get_mp(doc["mp"])
+            self._logger.debug("\n%s" % resolved_name)
+            categories = self._get_category_data(doc["interests"])
+
+            mp_data = {
+                "mp": resolved_name,
+                "interests": categories,
+                "date": doc["date"],
+                "source": doc["source"]
+            }
+
+            self.db.save("%s_parse" % self.PREFIX, mp_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -62,10 +63,13 @@ class ParseMPsInterests:
         # individual categories to conform to specific conventions
         # this function picks the appropriate parser for each convention
 
-        self._show_record(record)
-        category_name = record["category_name"]
-        if category_name == "Directorships":
+        #self._show_record(record)
 
+        category_name = record["category_name"]
+
+        self._logger.debug("* %s" % category_name)
+
+        if category_name == "Directorships":
             return self._parse_list_record(record)
         elif category_name == "Remunerated directorships":
             return self._parse_list_record(record)
@@ -138,15 +142,19 @@ class ParseMPsInterests:
                     payments = [self._find_money(item) for item in record]
                     dates = [self._find_dates(item) for item in record]
                     remuneration = zip(payments, dates)
+                    cleaned_remuneration = self._cleanup_remuneration(remuneration)
+
                     entry = {
                         "interest": interest_name,
-                        "remuneration": self._cleanup_remuneration(remuneration),
+                        "remuneration": cleaned_remuneration,
                         "raw_record": full_record
                     }
-                    records.append(entry)
-                    self._logger.debug(" ---> donor: %s" % interest_name)
-                    # self._logger.debug(" ---> remuneration: %s" % remuneration)
+
+                    self._logger.debug(" ---> interest: %s" % interest_name)
+                    self._logger.debug(" ---> remuneration_clean: %s\n\n" % cleaned_remuneration)
                     # self._logger.debug(" ---> full record: %s" % full_record)
+
+                    records.append(entry)
                 else:
                     self._logger.debug("######## %s" % record)
                 self._logger.debug("-")
@@ -194,9 +202,7 @@ class ParseMPsInterests:
                         purpose = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % interest_name)
-            self._logger.debug(" ---> dest/cost: %s %s" % (destination, amount))
-            self._logger.debug("-")
+
             entry = {
                 "interest": interest_name,
                 "remuneration": amount,
@@ -205,6 +211,12 @@ class ParseMPsInterests:
                 "registered": registered,
                 "raw_record": full_record
             }
+
+            self._logger.debug(" ---> interest: %s" % interest_name)
+            self._logger.debug(" ---> dest/cost: %s %s" % (destination, amount))
+            self._logger.debug(" ---> registered: %s" % registered)
+            self._logger.debug("-")
+
             records.append(entry)
         return records
 
@@ -230,12 +242,14 @@ class ParseMPsInterests:
                     dates = self._find_dates(item)
                     if interest_name:
                         # if no interest is found, skip record
-                        self._logger.debug("----> %s %s" % (interest_name, dates))
                         entry = {
                             "interest": interest_name,
                             "registered": dates,
                             "raw_record": item
                         }
+                        self._logger.debug(" ---> interest: %s" % interest_name)
+                        self._logger.debug(" ---> registered: %s" % dates)
+
                         records.append(entry)
         return records
 
@@ -275,9 +289,7 @@ class ParseMPsInterests:
                         donor_status = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % interest_name)
-            self._logger.debug(" ---> status/cost: %s %s" % (donor_status, amount))
-            self._logger.debug("-")
+
             entry = {
                 "interest": interest_name,
                 "remuneration": amount,
@@ -285,6 +297,10 @@ class ParseMPsInterests:
                 "registered": registered,
                 "raw_record": full_record
             }
+
+            self._logger.debug(" ---> interest: %s" % interest_name)
+            self._logger.debug(" ---> registered: %s" % registered)
+
             records.append(entry)
         return records
 
@@ -330,18 +346,22 @@ class ParseMPsInterests:
                         donor_status = self._split_if_colon(item)
                     elif "Registered" in item:
                         registered = self._find_dates(item)
-            self._logger.debug(" ---> donor: %s" % interest_name)
-            self._logger.debug(" ---> status/cost: %s %s" % (donor_status, amount))
-            self._logger.debug("-")
+
             entry = {
                 "interest": interest_name,
                 "remuneration": amount,
                 "nature": nature,
                 "receipt": receipt,
+                "donor_status": donor_status,
                 "accepted": accepted,
                 "registered": registered,
                 "raw_record": full_record
             }
+
+            self._logger.debug(" ---> interest: %s" % interest_name)
+            self._logger.debug(" ---> registered: %s" % registered)
+            self._logger.debug("-")
+
             records.append(entry)
         return records
 
@@ -405,25 +425,30 @@ class ParseMPsInterests:
 
     def _show_record(self, data):
         self._logger.debug("   * %s" % data["category_name"])
+        print data["records"]
         for record in data["records"]:
             for item in record:
                 self._logger.debug("     %s" % item)
             self._logger.debug("---")
 
     def _cleanup_remuneration(self, data):
+        money_entry, date_entries = 0, 1
         new_list = []
         if data:
             for entry in data:
                 if len(entry[0]) > 0:
                     # self._logger.debug("%s %s" % (entry[0][0][1], entry[1]))
-                    if entry[1] and len(entry[1]) > 1:
-                        received = entry[1][0]
-                        registered = entry[1][1]
+                    if entry[date_entries] and len(entry[date_entries]) > 1:
+                        received = entry[date_entries][0]
+                        registered = entry[date_entries][1]
+                    elif entry[1] and len(entry[1]) == 1:
+                            received = "Unknown"
+                            registered = entry[date_entries][0]
                     else:
                         received = "Unknown"
                         registered = "Unknown"
                     new_entry = {
-                        "amount": entry[0][0][1],
+                        "amount": entry[money_entry][0][1],
                         "received": received,
                         "registered": registered,
                     }

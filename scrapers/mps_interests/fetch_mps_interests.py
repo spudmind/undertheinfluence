@@ -86,5 +86,6 @@ class FetchMPsInterests:
             self.db.save(self.COLLECTION_NAME, meta)
         self._logger.info("Done.")
 
+
 def fetch(**kwargs):
     FetchMPsInterests(**kwargs).run()

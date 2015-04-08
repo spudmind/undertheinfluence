@@ -28,8 +28,16 @@ lords_titles = [
 ]
 
 mapped_positions = [
-    (u"Nicholas Boles", u"Nick Boles"),
+    (
+        u"Parliamentary Under Secretary of State (Minister for Employment Relations",
+        u"Parliamentary Under Secretary of State (Minister for Employment Relations, Consumer and Postal Affairs)"
+    ),
 ]
+
+position_entities = [
+    u"Parliamentary Under Secretary of State (Minister for Employment Relations"
+]
+
 
 influencer_entities = [
     u"IPSOS Mori",
@@ -305,6 +313,7 @@ mapped_influencers = [
     (u"Babcock", u"Babcock International Group"),
     (u"Beggars", u"Beggars Group"),
     (u"Talktalk", u"Talk Talk"),
+    (u"TalkTalk", u"Talk Talk"),
     (u"SERCO", u"Serco"),
     (u"Bbc", u"BBC"),
     (u"Ministry of Sound Group Ltd", u"Ministry of Sound"),

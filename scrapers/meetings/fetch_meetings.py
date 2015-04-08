@@ -33,18 +33,21 @@ class FetchMeetings:
         self._logger.debug("Searching %s for '%s' with filter '%s' ..." % (self.BASE_URL, self.search_term, self.search_filter))
         search_tmpl = "%s/government/publications?keywords=%s&publication_filter_option=%s&page=%%d" % (self.BASE_URL, urllib.quote_plus(self.search_term), self.search_filter)
         page = 1
+        total_pages = "unknown"
         collections = {}
         publications = {}
         while True:
+            if total_pages != "unknown" and page > total_pages:
+                # no more search results
+                break
             # search gov.uk for results
-            self._logger.debug("  Fetching results page %d ..." % page)
+            self._logger.debug("  Fetching results page %d / %s ..." % (page, total_pages))
             r = requests.get(search_tmpl % page)
             time.sleep(0.5)
             soup = BeautifulSoup(r.text)
+            if total_pages == "unknown":
+                total_pages = int(soup.find(class_="page-numbers").text[5:])
             publication_soups = soup.find_all(class_="document-row")
-            if publication_soups == []:
-                # no more search results
-                break
 
             for pub_soup in publication_soups:
                 # find collections (we'll use these to find more publications)
@@ -55,7 +58,7 @@ class FetchMeetings:
                     if collection_url not in collections and self.search_term in collection_text.lower():
                         collections[collection_url] = {
                             "url": collection_url,
-                            "title": collection_soup.a.text,
+                            "name": collection_text,
                         }
                     continue
 
@@ -72,6 +75,7 @@ class FetchMeetings:
                         "source": {
                             "linked_from_url": pub_url,
                         },
+                        "collection": None,
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text.strip(),
                         "department": department,
@@ -99,6 +103,7 @@ class FetchMeetings:
                         "source": {
                             "linked_from_url": pub_url,
                         },
+                        "collection": collection["name"],
                         "title": pub_title.text,
                         "published_at": pub_soup.find(class_="public_timestamp").text,
                         "department": department,

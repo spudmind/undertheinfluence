@@ -6,19 +6,22 @@ import os.path
 from utils import mongo, pdftoxml
 
 
-class ScrapePRCA():
-    def __init__(self):
+class ScrapePRCA:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-        self.db = mongo.MongoInterface()
         # prefix for database tables
         self.PREFIX = "prca"
+        # database stuff
+        self.db = mongo.MongoInterface()
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_scrape" % self.PREFIX)
         # directory where files are stored
         self.STORE_DIR = "store"
         # the y-position of the top of the footer
         # (where the page number lives)
         self.FOOTER_Y = 1170
         self.CATEGORIES = {
-            "contact": re.compile(r"^Office\(?s", re.IGNORECASE),
+            "contact": re.compile(r"^Office\(?s\)?(?:$|\:| p| f| a)", re.IGNORECASE),
             "pa_contact": re.compile(r"CONTACT FOR PUBLIC AFFAIRS"),
             "staff": re.compile(r"(?:Employees|Staff).*? (?:performing|providing|conducted).*? (?:public affairs|PA|lobbying).*? (?:services|work)", re.IGNORECASE),
             "clients": re.compile(r"Clients for whom.*? (?:public affairs|lobbying)", re.IGNORECASE),
@@ -32,13 +35,42 @@ class ScrapePRCA():
     # Various hacks due to pdf-related problems
     def pdf_hacks(self, blocks, filename, page_num):
         if filename.endswith("agency_2014-03_2014-05.pdf") and page_num == 20:
+            # DTW (Davies Tanner)
             return blocks[15:]
-        if filename.endswith("agency_2014-06_2014-08.pdf") and page_num == 22:
-            return blocks[25:]
         if filename.endswith("in-house_2014-03_2014-05.pdf") and page_num == 20:
+            # Sport and Recreation Alliance (Slimming World)
             return blocks[18:]
+        if filename.endswith("agency_2014-06_2014-08.pdf") and page_num == 22:
+            # Edelman (DTW)
+            return blocks[25:]
         if filename.endswith("in-house_2014-06_2014-08.pdf") and page_num == 20:
+            # Sport and Recreation Alliance (Slimming World)
             return blocks[18:]
+
+        staff_str = "List of employees that have conducted public affairs services:"
+        clients_str = "List of clients for whom public affairs services have been provided:"
+        if filename.endswith("agency_2013-03_2013-05.pdf") and page_num == 52:
+            # Weber Shandwick Public Affairs
+            blocks[2] = (staff_str, blocks[2][1])
+        elif filename.endswith("agency_2013-06_2013-08.pdf") and page_num == 53:
+            # Weber Shandwick Public Affairs
+            blocks[36] = (staff_str, blocks[36][1])
+        elif filename.endswith("agency_2013-12_2014-02.pdf") and page_num == 34:
+            # Hanover Communications International Ltd
+            blocks[8] = (staff_str, blocks[8][1])
+        elif filename.endswith("agency_2013-12_2014-02.pdf") and page_num == 35:
+            # Hanover Communications International Ltd
+            blocks[20] = (clients_str, blocks[20][1])
+        elif filename.endswith("agency_2013-12_2014-02.pdf") and page_num == 40:
+            # JBP PR & Parliamentary Affairs
+            blocks[9] = (staff_str, blocks[9][1])
+            blocks[25] = (clients_str, blocks[25][1])
+        elif filename.endswith("agency_2013-12_2014-02.pdf") and page_num == 54:
+            # MHP Communications
+            blocks[17] = (staff_str, blocks[17][1])
+        elif filename.endswith("agency_2013-12_2014-02.pdf") and page_num == 57:
+            # MHP Communications
+            blocks[4] = (clients_str, blocks[4][1])
         return blocks
 
     # Patch some errors in the PDFs, where the incorrect heading
@@ -46,12 +78,10 @@ class ScrapePRCA():
     def apply_patches(self, all_blocks, idx):
         if all_blocks[idx][0] == "The Communication Group plc.":
             all_blocks[idx+1] = (u"Office(s) address:", all_blocks[idx+1][1])
-        elif all_blocks[idx][0] == "Email: cmclauchlin@webershandwick.com":
-            all_blocks[idx+1] = (u"List of employees that have conducted lobbying services:", all_blocks[idx+1][1])
         return all_blocks
 
     def scrape_blocks_from_pdf(self, filename):
-        self._logger.info("parsing: %s" % filename)
+        #self._logger.info("parsing: %s" % filename)
         # convert to xml
         pdf = pdftoxml.from_file(filename)
         all_blocks = []
@@ -115,8 +145,9 @@ class ScrapePRCA():
                 try:
                     assert(current_cat not in agency)
                 except AssertionError:
+                    for k, v in agency.items():
+                        print k, v
                     print idx, block
-                    print agency
                     raise
             # okay - if we've got to here, we're setting a property
             else:
@@ -132,23 +163,18 @@ class ScrapePRCA():
             for cat in self.CATEGORIES.keys():
                 if cat not in agency:
                     continue
-                agency[cat] = sorted(agency[cat], key=lambda x: (x[1]["left"], x[1]["page"], x[1]["top"]))
+                agency[cat] = sorted(
+                    agency[cat], key=lambda x: (x[1]["left"], x[1]["page"], x[1]["top"])
+                )
                 agency[cat] = [x[0] for x in agency[cat]]
         return agencies
 
     def save_to_db(self, agencies, meta):
         for agency in agencies:
-            m = {k: v for k, v in meta.items() if k in ['linked_from', 'fetched', 'url']}
-            agency["meta"] = dict(agency["meta"].items() + m.items())
-            agency["date_from"] = meta["date_from"]
-            agency["date_to"] = meta["date_to"]
-
-            for k, v in agency.items():
-                self._logger.debug("%s:      %s" % (k, v))
-            self._logger.debug("---")
-
-            agency_entity = self.db.save("%s_scrape" % self.PREFIX, agency)
-
+            agency["source"] = meta["source"]
+            agency["date_range"] = meta["date_range"]
+            self._logger.debug("... %s" % agency["name"])
+            self.db.save("%s_scrape" % self.PREFIX, agency)
 
     # # TODO! This is wrong at the moment
     # def parse_contact(self, agency):
@@ -166,7 +192,7 @@ class ScrapePRCA():
     #     agency["contact"][-1][key] = value
 
     def parse_file(self, meta):
-        self._logger.debug("... %s" % meta["filename"])
+        self._logger.debug("\nParsing: %s" % meta["filename"])
         filename = meta["filename"]
         current_path = os.path.dirname(os.path.abspath(__file__))
         full_path = os.path.join(current_path, self.STORE_DIR, filename)
@@ -175,7 +201,11 @@ class ScrapePRCA():
 
         # Right - we have a big list of text blocks, roughly in order.
         # Now let's group them by agency.
-        agencies = self.blocks_to_agencies(blocks)
+        try:
+            agencies = self.blocks_to_agencies(blocks)
+        except AssertionError:
+            print meta
+            raise
 
         # We then re-sort - by section, then page, then horizontal position, then vertical position.
         # We do this because it matches the way the text is actually written - and that's
@@ -195,5 +225,5 @@ class ScrapePRCA():
             self.parse_file(meta)
 
 
-def scrape():
-    ScrapePRCA().run()
+def scrape(**kwargs):
+    ScrapePRCA(**kwargs).run()

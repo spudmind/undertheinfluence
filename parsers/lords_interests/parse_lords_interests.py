@@ -6,15 +6,17 @@ from utils import mongo
 from utils import entity_resolver
 
 
-class LordsInterestsParser:
-    def __init__(self):
+class ParseLordsInterests():
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+        self.resolver = entity_resolver.MasterEntitiesResolver()
+        self.PREFIX = "lords_interests"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_parse" % self.PREFIX)
 
     def run(self):
-        self.resolver = entity_resolver.MasterEntitiesResolver()
-        self.db = mongo.MongoInterface()
-
-        all_interests = self.db.fetch_all('scraped_lords_interests', paged=False)
+        all_interests = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for lord in all_interests:
             lord_name = lord["member_title"]
             resolved_name = self.resolver.find_lord(lord_name)
@@ -26,7 +28,7 @@ class LordsInterestsParser:
                     "lord": resolved_name,
                     "interests": categories
                 }
-                self.db.save('parsed_lords_interests', lord_data)
+                self.db.save("%s_parse" % self.PREFIX, lord_data)
 
     def _get_category_data(self, categories):
         categories_data = []
@@ -104,7 +106,7 @@ class LordsInterestsParser:
 
         records = []
         for record in data["records"]:
-            interest_name = self.resolver.find_donor(record["interest"])
+            interest_name = self.resolver.find_influencer(record["interest"])
             # if no interest is found, skip record
             if interest_name:
                 self._logger.debug(" interest: %s" % interest_name)
@@ -144,3 +146,7 @@ class LordsInterestsParser:
 
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))
+
+
+def parse(**kwargs):
+    ParseLordsInterests(**kwargs).run()

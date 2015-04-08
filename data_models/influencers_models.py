@@ -14,6 +14,8 @@ class Influencer(BaseDataModel):
             self.interests = self._get_interests()
             self.donations = self._get_donations()
             self.lobbyists = self._get_lobbyists()
+            self.meetings = self._get_meetings()
+            self.meetings_summary = self._get_meetings_summary()
             self.interests_summary = self._get_interests_summary()
             self.donations_summary = self._get_donations_summary()
             self.lobbyists_summary = self._get_lobbyists_summary()
@@ -46,6 +48,72 @@ class Influencer(BaseDataModel):
         """.format(self.name)
         count = self.query(search_string)[0]["total"]
         return {"lobbyist_hired": count}
+
+    def _get_meetings_summary(self):
+        return {
+            "meetings_count": self._meetings_total_count(),
+            "politician_count": len(set(self._politicians_met())),
+            "department_count": len(set(self._departments_met())),
+            "politicians_met": self._politicians_met(),
+            "departments_met": self._departments_met()
+        }
+
+    def _meetings_total_count(self):
+        query = u"""
+            MATCH (a:`Named Entity` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(a) with m, a
+            RETURN count(m) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
+    def _politicians_met(self):
+        results = []
+        query = u"""
+            MATCH (a:`Named Entity` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
+            RETURN DISTINCT m.host_name as mp
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            if entry[0]:
+                results.append(entry[0])
+        return results
+
+    def _departments_met(self):
+        results = []
+        query = u"""
+            MATCH (a:`Named Entity` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
+            RETURN DISTINCT m.department as dept
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            if entry[0]:
+                results.append(entry[0])
+        return results
+
+    def _get_meetings(self):
+        results = []
+        query = u"""
+            MATCH (a:`Meeting Attendee` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
+            MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
+            RETURN g.name as position, mp.name as host, m.meeting as meeting,
+                m.title as title, m.purpose as purpose, m.date as date
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            meeting = {
+                "position": entry["position"],
+                "host": entry["host"],
+                "title": entry["title"],
+                "purpose": entry["purpose"],
+                "meeting": entry["meeting"],
+                "date": entry["date"],
+            }
+            results.append(meeting)
+        return results
 
     def _get_interests(self):
         results = []
@@ -186,9 +254,9 @@ class Influencers(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Meeting Attendee`
                 OR inf:`LobbyAgency Client` OR inf:`Lobby Agency Client` with inf
-            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED]-(x)
+            MATCH (inf)<-[y:REGISTERED_CONTRIBUTOR|FUNDING_RELATIONSHIP|HIRED|ATTENDED_BY]-(x)
             RETURN DISTINCT inf.name as influencer, inf.donor_type, labels(inf), count(y) as weight
             ORDER BY weight DESC
         """
@@ -200,7 +268,8 @@ class Influencers(BaseDataModel):
 
     def _get_count(self):
         search_string = u"""
-            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Lobby Agency Client`
+            MATCH (inf) WHERE inf:Donor OR inf:`Registered Interest` OR inf:`Meeting Attendee`
+                OR inf:`LobbyAgency Client` OR inf:`Lobby Agency Client` with inf
             RETURN count(inf)
         """
         search_result = self.query(search_string)
@@ -223,6 +292,13 @@ class LobbyAgency(NamedEntity):
             count = self._get_counts()
             self.client_count = count[0]
             self.employee_count = count[1]
+            self.meetings = self._get_meetings()
+            self.meetings_summary = self._get_meetings_summary()
+
+    def set_lobbyist_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Lobby Agency", "Named Entity"]
+        self.set_node_properties(properties, labels)
 
     def _get_clients(self):
         results = []
@@ -232,7 +308,7 @@ class LobbyAgency(NamedEntity):
             MATCH (r)-[:HIRED]-(c) with f, r, c
             MATCH (c)-[x]-() with f, r, c, x
             RETURN c.name as name, labels(c) as labels, count(x) as weight
-            ORDER BY weight DESC
+                ORDER BY weight DESC
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
@@ -272,10 +348,75 @@ class LobbyAgency(NamedEntity):
         output = self.query(search_string)
         return output[0]["clients"], output[0]["employees"]
 
-    def set_lobbyist_details(self, properties=None):
-        properties = self._add_namedentity_properties(properties)
-        labels = ["Lobby Agency", "Named Entity"]
-        self.set_node_properties(properties, labels)
+    def _get_meetings_summary(self):
+        return {
+            "meeting_count": self._meetings_total_count(),
+            "politician_count": len(self._politicians_met()),
+            "department_count": len(self._departments_met()),
+            "politicians_met": self._politicians_met(),
+            "departments_met": self._departments_met()
+        }
+
+    def _meetings_total_count(self):
+        query = u"""
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(f) with m, f
+            RETURN count(m) as total
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["total"]
+
+    def _politicians_met(self):
+        results = []
+        query = u"""
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(f) with m, f
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with f, m, g
+                OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with f, m, g, mp
+                    WHERE mp.name = m.host_name
+            RETURN DISTINCT mp.name as mp
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            if entry[0]:
+                results.append(entry[0])
+        return results
+
+    def _departments_met(self):
+        results = []
+        query = u"""
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(f) with m, f
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with f, m, g
+            RETURN DISTINCT g.name
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            if entry[0]:
+                results.append(entry[0])
+        return results
+
+    def _get_meetings(self):
+        results = []
+        query = u"""
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
+            MATCH (m)-[:ATTENDED_BY]-(f) with m, f
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with f, m, g
+                OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with f, m, g, mp
+                    WHERE mp.name = m.host_name
+            RETURN g.name as position, mp.name as host, m.meeting as meeting,
+                m.purpose as purpose, m.date as date
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            meeting = {
+                "position": entry["position"],
+                "host": entry["host"],
+                "purpose": entry["purpose"],
+                "meeting": entry["meeting"],
+                "date": entry["date"],
+            }
+            results.append(meeting)
+        return results
 
 
 class LobbyAgencies(BaseDataModel):
@@ -446,6 +587,23 @@ class FundingRelationship(BaseDataModel):
 
     def set_registered_date(self, date):
         self.set_date(date, "REGISTERED")
+
+
+class MeetingAttendee(NamedEntity):
+    def __init__(self, name=None):
+        NamedEntity.__init__(self)
+        self.exists = False
+        self.label = "Meeting Attendee"
+        self.primary_attribute = "name"
+        self.name = name
+        self.exists = self.fetch(
+            "Named Entity", self.primary_attribute, self.name
+        )
+
+    def set_attendee_details(self, properties=None):
+        properties = self._add_namedentity_properties(properties)
+        labels = ["Named Entity", "Meeting Attendee"]
+        self.set_node_properties(properties, labels)
 
 
 class InterestCategory(BaseDataModel):

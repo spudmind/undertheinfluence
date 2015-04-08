@@ -1,40 +1,36 @@
 # -*- coding: utf-8 -*-
-import os
+import os.path
 import logging
 from lxml import objectify
 from utils import mongo
 
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-
-
-class MPsInterestsScraper():
-    def __init__(self):
+class ScrapeMPsInterests:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
+        # get the current path
+        self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # database stuff
+        self.db = mongo.MongoInterface()
+        self.PREFIX = "mps_interests"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_scrape" % self.PREFIX)
 
     def run(self):
-        self.cache = mongo.MongoInterface()
-        self.cache_data = self.cache.db.scraped_mps_interests
-        self.data = '/data/regmem'
-
-        # regmem data is produced by the parlparse project which dumps
-        # http://www.publications.parliament.uk/pa/cm/cmregmem/memi0910.htm
-        # into an xml file. Each file stored one day's recorded interests
-
-        xml_data = current_path + self.data + "/"
-        for f in os.listdir(xml_data):
+        metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
+        for meta in metas:
             # scrape each file for interests data
-            self.scrape_xml(xml_data, f)
+            self.scrape_xml(meta)
 
-    def scrape_xml(self, xml_path, file_name):
+    def scrape_xml(self, meta):
         # the hierarchy of the file to be scraped is:
         # regmem /member name > category > record > items
         # regmem contains 1 or more categories
         # category contains one or more records
         # record is the registered interest & is comprised of many items
 
-        with open(xml_path + file_name) as f:
-                xml = f.read()
+        with open(os.path.join(self.current_path, meta["filename"])) as f:
+            xml = f.read()
         root = objectify.fromstring(xml)
         contents = []
         for mp in root.getchildren():
@@ -58,10 +54,11 @@ class MPsInterestsScraper():
             }
             contents.append(mp_data)
         data = {
-            "file_name": file_name.split(".")[0],
-            "contents": contents
+            "contents": contents,
+            "date": meta["date"],
+            "source": meta["source"],
         }
-        self.cache_data.save(data)
+        self.db.update("%s_scrape" % self.PREFIX, {"date": meta["date"]}, data)
 
     def scrape_category(self, category):
         self._logger.debug("\t *%s" % category.attrib["name"].strip())
@@ -81,8 +78,7 @@ class MPsInterestsScraper():
             records.append(items)
         return records
 
-    @staticmethod
-    def scrape_item(items):
+    def scrape_item(self, items):
         string = u""
         for x in items.getchildren():
             if x.text is not None:
@@ -92,3 +88,6 @@ class MPsInterestsScraper():
                     if y.text is not None:
                         string += y.text
         return string.strip()
+
+def scrape(**kwargs):
+    ScrapeMPsInterests(**kwargs).run()

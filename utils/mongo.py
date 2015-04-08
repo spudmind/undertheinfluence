@@ -78,9 +78,10 @@ class MongoInterface:
         return collection.Collection(self.db, _collection).save(document, **kwargs)
 
     # update a document in a collection
-    def update(self, _collection, document, update):
-        return collection.Collection(self.db, _collection).update(document, update)
+    def update(self, _collection, spec, document, **kwargs):
+        return collection.Collection(self.db, _collection).update(spec, document, **kwargs)
 
     def drop(self, _collection):
+        self._logger.debug("Dropping collection '%s'" % _collection)
         q = collection.Collection(self.db, _collection)
         return q.drop()

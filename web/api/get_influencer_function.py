@@ -1,12 +1,14 @@
 from data_models.influencers_models import Influencer
 from web.api import BaseAPI
 from utils import mongo
+from utils import config
 
 
 class InfluencerApi(BaseAPI):
     def __init__(self):
         BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
+        self.lords_titles = config.lords_titles
         self._db_table = 'api_influencers'
 
     def request(self, args):
@@ -17,6 +19,7 @@ class InfluencerApi(BaseAPI):
             register = self._nest_category(self._interest_urls(influencer.interests))
             ec = self._recipient_urls(influencer.donations)
             lobby = influencer.lobbyists
+            meetings = self._politician_urls(influencer.meetings)
             result = {
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],
@@ -24,6 +27,7 @@ class InfluencerApi(BaseAPI):
                     "lobby_registers": lobby,
                     "register_of_interests": register,
                     "electoral_commission": ec,
+                    "meetings": meetings
                 },
             }
         return result
@@ -49,5 +53,21 @@ class InfluencerApi(BaseAPI):
             urls = self.named_entity_resources(recipient_name, recipient_labels)
             updated["recipient"]["details_url"] = urls[0]
             updated["recipient"]["api_url"] = urls[1]
+            results.append(updated)
+        return results
+
+    def _politician_urls(self, meetings):
+        results = []
+        for meeting in meetings:
+            updated = meeting
+            host_name = {"name": meeting["host"], "details_url": None}
+            if meeting["host"]:
+                if any(title in meeting["host"] for title in self.lords_titles):
+                    label = "lord"
+                else:
+                    label = "mp"
+                urls = self.named_entity_resources(meeting["host"], label)
+                host_name["details_url"] = urls[0]
+                updated["host"] = host_name
             results.append(updated)
         return results

@@ -21,7 +21,7 @@ in the database
 
 
 class FetchPRCA():
-    def __init__(self):
+    def __init__(self, **kwargs):
         # fetch the logger
         self._logger = logging.getLogger("spud")
         # PRCA website
@@ -33,12 +33,16 @@ class FetchPRCA():
         # database stuff
         self.db = mongo.MongoInterface()
         self.COLLECTION_NAME = "prca_fetch"
+        if kwargs["refreshdb"]:
+            self.db.drop(self.COLLECTION_NAME)
         # local directory to save fetched files to
         self.STORE_DIR = "store"
         # the URL for this particular register is incorrect
-        self.URL_CORRECTION = (("2012-12", "2013-02", "in-house"), "/assets/files/IN-HOUSE%20PRCA%20Public%20Affairs%20Register%20March%202013.pdf")
+        self.URL_CORRECTION = ((("2012-12-01", "2013-02-28"), "in-house"), "/assets/files/IN-HOUSE%20PRCA%20Public%20Affairs%20Register%20March%202013.pdf")
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # if True, avoid downloading where possible
+        self.dryrun = kwargs["dryrun"]
 
     def scrape_index(self):
         self._logger.info("Fetching PRCA index page (%s) ..." % self.index_url)
@@ -49,23 +53,24 @@ class FetchPRCA():
 
         # get link and anchor text - working around links split in half
         links = [(li.text, link["href"]) for li in soup.find(id="content_1327").find_all("li") for link in li.find_all("a")]
-        self._logger.info("... Index Scraped.")
+        self._logger.info("PRCA Index fetched.")
         return links
 
     def parse_text(self, anchor_text):
         # fetch the start date...
         start = self.DATE_RE.search(anchor_text)
-        start_dt = datetime.strptime("-".join(start.groups()), "%B-%Y")
+        start_date = datetime.strptime("-".join(start.groups()), "%B-%Y").date()
         # ...and end date
         end = self.DATE_RE.search(anchor_text[start.start()+1:])
-        end_dt = datetime.strptime("-".join(end.groups()), "%B-%Y")
+        end_date = datetime.strptime("-".join(end.groups()), "%B-%Y").date()
         # set the day to the end of the month
-        end_day = calendar.monthrange(end_dt.year, end_dt.month)[1]
-        end_dt = end_dt.replace(day=end_day)
+        end_day = calendar.monthrange(end_date.year, end_date.month)[1]
+        end_date = end_date.replace(day=end_day)
         # ensure start date is before end date!
-        if start_dt > end_dt:
+        if start_date > end_date:
             # fixes e.g. "December to February 2013"
-            start_dt = start_dt.replace(year=start_dt.year-1)
+            start_date = start_date.replace(year=start_date.year-1)
+        date_range = (str(start_date), str(end_date))
 
         if anchor_text.lower().find("agency") != -1:
             desc = "agency"
@@ -74,25 +79,22 @@ class FetchPRCA():
         else:
             desc = "mixed"
 
-        return {"date_from": datetime.strftime(start_dt, "%Y-%m-%d"), "date_to": datetime.strftime(end_dt, "%Y-%m-%d"), "description": desc}
+        return {"date_range": date_range, "description": desc}
 
     def fetch_file(self, record):
         # name the file
-        file_type = record["source"][-3:]
-        filename = "%s_%s_%s.%s" % (record["description"], record["date_from"][:7], record["date_to"][:7], file_type)
-        full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
+        full_path = os.path.join(self.current_path, self.STORE_DIR, record["filename"])
         # fetch from URL and save locally
         try:
-            _ = urllib.urlretrieve(record["source"], full_path)
+            self._logger.info("Fetching '%s' ..." % full_path)
+            _ = urllib.urlretrieve(record["source"]["url"], full_path)
+            record["source"]["fetched"] = str(datetime.now())
             time.sleep(0.5)
         except IOError:
-            self._logger.error("URL not found: %s" % record["source"])
+            self._logger.error("URL not found: %s" % record["source"]["url"])
             raise
-        # record filename and timestamp in the db
-        record["filename"] = filename
-        record["fetched"] = str(datetime.now())
-        self._logger.info("... fetched %s." % filename)
-        self.db.save(self.COLLECTION_NAME, record)
+
+        return record
 
     def run(self):
         self._logger.info("Fetching PRCA")
@@ -100,26 +102,34 @@ class FetchPRCA():
         for anchor_text, rel_url in links:
             current = self.parse_text(anchor_text)
 
-            # hack to fix broken URL in source
-            if (current["date_from"][:7], current["date_to"][:7], current["description"]) == self.URL_CORRECTION[0]:
+            # hack to fix incorrect URL in source
+            if (current["date_range"], current["description"]) == self.URL_CORRECTION[0]:
                 rel_url = self.URL_CORRECTION[1]
 
-            # fetch db instance matching this one
-            existing = self.db.find_one(self.COLLECTION_NAME, current)
-            if existing:
-                # this is already in the db
-                current = existing
-                if current["fetched"]:
-                    # this is already fetched too, so skip
-                    continue
-            else:
-                # store a record in the db, but with fetched=False
-                current["fetched"] = False
-                current["source"] = "%s%s" % (self.BASE_URL, rel_url)
-                current["linked_from"] = self.index_url
-                self.db.save(self.COLLECTION_NAME, current)
-            self.fetch_file(current)
+            file_type = rel_url[-3:]
+            filename = "%s_%s_%s.%s" % (
+                current["description"],
+                current["date_range"][0][:7],
+                current["date_range"][1][:7],
+                file_type
+            )
+            current["filename"] = filename
+
+            if self.db.find_one(self.COLLECTION_NAME, current):
+                self._logger.info("Skipping '%s' ..." % rel_url)
+                continue
+
+            current["source"] = {
+                "url": "%s%s" % (self.BASE_URL, rel_url),
+                "linked_from_url": self.index_url,
+                "fetched": False,
+            }
+
+            if not self.dryrun:
+                current = self.fetch_file(current)
+
+            self.db.save(self.COLLECTION_NAME, current)
 
 
-def fetch():
-    FetchPRCA().run()
+def fetch(**kwargs):
+    FetchPRCA(**kwargs).run()

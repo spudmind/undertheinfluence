@@ -4,40 +4,37 @@ from utils import mongo
 from utils import entity_resolver
 
 
-class AppcParser:
-    def __init__(self):
+class ParseAppc:
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
-        self.resolver = entity_resolver.MasterEntitiesResolver()
         self.db = mongo.MongoInterface()
-        self.COLLECTION_NAME = "appc_parse"
+        self.resolver = entity_resolver.MasterEntitiesResolver()
+        self.PREFIX = "appc"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_parse" % self.PREFIX)
 
     def run(self):
         self._logger.debug("\n\nParsing APPC")
-        all_entries = self.db.fetch_all("appc_scrape", paged=False)
+        all_entries = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for document in all_entries:
             name = self.resolver.map_lobby_agency(document["name"])
             self._logger.debug("\nLobbying Firm: %s" % name)
-            meta = document["meta"]
-            meta["date_range"] = {
-                "to": document["date_to"],
-                "from": document["date_from"]
-            }
+
             clients = self._parse_clients(document["clients"])
             staff = self._parse_staff(document["staff"])
             countries = self._parse_countries(document["countries"])
             entry = {
-                "lobbyist": {
-                    "name": name,
-                    "contact_details": self._collapse_list(document["contacts"]),
-                    "address": self._collapse_list(document["addresses"]),
-                    "pa_contact": self._fill_empty_field("pa_contact", document)
-                },
+                "name": name,
+                "contact_details": self._collapse_list(document["contacts"]),
+                "address": self._collapse_list(document["addresses"]),
+                "pa_contact": self._fill_empty_field("pa_contact", document),
+                "date_range": document["date_range"],
                 "clients": clients,
                 "staff": staff,
                 "countries": countries,
-                "meta": document["meta"]
+                "source": document["source"]
             }
-            self.db.save(self.COLLECTION_NAME, entry)
+            self.db.save("%s_parse" % self.PREFIX, entry)
 
     def _parse_clients(self, clients):
         self._logger.debug("... Parsing Clients")
@@ -50,7 +47,6 @@ class AppcParser:
                     "name": self._normalize_text(client["name"]),
                     "client_type": client_type,
                     "description": client["description"]
-
                 }
                 client_list.append(entry)
         return client_list
@@ -104,4 +100,5 @@ class AppcParser:
         return None if field not in document else document[field]
 
 
-
+def parse(**kwargs):
+    ParseAppc(**kwargs).run()

@@ -5,19 +5,11 @@ import sys
 import argparse
 import logging
 
-from scrapers import mps, lords, meetings, prca, party_funding, appc
-
-from scrapers import scrape_mps_interests
-from scrapers import scrape_lords_interests
+from scrapers import appc, lords, lords_interests, meetings, mps, mps_interests, party_funding, prca
+from parsers import mps, lords, appc, prca, meetings, mps_interests, lords_interests, party_funding
 
 from parsers import master_entities
-from parsers import parse_mps
-from parsers import parse_lords
-from parsers import parse_mps_interests
-from parsers import parse_lords_interests
-from parsers import parse_party_funding
-from parsers import parse_prca
-from parsers import parse_appc
+
 
 from graphers import graph_mps
 from graphers import graph_lords
@@ -26,17 +18,20 @@ from graphers import graph_lords_interests
 from graphers import graph_party_funding
 from graphers import graph_prca
 from graphers import graph_appc
+from graphers import graph_meetings
 
 from data_interfaces import api_data_gen
 from data_models import core
 
 
-choices = ["mps", "lords", "mps_interests", "lords_interests", "party_funding", "meetings", "prca", "appc"]
+choices = ["appc", "lords", "lords_interests", "meetings", "mps", "mps_interests", "party_funding", "prca"]
 arg_parser = argparse.ArgumentParser(description="Task runner for spud.")
 arg_parser.add_argument("--verbose", "-v", action="store_true", help="Noisy output")
+arg_parser.add_argument("--refreshdb", action="store_true", help="Refresh the db collection")
+arg_parser.add_argument("--dryrun", action="store_true", help="Avoid downloading files")
 arg_parser.add_argument("--fetch", nargs="+", choices=choices, help="Specify the fetcher(s) to run")
 arg_parser.add_argument("--scrape", nargs="+", choices=choices, help="Specify the scraper(s) to run")
-arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords"], help="Parse master entities")
+arg_parser.add_argument("--master", nargs="+", choices=["mps", "lords", "positions"], help="Parse master entities")
 arg_parser.add_argument("--parse", nargs="+", choices=choices, help="Specify the parser(s) to run")
 arg_parser.add_argument("--graph", nargs="+", choices=choices, help="Specify the grapher(s) to run")
 arg_parser.add_argument("--api_gen", nargs="+", choices=["politicians", "lobbyists", "government", "influencers", "parties"], help="Create mongo database for API")
@@ -55,25 +50,24 @@ if args.verbose:
 else:
     logger.setLevel(logging.ERROR)
 
+scraper_args = {
+    "refreshdb": args.refreshdb,
+    "dryrun": args.dryrun,
+}
+
+parser_args = {
+    "refreshdb": args.refreshdb
+}
+
 # run fetchers
 if args.fetch is not None:
     for fetcher in args.fetch:
-        sys.modules["scrapers.%s" % fetcher].fetch()
+        sys.modules["scrapers.%s" % fetcher].fetch(**scraper_args)
 
 # run scrapers
 if args.scrape is not None:
-    exec_scraper = {
-        "mps": mps,
-        "lords": lords,
-        "mps_interests": scrape_mps_interests.MPsInterestsScraper,
-        "lords_interests": scrape_lords_interests.LordsInterestsScraper,
-        "party_funding": party_funding,
-        "meetings": meetings,
-        "prca": prca,
-        "appc": appc,
-    }
     for scraper in args.scrape:
-        exec_scraper[scraper].scrape()
+        sys.modules["scrapers.%s" % scraper].scrape(**scraper_args)
 
 # parse master entities
 if args.master is not None:
@@ -82,20 +76,13 @@ if args.master is not None:
         master.create_mps()
     if "lords" in args.master:
         master.create_lords()
+    if "positions" in args.master:
+        master.create_positions()
 
 # run parsers
 if args.parse is not None:
-    exec_parser = {
-        "mps": parse_mps.MPsParser,
-        "lords": parse_lords.LordsParser,
-        "mps_interests": parse_mps_interests.MPsInterestsParser,
-        "lords_interests": parse_lords_interests.LordsInterestsParser,
-        "party_funding": parse_party_funding.PartyFundingParser,
-        "prca": parse_prca.PrcaParser,
-        "appc": parse_appc.AppcParser,
-    }
     for parser in args.parse:
-        exec_parser[parser]().run()
+        sys.modules["parsers.%s" % parser].parse(**parser_args)
 
 # run graphers
 if args.graph is not None:
@@ -107,6 +94,7 @@ if args.graph is not None:
         "party_funding": graph_party_funding.GraphPartyFunding,
         "prca": graph_prca.GraphPrca,
         "appc": graph_appc.GraphAppc,
+        "meetings": graph_meetings.GraphMeetings,
     }
     for grapher in args.graph:
         exec_grapher[grapher]().run()

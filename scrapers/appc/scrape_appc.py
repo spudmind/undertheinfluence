@@ -5,31 +5,37 @@ import requests
 from bs4 import BeautifulSoup
 from utils import mongo
 
+
 class ScrapeAPPC:
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._logger = logging.getLogger('spud')
         # local directory to save fetched files to
         self.STORE_DIR = "store"
         # get the current path
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        # database stuff
         self.db = mongo.MongoInterface()
         self.PREFIX = "appc"
+        if kwargs["refreshdb"]:
+            self.db.drop("%s_scrape" % self.PREFIX)
 
     def run(self):
-        self._logger.info("Scraping APPC")
+        self._logger.info("Scraping APPC ...")
         metas = self.db.fetch_all("%s_fetch" % self.PREFIX, paged=False)
         for meta in metas:
-            if meta["description"] == "current":
+            if meta["filename"].endswith(".html"):
                 agency = self.scrape_current(meta)
-                self.db.save("%s_scrape" % self.PREFIX, agency)
+                spec = {"name": agency["name"], "date_range": agency["date_range"]}
+                self.db.update("%s_scrape" % self.PREFIX, spec, agency, upsert=True)
             else:
                 # TODO: Scrape PDFs
                 # agencies = self.scrape_pdf(meta)
                 pass
+        self._logger.info("Done scraping APPC.")
 
     def scrape_current(self, meta):
-        self._logger.debug("... %s" % meta["filename"])
-        full_path = os.path.join(self.current_path, self.STORE_DIR, meta["date_to"], meta["filename"])
+        self._logger.info("  Scraping '%s' ...." % meta["filename"])
+        full_path = os.path.join(self.current_path, self.STORE_DIR, meta["date_range"][1], meta["filename"])
         with open(full_path) as f:
             html = f.read()
         soup = BeautifulSoup(html).find(class_="member-profile")
@@ -79,16 +85,15 @@ class ScrapeAPPC:
 
         return {
             "name": name,
-            "date_from": meta["date_from"],
-            "date_to": meta["date_to"],
+            "date_range": meta["date_range"],
             "addresses": addresses,
             "contacts": contacts,
             "countries": countries,
             "staff": staff,
             "clients": clients,
-            "meta": {k: v for k, v in meta.items() if k in ["source", "linked_from", "fetched"]}
+            "source": meta["source"],
         }
 
 
-def scrape():
-    ScrapeAPPC().run()
+def scrape(**kwargs):
+    ScrapeAPPC(**kwargs).run()

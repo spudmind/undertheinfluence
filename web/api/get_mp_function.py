@@ -15,15 +15,17 @@ class MpApi(BaseAPI):
 
         if len(result) > 0:
             mp = government_models.MemberOfParliament(name)
+            meetings = self._influencer_urls(mp.meetings)
+            interests = self._nest_category(self._interest_urls(mp.interests))
+            donations = self._donor_urls(mp.donations)
             result = {
                 'name': result[0]['name'],
                 'party': result[0]['party'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
-                    "register_of_interests": self._nest_category(
-                        self._interest_urls(mp.interests)
-                    ),
-                    "electoral_commission": self._donor_urls(mp.donations),
+                    "register_of_interests": interests,
+                    "electoral_commission": donations,
+                    "meetings": meetings
                 },
                 "government_positions": result[0]["government_positions"],
                 "government_departments": self._department_detail_urls(
@@ -53,5 +55,17 @@ class MpApi(BaseAPI):
             urls = self.named_entity_resources(donor_name, donor_labels)
             updated["donor"]["details_url"] = urls[0]
             updated["donor"]["api_url"] = urls[1]
+            results.append(updated)
+        return results
+
+    def _influencer_urls(self, meetings):
+        results = []
+        for meeting in meetings:
+            updated = meeting
+            attendee_name = {"name": meeting["attendee"], "details_url": None}
+            if meeting["attendee"]:
+                urls = self.named_entity_resources(meeting["attendee"], "influencer")
+                attendee_name["details_url"] = urls[0]
+                updated["attendee"] = attendee_name
             results.append(updated)
         return results

@@ -65,7 +65,6 @@ def show_contact():
 
 @app.route('/politicians')
 def show_politicians():
-    args = {}
     reply = get_summary_function.SummaryApi().request()
     mps_summary = reply["results"]["summary"]["mps"]
     lords_summary = reply["results"]["summary"]["lords"]
@@ -83,6 +82,8 @@ def show_politicians_detail():
             "interests_lt",
             "donations_gt",
             "donations_lt",
+            "meetings_gt",
+            "meetings_lt",
             "party",
             "type",
             "labels"
@@ -136,6 +137,8 @@ def show_influencers_detail():
         fields = [
             "interests_gt",
             "interests_lt",
+            "meetings_gt",
+            "meetings_lt",
             "donations_gt",
             "donations_lt",
             "lobbyists_gt",
@@ -200,7 +203,7 @@ def _build_title(args):
 
 
 
-@app.route('/influencer/<name>')
+@app.route('/influencer/detail/<name>')
 def show_influencer(name):
     args = {"name": name}
     influencer = get_influencer_function.InfluencerApi().request(args)
@@ -268,6 +271,8 @@ class GetPoliticians(Resource):
         self.reqparse.add_argument('interests_lt', type=int)
         self.reqparse.add_argument('donations_gt', type=int)
         self.reqparse.add_argument('donations_lt', type=int)
+        self.reqparse.add_argument('meetings_gt', type=int)
+        self.reqparse.add_argument('meetings_lt', type=int)
         super(GetPoliticians, self).__init__()
 
     def get(self):
@@ -350,6 +355,8 @@ class GetInfluencers(Resource):
         self.reqparse.add_argument('donations_lt', type=int)
         self.reqparse.add_argument('lobbyists_gt', type=int)
         self.reqparse.add_argument('lobbyists_lt', type=int)
+        self.reqparse.add_argument('meetings_gt', type=int)
+        self.reqparse.add_argument('meetings_lt', type=int)
         super(GetInfluencers, self).__init__()
 
     def get(self):

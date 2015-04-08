@@ -7,53 +7,46 @@ from data_models import government_models
 class GraphMPs():
     def __init__(self):
         self._logger = logging.getLogger('spud')
-
-    def run(self):
         self.db = mongo.MongoInterface()
         self.data_models = government_models
-        all_mps = self.db.fetch_all('parsed_mp_info', paged=False)
+        self.PREFIX = "mps"
+
+    def run(self):
+        all_mps = self.db.fetch_all("%s_parse" % self.PREFIX, paged=False)
         for doc in all_mps:
             self._import(doc)
 
     def _import(self, node):
+        terms = node["terms"]
         mp = self.graph_mp(node)
-        if "terms" in node:
-            self.import_terms(mp, node["terms"])
+        if terms:
+            self.import_terms(mp, terms)
 
     def graph_mp(self, node):
         self._logger.debug("\n..................")
         self._logger.debug("%s x %s" % (node["full_name"], node["number_of_terms"]))
-        if "also_known_as" in node:
-            self._logger.debug("AKA: %s" % node["also_known_as"])
         self._logger.debug(node["party"])
         self._logger.debug("..................")
-        # self._logger.debug(node["twfy_id"])
+
         return self._create_mp(node)
 
-    def _create_mp(self, mp):
-        new_mp = self.data_models.MemberOfParliament(mp["full_name"])
-        mp_details = {
-            "first_name": mp["first_name"],
-            "last_name": mp["last_name"],
-            "party": mp["party"],
-            "twfy_id": mp["twfy_id"],
-            "number_of_terms": mp["number_of_terms"],
-            # TODO change mp["guardian_image"] to mp["image_url"]
-            # set to image_url for live version which is refreshed
-            "image_url": mp["guardian_image"],
-            "data_source": "theyworkforyou"
-        }
-        if "guardian_url" in mp:
-            mp_details["guardian_url"] = mp["guardian_url"]
-        if "publicwhip_url" in mp:
-            mp_details["publicwhip_url"] = mp["publicwhip_url"]
-            mp_details["publicwhip_id"] = mp["publicwhip_id"]
-        if "also_known_as" in mp:
-            mp_details["publicwhip_id"] = mp["also_known_as"]
+    def _create_mp(self, mp_details):
+        new_mp = self.data_models.MemberOfParliament(mp_details["full_name"])
         if not new_mp.exists:
             new_mp.create()
+
+        source = mp_details["source"]
+        del mp_details["_id"]
+        del mp_details["terms"]
+        del mp_details["source"]
+
+        mp_details["source_url"] = source["url"]
+        mp_details["source_linked_from"] = source["linked_from_url"]
+        mp_details["source_fetched"] = source["fetched"]
+
         new_mp.set_mp_details(mp_details)
-        new_mp.link_party(mp["party"])
+        new_mp.link_party(mp_details["party"])
+
         return new_mp
 
     def import_terms(self, mp, terms):
@@ -96,7 +89,7 @@ class GraphMPs():
             for office in offices:
                 if "department" in office and office["department"]:
                     self._create_office(
-                        term, "department", office["department"]
+                        term, "committee", office["department"]
                     )
                 if "position" in office and office["position"]:
                     self._create_office(
@@ -106,7 +99,7 @@ class GraphMPs():
             if not offices == "none":
                 if "department" in offices[0] and offices[0]["department"]:
                     self._create_office(
-                        term, "department", offices[0]["department"]
+                        term, "committee", offices[0]["department"]
                     )
                 if "position" in offices[0] and offices[0]["position"]:
                     self._create_office(
@@ -116,10 +109,10 @@ class GraphMPs():
     def _create_office(self, term, create_as, office):
         self._logger.debug(office)
         new_office = None
-        if create_as == "department":
+        if create_as == "committee":
             new_office = self.data_models.GovernmentOffice(office)
             new_office.create()
-            new_office.is_department()
+            new_office.is_committee()
         elif create_as == "position":
             new_office = self.data_models.GovernmentOffice(office)
             new_office.create()

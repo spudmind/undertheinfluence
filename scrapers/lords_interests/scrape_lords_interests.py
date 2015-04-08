@@ -32,8 +32,11 @@ class ScrapeLordsInterests:
         self._logger.info("Done importing Lords interests.")
 
     def scrape_interests(self, lord, meta):
+        self._logger.debug("... %s" % lord["DisplayAs"])
         member_id = lord["@Member_Id"]
-        name = lord["FullTitle"]
+
+        full_title = lord["FullTitle"]
+        member_title = lord["DisplayAs"]
         preferred_names = listify(lord["PreferredNames"]["PreferredName"])
         aliases = {" ".join([preferred_name[x] for x in ["Forename", "MiddleNames", "Surname"] if preferred_name.get(x, None) is not None]): None for preferred_name in preferred_names}.keys()
 
@@ -62,12 +65,14 @@ class ScrapeLordsInterests:
 
         data = {
             "member_id": member_id,
-            "name": name,
+            "full_title": full_title,
+            "member_title": member_title,
             "aliases": aliases,
             "interests": interests,
             "source": meta["source"]
         }
         self.db.update("%s_scrape" % self.PREFIX, {"member_id": data["member_id"]}, data, upsert=True)
+
 
 # wrap non-lists in a list
 def listify(l):
@@ -75,6 +80,7 @@ def listify(l):
         return l
     else:
         return [l]
+
 
 def scrape(**kwargs):
     ScrapeLordsInterests(**kwargs).run()

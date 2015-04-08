@@ -18,15 +18,18 @@ class ParseLordsInterests():
     def run(self):
         all_interests = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for lord in all_interests:
+
             lord_name = lord["member_title"]
             resolved_name = self.resolver.find_lord(lord_name)
-            self._logger.debug("\n%s / %s" % (resolved_name, lord_name))
+            self._logger.debug(resolved_name)
+
             if len(lord["interests"]) > 0:
                 # skip Lords who do not have any interests
                 categories = self._get_category_data(lord["interests"])
                 lord_data = {
                     "lord": resolved_name,
-                    "interests": categories
+                    "interests": categories,
+                    "source": lord["source"]
                 }
                 self.db.save("%s_parse" % self.PREFIX, lord_data)
 

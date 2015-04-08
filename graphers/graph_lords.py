@@ -53,9 +53,6 @@ class GraphLords():
 
     def import_terms(self, lord, terms):
         for term in terms:
-            self._logger.debug("%s - %s" % (term["constituency"], term["party"]))
-            self._logger.debug("%s to %s" % (term["entered_house"], term["left_house"]))
-            self._logger.debug(term["left_reason"])
             new_term = self._create_term(term)
             lord.link_peerage(new_term)
             self._logger.debug("-")

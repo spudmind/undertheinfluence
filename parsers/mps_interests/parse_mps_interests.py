@@ -22,9 +22,14 @@ class ParseMPsInterests:
     def run(self):
         all_interests = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for doc in all_interests:
-            # each document contains a days recorded interests
+            # we currently ignore documents before this date,
+            # because they're harder to parse
+            if doc["date"] < "2010-09-06":
+                continue
+
+            # each document contains a day's recorded interests for an MP
             # document structure is:
-            #   contents > mp > interests / categories > interest
+            #   contents > interests / categories > interest
             # parsed output is a document per mp structured:
             #   mp > interests / categories > interest
 

@@ -68,7 +68,7 @@ class FetchMPsInterests:
                 # logfile, but the data is not on parliament.uk or on parlparse
                 continue
 
-            if not self.dryrun:
+            if not (os.path.exists(full_path) and self.dryrun):
                 url = self.BASE_URL + filename
                 self._logger.info("  Fetching %s ..." % url)
                 urllib.urlretrieve(url, full_path)

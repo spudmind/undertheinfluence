@@ -69,7 +69,8 @@ class ScrapePartyFunding:
         return donation
 
     # convert %d/%m/%Y to %Y-%m-%d
-    def format_date(self, date):
+    @staticmethod
+    def format_date(date):
         if date == "":
             return
         return "%s-%s-%s" % (date[6:], date[3:5], date[0:2])
@@ -79,6 +80,7 @@ class ScrapePartyFunding:
         for keys, values in dictionary.items():
             self._logger.debug(" %-20s:%-25s" % (keys, values))
         self._logger.debug("\n\n")
+
 
 def scrape(**kwargs):
     ScrapePartyFunding(**kwargs).run()

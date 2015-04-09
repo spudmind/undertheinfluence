@@ -20,57 +20,62 @@ class ParsePartyFunding():
         _all_entries = self.db.fetch_all("%s_scrape" % self.PREFIX, paged=False)
         for doc in _all_entries:
             parsed = {}
-            parsed["recipient"] = self._get_recipient(
-                doc["recipient"], doc["donee_type"], doc["recipient_type"]
-            )
-            parsed["donor_name"] = self._get_donor(
-                doc["donor_name"], doc["donor_type"]
-            )
-            parsed["donor_type"] = doc["donor_type"]
-            parsed["donee_type"] = doc["donee_type"]
-            parsed["recipient_type"] = doc["recipient_type"]
-            parsed["donation_type"] = doc["donation_type"]
-            parsed["value"] = self._remove_broken_pound(doc["value"])
-            parsed["purpose"] = doc["purpose"]
-            parsed["nature_provision"] = doc["nature_provision"]
-            parsed["ec_reference"] = doc["ec_reference"]
-            parsed["company_reg"] = doc["company_reg"]
-            parsed["is_sponsorship"] = doc["is_sponsorship"]
-            parsed["6212"] = doc["6212"]
-            parsed["recd_by"] = doc["recd_by"]
-            parsed["received_date"] = doc["received_date"]
-            parsed["reported_date"] = doc["reported_date"]
-            parsed["accepted_date"] = doc["accepted_date"]
-            if not parsed["recipient"]:
-                self._print_dic(parsed)
-                self._logger.debug("---\n")
-            else:
-                self._print_out("recipient", parsed["recipient"])
-                self._print_out("donee_type", parsed["donee_type"])
-                self._print_out("donor_name", doc["donor_name"])
-                self._print_out("found_name", parsed["donor_name"])
-                self._print_out("donor_type", parsed["donor_type"])
-                self._print_out("value", parsed["value"])
-                self._logger.debug("---\n")
-                self.db.save("%s_parse" % self.PREFIX, parsed)
+            # skip the header row
+            if not doc["ec_reference"].lower() == "ec reference":
+                parsed["recipient"] = self._get_recipient(
+                    doc["recipient"], doc["donee_type"], doc["recipient_type"]
+                )
+                parsed["donor_name"] = self._get_donor(
+                    doc["donor_name"], doc["donor_type"]
+                )
+                parsed["donor_type"] = doc["donor_type"]
+                parsed["donee_type"] = doc["donee_type"]
+                parsed["recipient_type"] = doc["recipient_type"]
+                parsed["donation_type"] = doc["donation_type"]
+                parsed["value"] = self._remove_broken_pound(doc["value"])
+                parsed["purpose"] = doc["purpose"]
+                parsed["nature_provision"] = doc["nature_provision"]
+                parsed["ec_reference"] = doc["ec_reference"]
+                parsed["company_reg"] = doc["company_reg"]
+                parsed["is_sponsorship"] = doc["is_sponsorship"]
+                parsed["6212"] = doc["6212"]
+                parsed["recd_by"] = doc["recd_by"]
+                parsed["received_date"] = doc["received_date"]
+                parsed["reported_date"] = doc["reported_date"]
+                parsed["accepted_date"] = doc["accepted_date"]
+                if not parsed["recipient"]:
+                    self._print_dic(parsed)
+                    self._logger.debug("---\n")
+                else:
+                    self._print_out("recipient", doc["recipient"])
+                    self._print_out("found", parsed["recipient"])
+                    self._print_out("donee_type", parsed["donee_type"])
+                    self._print_out("donor_name", doc["donor_name"])
+                    self._print_out("found_name", parsed["donor_name"])
+                    self._print_out("donor_type", parsed["donor_type"])
+                    #self._print_out("value", parsed["value"])
+                    self._logger.debug("---\n")
+                    self.db.save("%s_parse" % self.PREFIX, parsed)
 
-    def _get_recipient(self, entry, entry_type, recipient_type):
-        # TODO Veify entity extraction is working as expected
-        result = self._remove_extraneous(entry)
-        if entry_type == "MP - Member of Parliament":
-            result = self.resolver.find_mp(result)
-        elif entry_type == "Political Party" or \
-                recipient_type == "Political Party":
-            result = self.resolver.find_party(result)
+    def _get_recipient(self, candidate, entry_type, recipient_type):
+        # TODO Verify entity extraction is working as expected
+        found = None
+        clean = self._remove_extraneous(candidate)
+        if self._is_party(candidate, entry_type, recipient_type):
+            found = self.resolver.find_party(clean)
         else:
-            result = self.resolver.get_entities(result)
-        return result if result else entry
+            if self._is_mp(candidate, entry_type, recipient_type):
+                found = self.resolver.find_mp(clean)
+            elif self._is_lord(candidate):
+                found = self.resolver.find_lord(clean)
+        if not found:
+            found = self.resolver.get_entities(clean)
+        return candidate if found is None else found
 
     def _get_donor(self, entry, entry_type):
         result = self._remove_extraneous(entry)
         if entry_type == "Individual":
-            title = entry.split(" ")[0]
-            if title in self.lords_titles:
+            if self._is_lord(entry):
                 result = self.resolver.find_lord(result)
             else:
                 result = self.resolver.get_entities(result)
@@ -84,6 +89,33 @@ class ParsePartyFunding():
             return entry
         else:
             return result
+
+    @staticmethod
+    def _is_party(candidate, entry_type, recipient_type):
+        found = False
+        fields = [candidate, entry_type, recipient_type]
+        search = ["Political Party", "Party"]
+        for field in fields:
+            if any(party_search in field for party_search in search):
+                if "Third" not in field:
+                    found = True
+        return found
+
+    @staticmethod
+    def _is_mp(candidate, entry_type, recipient_type):
+        found = False
+        fields = [candidate, entry_type, recipient_type]
+        search = ["Member of Parliament", "MP"]
+        for field in fields:
+            if any(mp_search in field for mp_search in search):
+                found = True
+        return found
+
+    def _is_lord(self, candidate):
+        found = False
+        if any(title in candidate for title in self.lords_titles):
+            found = True
+        return found
 
     @staticmethod
     def _remove_broken_pound(text):

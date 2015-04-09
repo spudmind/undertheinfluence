@@ -25,8 +25,8 @@ class FetchPartyFunding:
 
     def run(self):
         self._logger.info("Fetching Electoral Commission party funding data ...")
-        # EC records start in 2001
-        year = 2001
+        # EC records start in 2001 (set to start collecting from 2005)
+        year = 2005
         fetched = False
         while year <= datetime.now().year:
             filename = os.path.join(self.STORE_DIR, "ec-%s.csv" % year)
@@ -74,6 +74,7 @@ class FetchPartyFunding:
             for csv_line in csv_gen:
                 f.write(csv_line)
         return fetched
+
 
 def fetch(**kwargs):
     FetchPartyFunding(**kwargs).run()

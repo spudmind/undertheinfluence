@@ -24,6 +24,7 @@ class MasterEntitiesResolver:
         self._mapped_positions = config.mapped_positions
         self._position_entities = config.position_entities
         self._mapped_mps = config.mapped_mps
+        self._mp_entities = config.mp_entities
         self._mapped_influencers = config.mapped_influencers
         self._mapped_lords = config.mapped_lords
         self._influencer_entities = config.influencer_entities
@@ -52,23 +53,28 @@ class MasterEntitiesResolver:
 
     def find_mp(self, search):
         found = False
-        search = self._strip_prefix_sufix(search)
-        if isinstance(self._master_mps, list):
-            guess, accuracy = fuzzy_match.extractOne(search, self._master_mps)
-            if accuracy > 80:
+        name = self._strip_prefix_sufix(search)
+        for entry in self._mp_entities:
+            if entry in name:
                 found = True
-                search = guess
+                name = entry
+        if not found:
+            if isinstance(self._master_mps, list):
+                guess, accuracy = fuzzy_match.extractOne(name, self._master_mps)
+                if accuracy > 80:
+                    found = True
+                    name = guess
         for incorrect, correct in self._mapped_mps:
-            if incorrect in search or incorrect == search:
+            if incorrect in name or incorrect == name:
                 found = True
-                search = correct
-        return search if found else None
+                name = correct
+        return name if found else None
 
     def find_lord(self, search):
         found = False
         if isinstance(self._master_lords, list):
             guess, accuracy = fuzzy_match.extractOne(search, self._master_lords)
-            if accuracy > 80:
+            if accuracy > 90:
                 found = True
                 search = guess
         for incorrect, correct in self._mapped_lords:

@@ -63,10 +63,13 @@ class ParseMeetings():
             if "purpose" in meeting:
                 purpose = meeting["purpose"]
 
-            position = self._resolve_position(host["position"])
-            if host["position"] != position:
-                self._logger.debug("\n*** %s" % host["position"])
-                self._logger.debug("*** %s\n" % position)
+            if host["position"]:
+                position = self._resolve_position(host["position"])
+                if host["position"] != position:
+                    self._logger.debug("\n*** %s" % host["position"])
+                    self._logger.debug("*** %s\n" % position)
+            else:
+                position = None
 
             entry = {
                 "title": meeting["title"],

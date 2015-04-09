@@ -63,7 +63,14 @@ class MasterEntitiesParser:
             "Minister for Tourism and Heritage",
             "Minister for Sport and the Olympics",
             "Minister for Culture, Communications and Creative Industries",
-            "Minister for Defence Equipment, Support and Technology"
+            "Minister for Defence Equipment, Support and Technology",
+            "Minister for Defence Personnel, Welfare and Veterans",
+            "Minister for International Security Strategy",
+            "Parliamentary Under-Secretary of State",
+            "Secretary of State for Scotland",
+            "Solicitor General",
+            "Parliamentary Under Secretary of State (Minister for Culture, Communications and Creative Industries)",
+            "Parliamentary Under Secretary of State (Business, Innovation and Skills)",
         ]
         _all_mps = self.db.fetch_all('mps_scrape', paged=False)
         all_positions = []

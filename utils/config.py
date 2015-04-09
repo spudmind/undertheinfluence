@@ -32,6 +32,10 @@ mapped_positions = [
         u"Parliamentary Under Secretary of State (Minister for Employment Relations",
         u"Parliamentary Under Secretary of State (Minister for Employment Relations, Consumer and Postal Affairs)"
     ),
+    (
+        u"Parliamentary Secretary for Business, Innovation and Skills Parliamentary Under Secretary of State",
+        u"Parliamentary Secretary (Business, Innovation and Skills)"
+    )
 ]
 
 position_entities = [

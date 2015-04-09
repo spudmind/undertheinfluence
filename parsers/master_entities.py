@@ -55,6 +55,7 @@ class MasterEntitiesParser:
         self.db.drop("master_positions")
         additional = [
             "Secretary of State",
+            "Minister of State",
             "Secretary of State for Business, Innovation & Skills and President of the Board of Trade",
             "Minister of State (Business and Enterprise)",
             "Minister of State (Further Education, Skills and Lifelong Learning)",
@@ -69,8 +70,19 @@ class MasterEntitiesParser:
             "Parliamentary Under-Secretary of State",
             "Secretary of State for Scotland",
             "Solicitor General",
-            "Parliamentary Under Secretary of State (Minister for Culture, Communications and Creative Industries)",
-            "Parliamentary Under Secretary of State (Business, Innovation and Skills)",
+            "Parliamentary Under-Secretary of State (Minister for Culture, Communications and Creative Industries)",
+            "Parliamentary Under-Secretary of State (Business, Innovation and Skills)",
+            "Under-Secretary of State and the Lords spokesman on Defence",
+            "Departments and Agencies, Non-departmental public bodies, Government reviewers",
+            "Secretary of State for Culture, Olympics, Media and Sport",
+            "Minister for Culture, Communications and Communications",
+            "Minister of State for the Armed Forces",
+            "Parliamentary Under-Secretary of State for Transport",
+            "Secretary of State for Transport",
+            "Parliamentary Secretary (Business, Innovation and Skills)",
+            "Parliamentary Under-Secretary of State (Employment Relations, Consumer and Postal Affairs)",
+            "Minister of State for Skills and Enterprise (Skills jointly with the Department for Education)",
+            "Parliamentary Under-Secretary of State (Employment Relations, Consumer Affairs)"
         ]
         _all_mps = self.db.fetch_all('mps_scrape', paged=False)
         all_positions = []

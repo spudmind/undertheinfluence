@@ -46,7 +46,7 @@ class FetchLordsInterests:
             if not self.dryrun:
                 self._logger.info("  Fetching JSON for %s-%s ..." % year_range)
                 r = requests.get(url, headers=headers)
-                fetched = datetime.datetime.now()
+                fetched = str(datetime.datetime.now())
                 time.sleep(0.5)
                 full_path = os.path.join(self.current_path, self.STORE_DIR, filename)
                 with open(full_path, "w") as f:

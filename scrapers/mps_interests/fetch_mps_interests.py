@@ -46,7 +46,7 @@ class FetchMPsInterests:
                 "source": {
                     "url": None,  # TODO: this is a bit tricky to discern
                     "linked_from_url": self.LINKED_FROM_URL,
-                    "fetched": datetime.fromtimestamp(int(timestamp)),
+                    "fetched": str(datetime.fromtimestamp(int(timestamp))),
                 },
             }
             self.db.update(self.COLLECTION_NAME, {"date": date}, meta, upsert=True)
@@ -80,7 +80,7 @@ class FetchMPsInterests:
                 "source": {
                     "url": None,
                     "linked_from_url": self.LINKED_FROM_URL,
-                    "fetched": datetime.fromtimestamp(int(timestamp)),
+                    "fetched": str(datetime.fromtimestamp(int(timestamp))),
                 },
             }
             self.db.save(self.COLLECTION_NAME, meta)

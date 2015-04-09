@@ -259,7 +259,11 @@ influencer_entities = [
     u"German Industry UK",
     u"Rathlin Energy",
     u"Tamboran",
-    u"Cuadrilla"
+    u"Cuadrilla",
+    u"Independent Kidderminster Hospital and Health Concern",
+    u"Unite Against Fascism",
+    u"Muslim Friends Of Labour",
+    u"The Yeovil C.I.F. Trust Fund"
 ]
 
 mapped_influencers = [
@@ -324,7 +328,7 @@ mapped_influencers = [
     (u"Bbc", u"BBC"),
     (u"Ministry of Sound Group Ltd", u"Ministry of Sound"),
     (u"Ibm", u"IBM"),
-    (u"Unite", u"Unite the Union"),
+    #(u"Unite", u"Unite the Union"),
 ]
 
 
@@ -354,12 +358,22 @@ party_entities = [
     u"Co-operative Party",
     u"We Demand A Referendum Now",
     u"BNP",
-    u"Respect"
+    u"Respect",
     u"British National Party",
     u"NO2EU",
     u"English Democrats",
     u"Crossbench",
-    u"Bishop"
+    u"Bishop",
+    u"Scottish Socialist Party",
+    u"The Progressive Democratic Party",
+    u"The Liberal Party",
+    u"Scottish Green Party",
+    u"The People's Alliance",
+    u"Legalise Cannabis Alliance",
+    u"Christian Peoples Alliance",
+    u"The New Party",
+    u"ProLife",
+    u"The Blah Party"
 ]
 
 mapped_lobbyists = [
@@ -424,8 +438,15 @@ mapped_mps = [
     (u"Jeffrey M Donaldson", u"Jeffrey Donaldson"),
     (u"Edward Miliband", u"Ed Miliband"),
     (u"Edward Milliband", u"Ed Miliband"),
-    (u"Edward Balls", u"Ed Balls")
+    (u"Edward Balls", u"Ed Balls"),
+    (u"Michael Denzil Xavier Portillo", u"Michael Portillo"),
+    (u"Christopher Huhne", u"Chris Huhne"),
 ]
+
+mp_entities = [
+    u"Michael Denzil Xavier Portillo"
+]
+
 
 mapped_parties = [
     (u"DUP", u"Democratic Unionist Party"),

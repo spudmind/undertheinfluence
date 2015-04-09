@@ -5,7 +5,9 @@ from utils import entity_resolver
 resolver = entity_resolver.MasterEntitiesResolver()
 
 #test_entry = "Lord na Lester"
-test_entry = "The Rt Hon Vincent Cable MP"
+#test_entry = "The Rt Hon Vincent Cable MP"
+#test_entry = "Michael Denzil Xavier Portillo"
+test_entry = "The Rt Hon Sir Menzies Campbell QC"
 test_type = "MP"
 test_recipient = None
 
@@ -15,24 +17,11 @@ def parse_entities(entry):
     return result
 
 
-def parse_recipient(entry, entry_type, recipient_type):
-    print "Searching:", entry
-    if entry_type == "MP":
-        print "*trying mp search"
-        result = resolver.find_mp(entry)
-    elif entry_type == "Lord":
-        print "*trying lord search"
-        result = resolver.find_lord(entry)
-    elif entry_type == "Political Party" or \
-            recipient_type == "Political Party":
-        print "*trying political party search"
-        result = resolver.find_party(entry)
-    else:
-        print "*trying entity search"
-        result = resolver.get_entities(entry)
-        if result and isinstance(result, list):
-            result = result[0]
-    return result
+def parse_recipient(entry):
+    print "*trying mp search:", resolver.find_mp(entry)
+    print "*trying lord search:", resolver.find_lord(entry)
+    print "*trying party search:", resolver.find_party(entry)
+    print "*trying entity search:", resolver.get_entities(entry)
 
 
 def node_properties_test():
@@ -54,7 +43,7 @@ def node_properties_test():
     }
     new_me.set_recipient_details(extra_details)
 
-print "found:", parse_recipient(test_entry, test_type, test_recipient)
-print "found:", parse_entities(test_entry)
+parse_recipient(test_entry)
+#print "found:", parse_entities(test_entry)
 #node_properties_test()
 

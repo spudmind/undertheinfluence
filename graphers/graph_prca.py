@@ -12,22 +12,13 @@ class GraphPrca():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
-        self._logger.debug("\n\nGraphing PRCA")
         self.PREFIX = "prca"
 
     def run(self):
+        self._logger.debug("\n\nGraphing PRCA")
         all_lobbyists = self.db.fetch_all("%s_parse" % self.PREFIX, paged=False)
         for doc in all_lobbyists:
 
-            self.d = {
-                "lobby_agency": doc["mp"],
-                "source_url": doc["source"]["url"],
-                "source_linked_from": doc["source"]["linked_from_url"],
-                "source_fetched": doc["source"]["fetched"],
-                "meta": doc["meta"],
-                "from_date": doc["date_range"][0],
-                "to_date": doc["date_range"][1]
-            }
             name = doc["name"]
             self._logger.debug("\nLobby Agency: %s" % name)
 
@@ -40,6 +31,16 @@ class GraphPrca():
                 "contact_details": doc["contact_details"]
             }
             lobby_firm.set_lobbyist_details(lobby_props)
+
+            self.d = {
+                "lobby_agency": doc["name"],
+                "source_url": doc["source"]["url"],
+                "source_linked_from": doc["source"]["linked_from_url"],
+                "source_fetched": doc["source"]["fetched"],
+                "meta": doc["meta"],
+                "from_date": doc["date_range"][0],
+                "to_date": doc["date_range"][1]
+            }
 
             self._create_clients(lobby_firm, doc["clients"])
             self._create_staff(lobby_firm, doc["staff"])

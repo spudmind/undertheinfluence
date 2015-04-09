@@ -244,8 +244,10 @@ influencer_entities = [
     u"TRaC Defence and Aerospace Laboratory",
     u"Howard League for Penal Reform",
     u"Stoke on Trent City Council",
-    u"German Industry UK"
-
+    u"German Industry UK",
+    u"Rathlin Energy",
+    u"Tamboran",
+    u"Cuadrilla"
 ]
 
 mapped_influencers = [
@@ -397,6 +399,7 @@ mapped_lobbyists = [
     (u"The Communications Group", u"The Communication Group"),
     (u"The Whitehouse Consultancy", u"The Whitehouse Consultancy Ltd"),
     (u"Ebay UK Ltd", u"eBay UK Ltd"),
+    (u"Weber Shandwick", u"Weber Shandwick Public Affairs"),
 ]
 
 mapped_mps = [

@@ -66,7 +66,7 @@ class ParsePrca:
                     self._logger.debug("* %s" % entry)
             else:
                 self._logger.debug(">>>>> no data: %s" % entry)
-        return [x for x in client_list if len(x) > 1]
+        return [self._resolve_influencer(x) for x in client_list if len(x) > 1]
 
     def _parse_staff(self, staff):
         self._logger.debug("... Parsing Staff")
@@ -81,6 +81,10 @@ class ParsePrca:
             else:
                 self._logger.debug(">>>>> no data: %s" % entry)
         return [x for x in staff_list if len(x) > 1]
+
+    def _resolve_influencer(self, candidate):
+        name = self.resolver.find_influencer(candidate)
+        return candidate if name is None else name
 
     def _parse_list(self, entries):
         new_list = []

@@ -42,12 +42,16 @@ class ParseAppc:
         client_list = []
         for client_type in types:
             for client in clients[client_type]:
-                self._logger.debug("* %s" % self._normalize_text(client["name"]))
+                found = self._resolve_influencer(
+                    self._normalize_text(client["name"])
+                )
+                self._logger.debug("* %s" % found)
                 entry = {
-                    "name": self._normalize_text(client["name"]),
+                    "name": found,
                     "client_type": client_type,
                     "description": client["description"]
                 }
+
                 client_list.append(entry)
         return client_list
 
@@ -68,6 +72,10 @@ class ParseAppc:
     def _parse_countries(self, countries):
         self._logger.debug("... Parsing Staff")
         return [self._normalize_text(x) for x in countries]
+
+    def _resolve_influencer(self, candidate):
+        name = self.resolver.find_influencer(candidate)
+        return candidate if name is None else name
 
     @staticmethod
     def _collapse_list(content):

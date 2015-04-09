@@ -53,6 +53,37 @@ class MasterEntitiesParser:
 
     def create_positions(self):
         self.db.drop("master_positions")
+        additional = [
+            "Secretary of State",
+            "Minister of State",
+            "Secretary of State for Business, Innovation & Skills and President of the Board of Trade",
+            "Minister of State (Business and Enterprise)",
+            "Minister of State (Further Education, Skills and Lifelong Learning)",
+            "Minister of State (Trade and Investment)",
+            "Minister for Sport and Tourism",
+            "Minister for Tourism and Heritage",
+            "Minister for Sport and the Olympics",
+            "Minister for Culture, Communications and Creative Industries",
+            "Minister for Defence Equipment, Support and Technology",
+            "Minister for Defence Personnel, Welfare and Veterans",
+            "Minister for International Security Strategy",
+            "Parliamentary Under-Secretary of State",
+            "Secretary of State for Scotland",
+            "Solicitor General",
+            "Parliamentary Under-Secretary of State (Minister for Culture, Communications and Creative Industries)",
+            "Parliamentary Under-Secretary of State (Business, Innovation and Skills)",
+            "Under-Secretary of State and the Lords spokesman on Defence",
+            "Departments and Agencies, Non-departmental public bodies, Government reviewers",
+            "Secretary of State for Culture, Olympics, Media and Sport",
+            "Minister for Culture, Communications and Communications",
+            "Minister of State for the Armed Forces",
+            "Parliamentary Under-Secretary of State for Transport",
+            "Secretary of State for Transport",
+            "Parliamentary Secretary (Business, Innovation and Skills)",
+            "Parliamentary Under-Secretary of State (Employment Relations, Consumer and Postal Affairs)",
+            "Minister of State for Skills and Enterprise (Skills jointly with the Department for Education)",
+            "Parliamentary Under-Secretary of State (Employment Relations, Consumer Affairs)"
+        ]
         _all_mps = self.db.fetch_all('mps_scrape', paged=False)
         all_positions = []
         for mp in _all_mps:
@@ -63,6 +94,9 @@ class MasterEntitiesParser:
                         all_positions = all_positions + positions
         all_positions = list(set(all_positions))
         for position in all_positions:
+            self._print_out("position", position)
+            self.db.save('master_positions', {"position": position})
+        for position in additional:
             self._print_out("position", position)
             self.db.save('master_positions', {"position": position})
 

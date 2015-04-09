@@ -62,11 +62,20 @@ class ParseMeetings():
                 date = meeting["date"]
             if "purpose" in meeting:
                 purpose = meeting["purpose"]
+
+            if host["position"]:
+                position = self._resolve_position(host["position"])
+                if host["position"] != position:
+                    self._logger.debug("\n*** %s" % host["position"])
+                    self._logger.debug("*** %s\n" % position)
+            else:
+                position = None
+
             entry = {
                 "title": meeting["title"],
                 "department": meeting["department"],
                 "host_name": host["name"],
-                "host_position": host["position"],
+                "host_position": position,
                 "organisation": org,
                 "date": date,
                 "source": meeting["source"],
@@ -78,12 +87,6 @@ class ParseMeetings():
                 if problem == org:
                     print "\n\n", meeting, "\n\n"
             self.db.save("%s_parse" % self.PREFIX, entry)
-
-    def _parse_secretarial(self, meeting):
-        if "name" in meeting:
-            print meeting["name"]
-            print self._resolve_name(meeting["name"])
-            print "---\n"
 
     def _parse_organisation(self, org_string):
         separators = ["/", ",", ";", "\n", "-"]
@@ -156,9 +159,10 @@ class ParseMeetings():
         return name, position
 
     def _resolve_influencer(self, candidate):
+        name = None
         if "mp" in candidate.lower():
             name = self._resolve_politician(candidate)
-        else:
+        if not name:
             name = self.resolver.find_influencer(candidate)
         return candidate if name is None else name
 
@@ -171,6 +175,10 @@ class ParseMeetings():
 
     def _resolve_name(self, candidate):
         name = self.resolver.get_entities(candidate)
+        return candidate if name is None else name
+
+    def _resolve_position(self, candidate):
+        name = self.resolver.find_position(candidate)
         return candidate if name is None else name
 
 

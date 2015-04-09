@@ -22,6 +22,7 @@ class MasterEntitiesResolver:
             x["position"] for x in self._db.fetch_all('master_positions', paged=False)
         ]
         self._mapped_positions = config.mapped_positions
+        self._position_entities = config.position_entities
         self._mapped_mps = config.mapped_mps
         self._mapped_influencers = config.mapped_influencers
         self._mapped_lords = config.mapped_lords
@@ -77,17 +78,19 @@ class MasterEntitiesResolver:
         return search if found else None
 
     def find_position(self, search):
-        found = False
-        if isinstance(self._master_lords, list):
-            guess, accuracy = fuzzy_match.extractOne(search, self._master_positions)
-            if accuracy > 80:
-                found = True
-                search = guess
+        name = None
+        for entry in self._position_entities:
+            if entry in search:
+                name = entry
+        if not name:
+            if isinstance(self._master_lords, list):
+                guess, accuracy = fuzzy_match.extractOne(search, self._master_positions)
+                if accuracy > 80:
+                    name = guess
         for incorrect, correct in self._mapped_positions:
             if incorrect in search:
-                found = True
-                search = correct
-        return search if found else None
+                name = correct
+        return name
 
     def find_party(self, search):
         name = None

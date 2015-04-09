@@ -24,7 +24,7 @@ class ScrapeMPsInterests:
 
     def scrape_xml(self, meta):
         # the hierarchy of the file to be scraped is:
-        # regmem /member name > category > record > items
+        # regmem category > record > items
         # regmem contains 1 or more categories
         # category contains one or more records
         # record is the registered interest & is comprised of many items
@@ -48,17 +48,15 @@ class ScrapeMPsInterests:
                     }
                     categories.append(cat_data)
             self._logger.debug("\n---")
-            mp_data = {
+
+            data = {
                 "mp": mp.attrib["membername"],
-                "interests": categories
+                "interests": categories,
+                "date": meta["date"],
+                "source": meta["source"],
             }
-            contents.append(mp_data)
-        data = {
-            "contents": contents,
-            "date": meta["date"],
-            "source": meta["source"],
-        }
-        self.db.update("%s_scrape" % self.PREFIX, {"date": meta["date"]}, data)
+
+            self.db.save("%s_scrape" % self.PREFIX, data)
 
     def scrape_category(self, category):
         self._logger.debug("\t *%s" % category.attrib["name"].strip())

@@ -7,7 +7,7 @@ resolver = entity_resolver.MasterEntitiesResolver()
 #test_entry = "Lord na Lester"
 #test_entry = "The Rt Hon Vincent Cable MP"
 #test_entry = "Michael Denzil Xavier Portillo"
-test_entry = "The Rt Hon Sir Menzies Campbell QC"
+test_entry = "The Rt Hon Charles Kennedy MP"
 test_type = "MP"
 test_recipient = None
 

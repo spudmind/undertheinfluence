@@ -43,6 +43,7 @@ class ParsePartyFunding():
                 parsed["received_date"] = doc["received_date"]
                 parsed["reported_date"] = doc["reported_date"]
                 parsed["accepted_date"] = doc["accepted_date"]
+                parsed["source"] = doc["source"]
                 if not parsed["recipient"]:
                     self._print_dic(parsed)
                     self._logger.debug("---\n")

@@ -328,7 +328,9 @@ mapped_influencers = [
     (u"Bbc", u"BBC"),
     (u"Ministry of Sound Group Ltd", u"Ministry of Sound"),
     (u"Ibm", u"IBM"),
-    #(u"Unite", u"Unite the Union"),
+    (u"TBWA\LONDON", u"TBWA LONDON"),
+    (u"MIdlands Industrial Council", u"Midlands Industrial Council"),
+    (u"Midland Industrial Council", u"Midlands Industrial Council"),
 ]
 
 

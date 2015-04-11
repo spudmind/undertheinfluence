@@ -30,7 +30,7 @@ class GraphPartyFunding():
             donor = self._get_donor(donor, doc)
             donation = self._create_donation(doc)
 
-            d = {
+            self.current = {
                 "source_url": doc["source"]["url"],
                 "source_linked_from": doc["source"]["linked_from_url"],
                 "source_fetched": str(doc["source"]["fetched"]),
@@ -39,7 +39,6 @@ class GraphPartyFunding():
             recipient.link_funding_category(funding_relationship)
             funding_relationship.link_donor(donor)
             funding_relationship.link_funding(donation)
-            funding_relationship.update_raw_record(json.dumps(d))
 
     def _get_recipient(self, name, entry):
         new_recipient = DonationRecipient(name)
@@ -73,10 +72,10 @@ class GraphPartyFunding():
 
         props = {
             "donor_type": entry["donor_type"],
-            "company_reg": entry["company_reg"],
-            "data_source": "electoral_commission"
+            "company_reg": entry["company_reg"]
         }
         new_donor.set_donor_details(props)
+        new_donor.set_donor_details(self.current)
         return new_donor
 
     def _create_donation(self, entry):
@@ -108,6 +107,7 @@ class GraphPartyFunding():
             "6212": entry["6212"]
         }
         new_donation.set_donations_details(props)
+        new_donation.set_donations_details(self.current)
         new_donation.set_dates(
             entry["received_date"],
             entry["reported_date"],

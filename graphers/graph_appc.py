@@ -88,7 +88,6 @@ class GraphAppc():
                 relationship.link_staff(staff)
                 relationship.set_from_date(self.d["from_date"])
                 relationship.set_to_date(self.d["to_date"])
-                relationship.update_raw_record(json.dumps(self.d))
 
     def _create_relationship(self, firm, name, connection):
         props = {"lobbying_firm": firm, connection: name}

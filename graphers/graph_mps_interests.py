@@ -4,7 +4,7 @@ import json
 from data_models.influencers_models import FundingRelationship
 from data_models.influencers_models import InterestCategory
 from data_models.influencers_models import RegisteredInterest
-from data_models.influencers_models import Remuneration
+from data_models.influencers_models import InterestDetail
 from utils import mongo
 from data_models import government_models
 
@@ -41,9 +41,12 @@ class GraphMPsInterests():
         self._logger.debug(node["mp"])
         self._logger.debug("..................")
 
+        # UNCOMMENT
         mp = self._find_mp(node["mp"])
 
-        self._parse_categories(mp, node["interests"])
+        # UNCOMMENT
+        # self._parse_categories(mp, node["interests"])
+        self._parse_categories(node["interests"])
 
     def _find_mp(self, mp):
         new_mp = self.data_models.MemberOfParliament(mp)
@@ -53,67 +56,162 @@ class GraphMPsInterests():
             new_mp.set_mp_details({"data_source": "register_of_interests"})
         return new_mp
 
-    def _parse_categories(self, mp, categories):
+    def _parse_categories(self, categories):
+    # UNCOMMENT
+    # def _parse_categories(self, mp, categories):
         for category in categories:
-            category_name = category["category_name"]
 
-            self.current_detail["category"] = category_name
-            new_category = self._create_category(mp.name, category_name)
-            mp.link_interest_category(new_category)
+            self.current_detail["category"] = category["category_name"]
+            category_name = category["category_name"]
+            # UNCOMMENT
+            # new_category = self._create_category(mp.name, category_name)
+            # mp.link_interest_category(new_category)
 
             if category_name == "Directorships":
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_list(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated directorships":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_list(category_name, category["category_records"])
+                self._logger.debug(category_name)
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession etc":  # done
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_list(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Remunerated employment, office, profession, etc_":  # done
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_list(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Clients":
-                #continue
+                # TODO come back to this
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Land and Property":
-                #continue
-                self._create_graph(new_category, category["category_records"])
+                pass
             elif category_name == "Shareholdings":
-                #continue
-                self._create_graph(new_category, category["category_records"])
+                continue
+                self._logger.debug(category_name)
+                print category["category_records"]
+                self._graph_unstructured(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Registrable shareholdings":
-                #continue
-                self._create_graph(new_category, category["category_records"])
+                continue
+                print category["category_records"]
+                self._graph_unstructured(category_name, category["category_records"])
+                self._logger.debug(category_name)
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorships":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_sponsorship(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Sponsorship or financial or material support":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_sponsorship(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Overseas visits":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_travel(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_gifts(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Gifts, benefits and hospitality (UK)":
-                #continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_gifts(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             elif category_name == "Miscellaneous":
-                #continue
+                continue
                 self._logger.debug(category_name)
-                self._create_graph(new_category, category["category_records"])
+                self._graph_unstructured(category_name, category["category_records"])
+                # self._create_graph(new_category, category["category_records"])
             self._logger.debug("*")
+
+    def _graph_list(self, category, records):
+        if records:
+            self._print_out("recorded_date", self.current_detail["recorded_date"])
+            for record in records:
+                if record["interest"] and record["interest"] != "None":
+                    print "\n\n"
+
+                    if len(record["remuneration"]) > 0:
+                        for entry in record["remuneration"]:
+                            print category, record["interest"], entry["amount"], entry["received"], entry["registered"]
+                    else:
+                        print category, record["interest"]
+                    self._print_out("\nraw_record", record["raw_record"])
+
+    def _graph_unstructured(self, category, records):
+        for record in records:
+            print "\n\n"
+            if record["registered"]:
+                if len(record["registered"]) == 1:
+                    date = record["registered"][0]
+                else:
+                    date = record["registered"][-1]
+                print category, record["interest"], date
+            else:
+                print category, record["interest"]
+            self._print_out("\nraw_record", record["raw_record"])
+
+    def _graph_sponsorship(self, category, records):
+        for record in records:
+            print "\n\n-"
+            if record["registered"]:
+                if len(record["registered"]) == 1:
+                    date = record["registered"][0]
+                else:
+                    date = record["registered"][-1]
+                for payment in record["remuneration"]:
+                    print "-->", category, record["interest"], date, payment
+            else:
+                print record
+                for payment in record["remuneration"]:
+                    print "--->", category, record["interest"], payment
+            self._print_out("\nraw_record", record["raw_record"])
+
+    def _graph_travel(self, category, records):
+        for record in records:
+            print "\n\n-"
+            if record["registered"] and len(record["registered"]) == 1:
+                date = record["registered"][0]
+            else:
+                date = record["registered"]
+            if len(record["remuneration"]) > 0:
+                for payment in record["remuneration"]:
+                    print category, record["interest"], payment, date
+            else:
+                print category, record["interest"]
+            self._print_out("\nraw_record", record["raw_record"])
+
+    def _graph_gifts(self, category, records):
+        self._print_out("recorded_date", self.current_detail["recorded_date"])
+        for record in records:
+            print "\n\n"
+            if record["registered"]:
+                if len(record["registered"]) == 1:
+                    date = record["registered"][0]
+                else:
+                    date = record["registered"][-1]
+            else:
+                date = None
+            if record["remuneration"] and len(record["remuneration"]) > 0:
+                for payment in record["remuneration"]:
+                    print category, record["interest"], payment, date
+            else:
+                print category, record["interest"]
+            self._print_out("\nraw_record", record["raw_record"])
 
     def _create_graph(self, category, records):
         if records:
@@ -201,7 +299,7 @@ class GraphMPsInterests():
             summary = u"{} - £{} - {}".format(
                 context, amount, payment_details["received"]
             )
-            payment = Remuneration(summary)
+            payment = InterestDetail(summary)
             payment.create()
             payment.set_remuneration_details(payment_details)
             payment.set_remuneration_details({"amount": int_amount})
@@ -216,7 +314,7 @@ class GraphMPsInterests():
                     context, payment, u"Unknown"
                 )
                 int_amount = self.convert_to_number(payment)
-                payment = Remuneration(summary)
+                payment = InterestDetail(summary)
                 payment.create()
                 relationship.link_payment(payment)
                 payment.set_remuneration_details({"amount": int_amount})
@@ -225,7 +323,7 @@ class GraphMPsInterests():
                 context, payment_details, u"Unknown"
             )
             int_amount = self.convert_to_number(payment_details)
-            payment = Remuneration(summary)
+            payment = InterestDetail(summary)
             payment.create()
             relationship.link_payment(payment)
             payment.set_remuneration_details({"amount": int_amount})

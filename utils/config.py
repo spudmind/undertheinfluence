@@ -50,7 +50,7 @@ influencer_entities = [
     u"YouGov",
     u"ComRes",
     u"Guardian Media Group"
-    u"Social Investment Business Group",
+    u"Social Investment Business",
     u"Mansfeider Kupfer Und Messing GMBH",
     u"Pembroke VCT plc",
     u"Woodlands Schools Ltd",
@@ -263,7 +263,25 @@ influencer_entities = [
     u"Independent Kidderminster Hospital and Health Concern",
     u"Unite Against Fascism",
     u"Muslim Friends Of Labour",
-    u"The Yeovil C.I.F. Trust Fund"
+    u"The Yeovil C.I.F. Trust Fund",
+    u"Danczuk’s Delicatessen Ltd",
+    u"Somerset Capital Management LLP",
+    u"African Speciality Products Ltd",
+    u"Bedford and Kempston Conservative Association",
+    u"Morley and Outwood CLP",
+    u"British Olympic Association",
+    u"Australia Israel Cultural Exchange",
+    u"Israeli Ministry of Foreign Affairs",
+    u"The Council for European Palestinian Relations",
+    u'Carlton Club',
+    u"Excelsior Properties Ltd",
+    u"LOCOG",
+    u"UK Music",
+    u"Ladbrokes Betting and Gaming Ltd",
+    u"Nestlé UK",
+    u"Japan Tobacco International",
+    u"BP International Limited"
+
 ]
 
 mapped_influencers = [
@@ -331,6 +349,7 @@ mapped_influencers = [
     (u"TBWA\LONDON", u"TBWA LONDON"),
     (u"MIdlands Industrial Council", u"Midlands Industrial Council"),
     (u"Midland Industrial Council", u"Midlands Industrial Council"),
+    (u"Social Investment Business", u"Social Investment Business Group"),
 ]
 
 

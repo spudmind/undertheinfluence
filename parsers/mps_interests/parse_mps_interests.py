@@ -89,7 +89,8 @@ class ParseMPsInterests:
             return self._parse_clients(record)
             #pass
         elif category_name == "Land and Property":
-            return self._parse_land_ownership(record)
+            pass
+            #return self._parse_land_ownership(record)
             #pass
         elif category_name == "Shareholdings":
             return self._parse_unstructured_record(record)
@@ -326,6 +327,8 @@ class ParseMPsInterests:
             full_record = u"\n".join([item for item in record])
             if len(record) == 7:
                 interest_name = self.resolver.find_influencer(record[0])
+                if not interest_name and ":" in record[0]:
+                    interest_name = self._split_if_colon(record[0])
                 amount = [y for x, y in self._find_money(record[2])]
                 nature = self._split_if_colon(record[2])
                 receipt = self._find_dates(record[3])

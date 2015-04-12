@@ -718,11 +718,11 @@ class RegisteredDonation(BaseDataModel):
         self.set_date(date, "ACCEPTED")
 
 
-class Remuneration(BaseDataModel):
+class InterestDetail(BaseDataModel):
     def __init__(self, summary=None):
         BaseDataModel.__init__(self)
         self.exists = False
-        self.label = "Remuneration"
+        self.label = "Interest Detail"
         self.primary_attribute = "summary"
         self.summary = summary
         self.exists = self.fetch(
@@ -739,7 +739,7 @@ class Remuneration(BaseDataModel):
         self.exists = True
 
     def set_remuneration_details(self, properties=None):
-        labels = ["Remuneration", "Contributions"]
+        labels = ["Interest Detail", "Contributions"]
         self.set_node_properties(properties, labels)
 
     def set_registered_date(self, date):

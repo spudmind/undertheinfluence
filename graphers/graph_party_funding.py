@@ -38,7 +38,7 @@ class GraphPartyFunding():
             donation = self._create_donation(doc)
 
             recipient.link_funding_category(funding_relationship)
-            funding_relationship.link_donor(donor)
+            funding_relationship.link_contributor(donor)
             funding_relationship.link_funding(donation)
 
     def _get_recipient(self, name, entry):
@@ -63,7 +63,7 @@ class GraphPartyFunding():
             new_relationship.create()
 
         props = {"recipient": name, "donor": donor}
-        new_relationship.set_category_details(props)
+        new_relationship.set_relationship_details(props)
         return new_relationship
 
     def _get_donor(self, name, entry):

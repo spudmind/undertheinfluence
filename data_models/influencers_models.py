@@ -588,7 +588,7 @@ class FundingRelationship(BaseDataModel):
         )
         self.exists = True
 
-    def set_category_details(self, properties=None):
+    def set_relationship_details(self, properties=None):
         self.set_node_properties(properties)
 
     def update_raw_record(self, raw_record):
@@ -600,7 +600,7 @@ class FundingRelationship(BaseDataModel):
         self.vertex["raw_record"] = new
         self.vertex.push()
 
-    def link_donor(self, donor):
+    def link_contributor(self, donor):
         self.create_relationship(
             self.vertex, "REGISTERED_CONTRIBUTOR", donor.vertex
         )
@@ -610,12 +610,17 @@ class FundingRelationship(BaseDataModel):
             self.vertex, "DONATION_RECEIVED", funding.vertex
         )
 
-    def link_payment(self, payment):
+    def link_interest_detail(self, payment):
         self.create_relationship(
             self.vertex, "REMUNERATION_RECEIVED", payment.vertex
         )
 
     def set_registered_date(self, date):
+        self.set_node_properties({"registered": date})
+        self.set_date(date, "REGISTERED")
+
+    def set_received_date(self, date):
+        self.set_node_properties({"received": date})
         self.set_date(date, "REGISTERED")
 
 
@@ -738,7 +743,16 @@ class InterestDetail(BaseDataModel):
         )
         self.exists = True
 
-    def set_remuneration_details(self, properties=None):
+    def update_raw_record(self, raw_record):
+        existing = self.vertex["raw_record"]
+        if existing and len(existing) > 0:
+            new = u"{}\n---\n\n{}".format(existing, raw_record)
+        else:
+            new = raw_record
+        self.vertex["raw_record"] = new
+        self.vertex.push()
+
+    def set_interest_details(self, properties=None):
         labels = ["Interest Detail", "Contributions"]
         self.set_node_properties(properties, labels)
 

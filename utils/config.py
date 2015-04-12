@@ -272,7 +272,7 @@ influencer_entities = [
     u"British Olympic Association",
     u"Australia Israel Cultural Exchange",
     u"Israeli Ministry of Foreign Affairs",
-    u"The Council for European Palestinian Relations",
+    u"Council for European Palestinian Relations",
     u'Carlton Club',
     u"Excelsior Properties Ltd",
     u"LOCOG",
@@ -350,6 +350,7 @@ mapped_influencers = [
     (u"MIdlands Industrial Council", u"Midlands Industrial Council"),
     (u"Midland Industrial Council", u"Midlands Industrial Council"),
     (u"Social Investment Business", u"Social Investment Business Group"),
+    (u"JTI", u"Japan Tobacco International"),
 ]
 
 

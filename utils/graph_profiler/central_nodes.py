@@ -15,7 +15,7 @@ class CentralNodes(DataProfiler):
             ("Funding Category", "name"),
             ("Registered Funding", "funding"),
             ("Registered Interest", "summary"),
-            ("Remuneration", "summary")
+            ("InterestDetail", "summary")
         ]
         self.outgoing = ["outgoing", "-", "->"]
         self.incoming = ["incoming", "<-", "-"]

@@ -18,5 +18,5 @@ class DataProfiler:
             "Funding Relationship",
             "Registered Funding",
             "Registered Interest",
-            "Remuneration",
+            "InterestDetail",
         ]

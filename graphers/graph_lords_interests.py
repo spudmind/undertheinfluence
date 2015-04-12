@@ -60,7 +60,7 @@ class GraphLordsInterests():
                     }
 
                     category.link_relationship(funding_relationship)
-                    funding_relationship.link_donor(new_interest)
+                    funding_relationship.link_contributor(new_interest)
                     funding_relationship.update_raw_record(json.dumps(d))
 
                     if "created" in record and record["created"]:
@@ -88,7 +88,7 @@ class GraphLordsInterests():
         new_relationship = FundingRelationship(category_name)
         if not new_relationship.exists:
             new_relationship.create()
-        new_relationship.set_category_details(props)
+        new_relationship.set_relationship_details(props)
         return new_relationship
 
     def _create_interest(self, interest):

@@ -37,7 +37,6 @@
 </head>
 
 <body>
-
 <nav class="navbar navbar-inverse" role="navigation">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -54,19 +53,6 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-                    <a href="/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Influence & Lobbying<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('show_influencers')}}">Influence Summary</a></li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Explore the detail:</li>
-                        <li><a href="{{ url_for('show_influencers_detail')}}">All Influencers</a></li>
-                        <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Funding & Donors</a></li>
-                        <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a></li>
-                        <li><a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Agency Clients</a></li>
-                        <li><a href="{{ url_for('show_lobbyists' )}}">Lobbying Agencies</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
                     <a href="/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Government & Politicians<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url_for('show_politicians')}}">Politicians Summary</a></li>
@@ -79,14 +65,32 @@
                         <li><a href="{{ url_for('show_committees')}}">Select Committees</a></li>
                     </ul>
                 </li>
+
+
+                <li class="dropdown">
+                    <a href="/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Influence & Lobbying<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('show_influencers')}}">Influence & Lobbying</a></li>
+                        <li><a href="{{ url_for('show_funding_landing')}}">Funding & Donors</a></li>
+                        <li><a href="{{ url_for('show_interests_landing')}}">Who employs legislators</a></li>
+                        <li><a href="{{ url_for('show_lobbying_landing')}}">Who’s lobbying</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Explore the detail:</li>
+                        <li><a href="{{ url_for('show_influencers_detail')}}">All Influencers</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Funding & Donors</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a></li>
+                        <li><a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Agency Clients</a></li>
+                        <li><a href="{{ url_for('show_lobbyists' )}}">Lobbying Agencies</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="{{ url_for('show_sources')}}">Sources & Resources</a></li>
+
             </ul>
             <form class="navbar-form navbar-left" action="/search" method="post">
                 <input type="text" name="search" class="form-control col-lg-8" placeholder="Search">
             </form>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-            </ul>
+
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
@@ -102,8 +106,8 @@
 
     <div class="col-md-13"><hr></div>
     <footer>
-        <p>Commissioned by <a href="http://www.spinwatch.org/">Spinwatch</a> & <a href="http://www.unlockdemocracy.org.uk/">Unlock Democracy</a>.
-            Built by <a href="https://github.com/wrrrrn">Warren Ali</a> & <a href="http://treadsoft.ly/">Andy Lulham</a></p>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
     </footer>
 
 </div> <!-- /container -->

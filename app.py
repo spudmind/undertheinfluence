@@ -72,6 +72,56 @@ def show_politicians():
         'politicians_summary.html', mps=mps_summary, lords=lords_summary)
 
 
+@app.route('/lobbyists')
+def show_lobbyists():
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    lobbyists = get_lobbyists_function.LobbyistsApi().request(page=page)['results']
+    return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
+
+
+@app.route('/influencers')
+def show_influencers():
+    args = {}
+    args["labels"] = request.args.get('labels', None)
+    reply = get_summary_function.SummaryApi().request()
+    influencer_summary = reply["results"]["summary"]["influencers"]
+    return render_template('influencers_summary.html', influencers=influencer_summary)
+
+
+@app.route('/funding')
+def show_funding_landing():
+    args = {}
+    args["labels"] = request.args.get('labels', None)
+    reply = get_summary_function.SummaryApi().request()
+    influencer_summary = reply["results"]["summary"]["influencers"]
+    return render_template('funding_summary.html', influencers=influencer_summary)
+
+
+@app.route('/interests')
+def show_interests_landing():
+    args = {}
+    args["labels"] = request.args.get('labels', None)
+    reply = get_summary_function.SummaryApi().request()
+    influencer_summary = reply["results"]["summary"]["influencers"]
+    return render_template('interests_summary.html', influencers=influencer_summary)
+
+
+@app.route('/lobbying')
+def show_lobbying_landing():
+    args = {}
+    args["labels"] = request.args.get('labels', None)
+    reply = get_summary_function.SummaryApi().request()
+    influencer_summary = reply["results"]["summary"]["influencers"]
+    return render_template('lobbying_summary.html', influencers=influencer_summary)
+
+
+@app.route('/sources')
+def show_sources():
+    return render_template('show_sources.html')
+
 @app.route('/politicians/detail', methods=['GET', 'POST'])
 def show_politicians_detail():
     args = {}
@@ -107,25 +157,6 @@ def show_politicians_detail():
     return render_template(
         'politicians_detail.html', politicians=politicians, pager=pager, title=title
     )
-
-
-@app.route('/lobbyists')
-def show_lobbyists():
-    try:
-        page = int(request.args.get('page', 1))
-    except ValueError:
-        page = 1
-    lobbyists = get_lobbyists_function.LobbyistsApi().request(page=page)['results']
-    return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
-
-
-@app.route('/influencers')
-def show_influencers():
-    args = {}
-    args["labels"] = request.args.get('labels', None)
-    reply = get_summary_function.SummaryApi().request()
-    influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('influencers_summary.html', influencers=influencer_summary)
 
 
 @app.route('/influencers/detail', methods=['GET', 'POST'])

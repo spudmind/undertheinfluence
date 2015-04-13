@@ -743,6 +743,15 @@ class InterestDetail(BaseDataModel):
         )
         self.exists = True
 
+    def update_recorded_dates(self, date):
+        existing = self.vertex["recorded date"]
+        if existing and len(existing) > 0 and not date == existing:
+            new = u"{},{}".format(existing, date)
+        else:
+            new = date
+        self.vertex["recorded date"] = new
+        self.vertex.push()
+
     def update_raw_record(self, raw_record):
         existing = self.vertex["raw_record"]
         if existing and len(existing) > 0:

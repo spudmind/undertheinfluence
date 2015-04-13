@@ -99,15 +99,16 @@ class MembersOfParliament(BaseDataModel):
 
 
 class MemberOfParliament(NamedEntity):
-    def __init__(self, name=None):
+    def __init__(self, name=None, get_properties=True):
         NamedEntity.__init__(self)
         self.label = "Member of Parliament"
         self.primary_attribute = "name"
         self.name = name
+        self._get_properties = get_properties
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
-        if self.exists:
+        if self.exists and self._get_properties:
             self.party, self.image_url = self._set_properties()
             self.positions = self._get_positions()
             self.departments = self._get_departments()

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import json
-from data_models.influencers_models import FundingRelationship, InterestCategory, RegisteredInterest
+from data_models.influencers_models import FundingRelationship
+from data_models.influencers_models import InterestCategory
+from data_models.influencers_models import RegisteredInterest
+from data_models.influencers_models import InterestDetail
 from utils import mongo
 from data_models import government_models
 
@@ -20,7 +23,10 @@ class GraphLordsInterests():
 
     def _graph_interests(self, node):
         self._logger.debug("\n..................")
-        self.current_detail = {"source": node["source"]}
+        self.current_detail = {
+            "lord": node["lord"],
+            "source": node["source"],
+        }
 
         lord = self._find_lord(node["lord"])
 
@@ -30,6 +36,7 @@ class GraphLordsInterests():
     def _parse_categories(self, lord, categories):
         for category in categories:
             category_name = category["category_name"]
+            self.current_detail["category"] = category_name
             self._logger.debug(category_name)
 
             new_category = self._create_category(lord.name, category_name)
@@ -43,31 +50,54 @@ class GraphLordsInterests():
             for record in records:
                 self._print_out("interest", record["interest"])
                 if record["interest"] and record["interest"] != "None":
+                    date = None
+                    position = None
 
                     funding_relationship = self._create_relationship(
                         lord.name,
                         record["interest"]
                     )
-
+                    funding_relationship.set_relationship_details()
                     new_interest = self._create_interest(record["interest"])
                     new_interest.set_interest_details()
 
-                    d = {
-                        "source_url": self.current_detail["source"]["url"],
-                        "source_linked_from": self.current_detail["source"]["linked_from_url"],
-                        "source_fetched": str(self.current_detail["source"]["fetched"]),
-                        "raw_record": record["raw_record"]
-                    }
+                    if "created" in record and record["created"]:
+                        date = record["created"]
+
+                    if "position" in record:
+                        position = record["position"]
 
                     category.link_relationship(funding_relationship)
                     funding_relationship.link_contributor(new_interest)
-                    funding_relationship.update_raw_record(json.dumps(d))
 
-                    if "created" in record and record["created"]:
-                            funding_relationship.set_registered_date(record["created"])
-                    if "position" in record:
-                        funding_relationship.vertex["position"] = record["position"]
-                    funding_relationship.vertex.push()
+                    summary = u"{} - {} - {} - {}".format(
+                        record["interest"],
+                        self.current_detail["category"],
+                        self.current_detail["lord"],
+                        date
+                    )
+
+                    meta = {
+                        "source_url": self.current_detail["source"]["url"],
+                        "source_linked_from": self.current_detail["source"]["linked_from_url"],
+                        "source_fetched": str(self.current_detail["source"]["fetched"]),
+                        "contributor": record["interest"],
+                        "recipient": self.current_detail["lord"],
+                        "position": position,
+                        "registered": date
+                    }
+
+                    interest_detail = InterestDetail(summary)
+                    if not interest_detail.exists:
+                        interest_detail.create()
+                        interest_detail.set_interest_details(meta)
+
+                        funding_relationship.link_interest_detail(interest_detail)
+
+                        if date:
+                            interest_detail.set_registered_date(date)
+
+                    funding_relationship.update_raw_record(record["raw_record"])
                 else:
                     self._logger.debug("** NO INTEREST ** ")
                     self._logger.debug("** NO INTEREST ** ")

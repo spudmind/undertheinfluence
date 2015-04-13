@@ -19,8 +19,6 @@ class GraphPartyFunding():
     def run(self):
         all_donations = self.db.fetch_all("%s_parse" % self.PREFIX, paged=False)
         for doc in all_donations:
-            self._logger.debug("\n..................")
-            #self._logger.debug("recipient: %s" % doc["recipient"])
 
             name = doc["recipient"]
             donor = doc["donor_name"]

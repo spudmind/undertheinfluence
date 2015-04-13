@@ -157,7 +157,7 @@ class GraphMPsInterests():
                             interest_detail.create()
                             interest_detail.set_interest_details({"amount": int_amount})
                             interest_detail.set_interest_details(meta)
-                            interest_detail.update_raw_record(record["raw_record"])
+                            # interest_detail.update_raw_record(record["raw_record"])
 
                             funding_relationship.link_interest_detail(interest_detail)
 
@@ -172,7 +172,7 @@ class GraphMPsInterests():
                         interest_detail = InterestDetail(context)
                         interest_detail.create()
                         interest_detail.set_interest_details(meta)
-                        interest_detail.update_raw_record(record["raw_record"])
+                        # interest_detail.update_raw_record(record["raw_record"])
                         funding_relationship.link_interest_detail(interest_detail)
 
                         self._logger.debug(context)
@@ -217,7 +217,7 @@ class GraphMPsInterests():
                 interest_detail = InterestDetail(summary)
                 interest_detail.create()
                 interest_detail.set_interest_details(meta)
-                interest_detail.update_raw_record(record["raw_record"])
+                # interest_detail.update_raw_record(record["raw_record"])
 
                 funding_relationship.link_interest_detail(interest_detail)
 
@@ -274,7 +274,7 @@ class GraphMPsInterests():
                         interest_detail.create()
                         interest_detail.set_interest_details({"amount": int_amount})
                         interest_detail.set_interest_details(meta)
-                        interest_detail.update_raw_record(record["raw_record"])
+                        # interest_detail.update_raw_record(record["raw_record"])
 
                         funding_relationship.link_interest_detail(interest_detail)
 
@@ -294,7 +294,7 @@ class GraphMPsInterests():
                     interest_detail = InterestDetail(summary)
                     interest_detail.create()
                     interest_detail.set_interest_details(meta)
-                    interest_detail.update_raw_record(record["raw_record"])
+                    # interest_detail.update_raw_record(record["raw_record"])
 
                     funding_relationship.link_interest_detail(interest_detail)
 
@@ -334,7 +334,7 @@ class GraphMPsInterests():
                     "recipient": self.current_detail["mp"],
                     "visit_dates": record["vist_dates"],
                     "purpose": record["purpose"],
-                    "raw_record": record["raw_record"],
+                    # "raw_record": record["raw_record"],
                 }
 
                 if record["remuneration"] and len(record["remuneration"]) > 0:
@@ -353,7 +353,7 @@ class GraphMPsInterests():
                         interest_detail.create()
                         interest_detail.set_interest_details({"amount": int_amount})
                         interest_detail.set_interest_details(meta)
-                        interest_detail.update_raw_record(record["raw_record"])
+                        # interest_detail.update_raw_record(record["raw_record"])
 
                         funding_relationship.link_interest_detail(interest_detail)
 
@@ -371,7 +371,7 @@ class GraphMPsInterests():
                     interest_detail = InterestDetail(summary)
                     interest_detail.create()
                     interest_detail.set_interest_details(meta)
-                    interest_detail.update_raw_record(record["raw_record"])
+                    # interest_detail.update_raw_record(record["raw_record"])
 
                     funding_relationship.link_interest_detail(interest_detail)
 
@@ -443,7 +443,7 @@ class GraphMPsInterests():
                         interest_detail.create()
                         interest_detail.set_interest_details({"amount": int_amount})
                         interest_detail.set_interest_details(meta)
-                        interest_detail.update_raw_record(record["raw_record"])
+                        # interest_detail.update_raw_record(record["raw_record"])
 
                         funding_relationship.link_interest_detail(interest_detail)
 
@@ -461,7 +461,7 @@ class GraphMPsInterests():
                     interest_detail = InterestDetail(summary)
                     interest_detail.create()
                     interest_detail.set_interest_details(meta)
-                    interest_detail.update_raw_record(record["raw_record"])
+                    # interest_detail.update_raw_record(record["raw_record"])
 
                     funding_relationship.link_interest_detail(interest_detail)
 
@@ -490,7 +490,7 @@ class GraphMPsInterests():
                         "source_fetched": str(self.current_detail["source_fetched"]),
                         "contributor": record["interest"],
                         "recipient": self.current_detail["mp"],
-                        "raw_record": record["raw_record"]
+                        # "raw_record": record["raw_record"]
                     }
 
                     category.link_relationship(funding_relationship)

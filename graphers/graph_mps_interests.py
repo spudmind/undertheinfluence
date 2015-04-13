@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import json
+from data_models.core import BaseDataModel
 from data_models.influencers_models import FundingRelationship
 from data_models.influencers_models import InterestCategory
 from data_models.influencers_models import RegisteredInterest
@@ -13,6 +14,7 @@ class GraphMPsInterests():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()
+        self.core = BaseDataModel()
         self.data_models = government_models
         self.PREFIX = "mps_interests"
         # database stuff
@@ -44,16 +46,19 @@ class GraphMPsInterests():
         self.current_detail["source_fetched"] = str(node["source"]["fetched"])
 
         self._logger.debug("\n..................")
-        self._logger.debug(node["mp"])
+        self._logger.debug("%s x %s" % (node["date"], node["mp"]))
         self._logger.debug("..................")
 
-        mp = self._find_mp(node["mp"])
+        if self._is_date_imported(node["mp"], node["date"]):
+            mp = self._find_mp(node["mp"])
 
-        self._parse_categories(mp, node["interests"])
-        #self._parse_categories(node["interests"])
+            self._parse_categories(mp, node["interests"])
+            #self._parse_categories(node["interests"])
+        else:
+            self._logger.debug("... previously imported")
 
     def _find_mp(self, mp):
-        new_mp = self.data_models.MemberOfParliament(mp)
+        new_mp = self.data_models.MemberOfParliament(mp, get_properties=False)
         if not new_mp.exists:
             self._logger.debug("%s *not found*" % mp)
             new_mp.create()
@@ -154,27 +159,32 @@ class GraphMPsInterests():
                                 context, amount, entry["received"], entry["registered"]
                             )
                             interest_detail = InterestDetail(summary)
-                            interest_detail.create()
-                            interest_detail.set_interest_details({"amount": int_amount})
-                            interest_detail.set_interest_details(meta)
-                            # interest_detail.update_raw_record(record["raw_record"])
+                            if not interest_detail.exists:
+                                interest_detail.create()
+                                interest_detail.set_interest_details({"amount": int_amount})
+                                interest_detail.set_interest_details(meta)
+                                # interest_detail.update_raw_record(record["raw_record"])
 
-                            funding_relationship.link_interest_detail(interest_detail)
+                                funding_relationship.link_interest_detail(interest_detail)
 
-                            if "received" in entry and entry["received"] != u"Unknown":
-                                interest_detail.set_interest_details({"registered": entry["received"]})
-                                interest_detail.set_received_date(entry["received"])
-                            if "registered" in entry and entry["registered"] != u"Unknown":
-                                interest_detail.set_interest_details({"registered": entry["registered"]})
-                                interest_detail.set_registered_date(entry["registered"])
+                                if "received" in entry and entry["received"] != u"Unknown":
+                                    interest_detail.set_interest_details({"registered": entry["received"]})
+                                    interest_detail.set_received_date(entry["received"])
+                                if "registered" in entry and entry["registered"] != u"Unknown":
+                                    interest_detail.set_interest_details({"registered": entry["registered"]})
+                                    interest_detail.set_registered_date(entry["registered"])
+                            else:
+                                interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
                             self._logger.debug(summary)
                     else:
                         interest_detail = InterestDetail(context)
-                        interest_detail.create()
-                        interest_detail.set_interest_details(meta)
-                        # interest_detail.update_raw_record(record["raw_record"])
-                        funding_relationship.link_interest_detail(interest_detail)
-
+                        if not interest_detail.exists:
+                            interest_detail.create()
+                            interest_detail.set_interest_details(meta)
+                            # interest_detail.update_raw_record(record["raw_record"])
+                            funding_relationship.link_interest_detail(interest_detail)
+                        else:
+                            interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
                         self._logger.debug(context)
 
     def _graph_unstructured(self, category, records):
@@ -215,16 +225,18 @@ class GraphMPsInterests():
                 }
 
                 interest_detail = InterestDetail(summary)
-                interest_detail.create()
-                interest_detail.set_interest_details(meta)
-                # interest_detail.update_raw_record(record["raw_record"])
+                if not interest_detail.exists:
+                    interest_detail.create()
+                    interest_detail.set_interest_details(meta)
+                    # interest_detail.update_raw_record(record["raw_record"])
 
-                funding_relationship.link_interest_detail(interest_detail)
+                    funding_relationship.link_interest_detail(interest_detail)
 
-                if date:
-                    interest_detail.set_interest_details({"registered": date})
-                    interest_detail.set_registered_date(date)
-
+                    if date:
+                        interest_detail.set_interest_details({"registered": date})
+                        interest_detail.set_registered_date(date)
+                else:
+                    interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
                 self._logger.debug(summary)
 
     def _graph_sponsorship(self, category, records):
@@ -271,16 +283,19 @@ class GraphMPsInterests():
                         )
 
                         interest_detail = InterestDetail(summary)
-                        interest_detail.create()
-                        interest_detail.set_interest_details({"amount": int_amount})
-                        interest_detail.set_interest_details(meta)
-                        # interest_detail.update_raw_record(record["raw_record"])
+                        if not interest_detail.exists:
+                            interest_detail.create()
+                            interest_detail.set_interest_details({"amount": int_amount})
+                            interest_detail.set_interest_details(meta)
+                            # interest_detail.update_raw_record(record["raw_record"])
 
-                        funding_relationship.link_interest_detail(interest_detail)
+                            funding_relationship.link_interest_detail(interest_detail)
 
-                        if date:
-                            interest_detail.set_interest_details({"registered": date})
-                            interest_detail.set_registered_date(date)
+                            if date:
+                                interest_detail.set_interest_details({"registered": date})
+                                interest_detail.set_registered_date(date)
+                        else:
+                            interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
 
                         self._logger.debug(summary)
                 else:
@@ -292,15 +307,18 @@ class GraphMPsInterests():
                     )
 
                     interest_detail = InterestDetail(summary)
-                    interest_detail.create()
-                    interest_detail.set_interest_details(meta)
-                    # interest_detail.update_raw_record(record["raw_record"])
+                    if not interest_detail.exists:
+                        interest_detail.create()
+                        interest_detail.set_interest_details(meta)
+                        # interest_detail.update_raw_record(record["raw_record"])
 
-                    funding_relationship.link_interest_detail(interest_detail)
+                        funding_relationship.link_interest_detail(interest_detail)
 
-                    if date:
-                        interest_detail.set_interest_details({"registered": date})
-                        interest_detail.set_registered_date(date)
+                        if date:
+                            interest_detail.set_interest_details({"registered": date})
+                            interest_detail.set_registered_date(date)
+                    else:
+                        interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
 
                     self._logger.debug(summary)
 
@@ -350,16 +368,19 @@ class GraphMPsInterests():
                         )
 
                         interest_detail = InterestDetail(summary)
-                        interest_detail.create()
-                        interest_detail.set_interest_details({"amount": int_amount})
-                        interest_detail.set_interest_details(meta)
-                        # interest_detail.update_raw_record(record["raw_record"])
+                        if not interest_detail.exists:
+                            interest_detail.create()
+                            interest_detail.set_interest_details({"amount": int_amount})
+                            interest_detail.set_interest_details(meta)
+                            # interest_detail.update_raw_record(record["raw_record"])
 
-                        funding_relationship.link_interest_detail(interest_detail)
+                            funding_relationship.link_interest_detail(interest_detail)
 
-                        if date:
-                            interest_detail.set_interest_details({"registered": date})
-                            interest_detail.set_registered_date(date)
+                            if date:
+                                interest_detail.set_interest_details({"registered": date})
+                                interest_detail.set_registered_date(date)
+                        else:
+                            interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
                         self._logger.debug(summary)
                 else:
                     summary = u"{} - {} - {} - {}".format(
@@ -369,15 +390,19 @@ class GraphMPsInterests():
                         date
                     )
                     interest_detail = InterestDetail(summary)
-                    interest_detail.create()
-                    interest_detail.set_interest_details(meta)
-                    # interest_detail.update_raw_record(record["raw_record"])
+                    if not interest_detail.exists:
+                        interest_detail.create()
+                        interest_detail.set_interest_details(meta)
+                        # interest_detail.update_raw_record(record["raw_record"])
 
-                    funding_relationship.link_interest_detail(interest_detail)
+                        funding_relationship.link_interest_detail(interest_detail)
 
-                    if date:
-                        interest_detail.set_interest_details({"registered": date})
-                        interest_detail.set_registered_date(date)
+                        if date:
+                            interest_detail.set_interest_details({"registered": date})
+                            interest_detail.set_registered_date(date)
+                    else:
+                        interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
+                    self._logger.debug(summary)
 
     def _graph_gifts(self, category, records):
         for record in records:
@@ -440,16 +465,19 @@ class GraphMPsInterests():
                         )
 
                         interest_detail = InterestDetail(summary)
-                        interest_detail.create()
-                        interest_detail.set_interest_details({"amount": int_amount})
-                        interest_detail.set_interest_details(meta)
-                        # interest_detail.update_raw_record(record["raw_record"])
+                        if not interest_detail.exists:
+                            interest_detail.create()
+                            interest_detail.set_interest_details({"amount": int_amount})
+                            interest_detail.set_interest_details(meta)
+                            # interest_detail.update_raw_record(record["raw_record"])
 
-                        funding_relationship.link_interest_detail(interest_detail)
+                            funding_relationship.link_interest_detail(interest_detail)
 
-                        if registered:
-                            interest_detail.set_interest_details({"registered": registered})
-                            interest_detail.set_registered_date(registered)
+                            if registered:
+                                interest_detail.set_interest_details({"registered": registered})
+                                interest_detail.set_registered_date(registered)
+                        else:
+                            interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
                         self._logger.debug(summary)
                 else:
                     summary = u"{} - {} - {} - {}".format(
@@ -459,15 +487,19 @@ class GraphMPsInterests():
                         registered
                     )
                     interest_detail = InterestDetail(summary)
-                    interest_detail.create()
-                    interest_detail.set_interest_details(meta)
-                    # interest_detail.update_raw_record(record["raw_record"])
+                    if not interest_detail.exists:
+                        interest_detail.create()
+                        interest_detail.set_interest_details(meta)
+                        # interest_detail.update_raw_record(record["raw_record"])
 
-                    funding_relationship.link_interest_detail(interest_detail)
+                        funding_relationship.link_interest_detail(interest_detail)
 
-                    if registered:
-                        interest_detail.set_interest_details({"registered": registered})
-                        interest_detail.set_registered_date(registered)
+                        if registered:
+                            interest_detail.set_interest_details({"registered": registered})
+                            interest_detail.set_registered_date(registered)
+                    else:
+                        interest_detail.update_recorded_dates(self.current_detail["recorded_date"])
+                    self._logger.debug(summary)
 
     def _create_graph(self, category, records):
         if records:
@@ -593,6 +625,20 @@ class GraphMPsInterests():
 
     def _print_out(self, key, value):
         self._logger.debug("  %-25s%-25s" % (key, value))
+
+    def _is_date_imported(self, mp, date):
+        result = False
+        query = u"""
+            MATCH (n:`Interest Detail`)
+            WHERE n.recipient = "{0}"
+            RETURN distinct collect(n.`recorded date`) as dates
+        """.format(mp)
+        dates = self.core.query(query)[0]["dates"]
+        if date in dates:
+            result = True
+        return result
+
+
 
     @staticmethod
     def _is_remuneration(record):

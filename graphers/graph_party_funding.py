@@ -91,7 +91,7 @@ class GraphPartyFunding():
         )
         self._logger.debug(summary)
         new_donation = RegisteredDonation(summary)
-        if not new_donation:
+        if not new_donation.exists:
             new_donation.create()
 
             props = {

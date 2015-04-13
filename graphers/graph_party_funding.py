@@ -91,28 +91,29 @@ class GraphPartyFunding():
         )
         self._logger.debug(summary)
         new_donation = RegisteredDonation(summary)
-        new_donation.create()
+        if not new_donation:
+            new_donation.create()
 
-        props = {
-            "recipient": entry["recipient"],
-            "donor_name": entry["donor_name"],
-            "amount": self.convert_to_number(entry["value"]),
-            "ec_reference": entry["ec_reference"],
-            "nature": entry["nature_provision"],
-            "purpose": entry["purpose"],
-            "recd_by": entry["recd_by"],
-            "received_date": entry["received_date"],
-            "reported_date": entry["reported_date"],
-            "accepted_date": entry["accepted_date"],
-            "6212": entry["6212"]
-        }
-        new_donation.set_donations_details(props)
-        new_donation.set_donations_details(self.current)
-        new_donation.set_dates(
-            entry["received_date"],
-            entry["reported_date"],
-            entry["accepted_date"]
-        )
+            props = {
+                "recipient": entry["recipient"],
+                "donor_name": entry["donor_name"],
+                "amount": self.convert_to_number(entry["value"]),
+                "ec_reference": entry["ec_reference"],
+                "nature": entry["nature_provision"],
+                "purpose": entry["purpose"],
+                "recd_by": entry["recd_by"],
+                "received_date": entry["received_date"],
+                "reported_date": entry["reported_date"],
+                "accepted_date": entry["accepted_date"],
+                "6212": entry["6212"]
+            }
+            new_donation.set_donations_details(props)
+            new_donation.set_donations_details(self.current)
+            new_donation.set_dates(
+                entry["received_date"],
+                entry["reported_date"],
+                entry["accepted_date"]
+            )
         return new_donation
 
     @staticmethod

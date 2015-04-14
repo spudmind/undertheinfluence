@@ -34,25 +34,9 @@ class ParseMeetings():
     def _parse_ministerial(self, meeting):
         orgs = []
         host = {}
-        problems = [
-            "London",
-            "UK Anti",
-            "doping",
-            "Sochi",
-            "Army",
-            "British",
-            "Home Enteraintment Gp",
-            "Justice",
-            "Co",
-            "Organisation for Economic Co",  # oecd
-            "AeroSpace",  # ADS
-            "Rolls",
-            "Beggars"
-        ]
         if "organisation" in meeting:
             orgs = self._parse_organisation(meeting["organisation"].strip())
         for org in orgs:
-            self._logger.debug("... %s" % org)
             date = None
             purpose = None
             if "name" in meeting:
@@ -65,9 +49,6 @@ class ParseMeetings():
 
             if host["position"]:
                 position = self._resolve_position(host["position"])
-                if host["position"] != position:
-                    self._logger.debug("\n*** %s" % host["position"])
-                    self._logger.debug("*** %s\n" % position)
             else:
                 position = None
 
@@ -83,9 +64,8 @@ class ParseMeetings():
                 "published_at": meeting["published_at"],
                 "meeting_type": "Ministerial Meetings",
             }
-            for problem in problems:
-                if problem == org:
-                    print "\n\n", meeting, "\n\n"
+            self._logger.debug("... %s" % org)
+            self._logger.debug("--> %s x %s\n" % (host["name"], position))
             self.db.save("%s_parse" % self.PREFIX, entry)
 
     def _parse_organisation(self, org_string):

@@ -24,7 +24,9 @@ class PoliticiansApi(BaseAPI):
         self._filter_meetings(args)
         self._filter_interests(args)
         self._filter_funding(args)
-        self._filter_department(args)
+        self._filter_committees(args)
+
+        print self.query
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
         if response['has_more']:
@@ -54,8 +56,8 @@ class PoliticiansApi(BaseAPI):
                 "twfy_id": entry["twfy_id"],
                 "labels": entry["labels"],
                 "government_positions": entry["government_positions"],
-                "government_departments": self._department_detail_urls(
-                    entry["government_departments"]
+                "government_committees": self._committee_detail_urls(
+                    entry["government_committees"]
                 ),
                 "influences_summary": self._influencer_urls(entry["influences"]),
                 "type": entry["type"]
@@ -104,12 +106,12 @@ class PoliticiansApi(BaseAPI):
         if _funding_search != {}:
             self.query[self._funding] = _funding_search
 
-    def _filter_department(self, args):
-        if args.get("government_department"):
+    def _filter_committees(self, args):
+        if args.get("government_committee"):
             self.query["$and"] = [
                 {
-                    "government_departments": {
-                    "$in": [args.get("government_department")]}
+                    "government_committees": {
+                    "$in": [args.get("government_committee")]}
                 }
             ]
 

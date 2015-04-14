@@ -13,7 +13,7 @@ class Politicians(BaseDataModel):
         search_string = u"""
             MATCH (p) where p:Lord OR p:`Member of Parliament` with p
             MATCH (p)-[r]-() with p,  r
-            RETURN DISTINCT p.name, p.party, p.twfy_id, p.image_url,
+            RETURN DISTINCT p.name, p.party, p.twfy_id, p.image,
                 count(r) as weight, labels(p)
             ORDER BY weight DESC
         """
@@ -53,7 +53,7 @@ class Politician(NamedEntity):
         if self.type == "mp":
             politician = MemberOfParliament(self.name)
             self.positions = politician.positions
-            self.departments = politician.departments
+            self.committees = politician.committees
         elif self.type == "lord":
             politician = Lord(self.name)
         else:
@@ -111,7 +111,7 @@ class MemberOfParliament(NamedEntity):
         if self.exists and self._get_properties:
             self.party, self.image_url = self._set_properties()
             self.positions = self._get_positions()
-            self.departments = self._get_departments()
+            self.committees = self._get_committees()
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meeting_summary()
             self.interests = self._get_interests()
@@ -122,23 +122,24 @@ class MemberOfParliament(NamedEntity):
     def _get_positions(self):
         return self._get_government_positions("Government Position")
 
-    def _get_departments(self):
-        return self._get_government_positions("Government Department")
+    def _get_committees(self):
+        return self._get_government_positions("Government Committee")
 
     def _set_properties(self):
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}})
-            return mp.party, mp.image_url
+            return mp.party, mp.image
         """.format(self.vertex["name"])
         output = self.query(search_string)
-        return output[0]["mp.party"], output[0]["mp.image_url"]
+        return output[0]["mp.party"], output[0]["mp.image"]
 
     def _get_government_positions(self, pos_type):
         results = []
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
-            MATCH (mp)-[:ELECTED_FOR]-(const)
-            WHERE const.left_reason = "still_in_office" with const
+            MATCH (mp)-[:ELECTED_FOR]-(const) with const
+                WHERE const.left_reason = "still_in_office"
+                    OR const.left_reason = "general_election"
             MATCH (const)-[:SERVED_IN]-(p:`{1}`) with p.name AS position
             RETURN position
         """.format(self.vertex["name"], pos_type)
@@ -742,9 +743,10 @@ class GovernmentOffices(BaseDataModel):
 
     def get_all(self):
         search_string = u"""
-            MATCH (n:`Government Department`) with n
+            MATCH (n:`Government Committee`) with n
             MATCH (n)-[:SERVED_IN]-(x) with n, x
                 WHERE x.left_reason = "still_in_office"
+                    OR x.left_reason = "general_election"
             MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
             RETURN n.name, labels(n), count(p)
             ORDER BY count(p) DESC
@@ -812,6 +814,7 @@ class GovernmentOffice(NamedEntity):
             MATCH (n:`Government Office` {{name: "{0}"}}) with n
             MATCH (n)-[:SERVED_IN]-(t) with n, t
                 WHERE t.left_reason = "still_in_office"
+                    OR t.left_reason = "general_election"
             MATCH (t)-[:ELECTED_FOR]-(p) with n, t, p
             RETURN p.name as name
         """.format(self.vertex["name"])

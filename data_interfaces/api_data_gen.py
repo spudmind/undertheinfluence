@@ -147,10 +147,10 @@ class PopulatePoliticiansApi():
         }
 
         if role == "mp":
-            politician_data["government_departments"] = politician.departments
+            politician_data["government_committees"] = politician.committees
             politician_data["government_positions"] = politician.positions
         else:
-            politician_data["government_departments"] = None
+            politician_data["government_committees"] = None
             politician_data["government_positions"] = None
 
         self.db.save("api_politicians", politician_data)
@@ -182,7 +182,7 @@ class PopulateMpsApi():
 
         mp = government_models.MemberOfParliament(name)
         positions = mp.positions
-        departments = mp.departments
+        departments = mp.committees
         register = mp.interests_summary
         ec = mp.donations_summary
         meetings = mp.meetings_summary
@@ -293,7 +293,7 @@ class PopulatePoliticalPartyApi():
         self.db.save("api_political_parties", party_data)
 
 
-class PopulateDepartmentsApi():
+class PopulateCommitteesApi():
     def __init__(self):
         self._logger = logging.getLogger('spud')
         self.db = mongo.MongoInterface()

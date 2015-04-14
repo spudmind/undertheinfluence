@@ -27,9 +27,9 @@ class BaseAPI:
                 #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
                 api = url_for('getPoliticalParty', name=name, _external=True)
                 web = url_for('show_party', name=name, _external=True)
-            elif "Government Department" in labels:
-                api = url_for('getPoliticians', government_department=name, _external=True)
-                web = url_for('show_politicians', government_department=name, _external=True)
+            elif "Government Committee" in labels:
+                api = url_for('getPoliticians', government_committee=name, _external=True)
+                web = url_for('show_politicians', government_committee=name, _external=True)
         return web, api
 
     @staticmethod
@@ -58,14 +58,14 @@ class BaseAPI:
             return None
 
     @staticmethod
-    def _department_detail_urls(departments):
+    def _committee_detail_urls(departments):
         if departments:
             updated = []
             for dept in departments:
                 entry = {
                     "name": dept,
                     "detail_url": url_for(
-                        'show_politicians', government_department=dept, _external=True
+                        'show_politicians', government_committee=dept, _external=True
                     )
                 }
                 updated.append(entry)

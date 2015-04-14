@@ -9,7 +9,7 @@ from web.api import get_influencer_function
 from web.api import get_parties_function
 from web.api import get_party_function
 from web.api import get_politicians_function
-from web.api import get_departments_function
+from web.api import get_committees_function
 from web.api import get_lobbyists_function
 from web.api import find_entity_function
 from web.api import get_summary_data
@@ -149,7 +149,7 @@ def show_politicians_detail():
                         args[value] = request.form[value]
     elif request.method == 'GET':
         args["type"] = request.args.get('type', None)
-        args["government_department"] = request.args.get('government_department', None)
+        args["government_committee"] = request.args.get('government_committee', None)
 
     title = _build_title(args)
     reply = get_politicians_function.PoliticiansApi().request(**args)
@@ -278,7 +278,8 @@ def show_committees():
         page = int(request.args.get('page', 1))
     except ValueError:
         page = 1
-    offices = get_departments_function.DepartmentsApi().request(page=page)['results']
+    offices = get_committees_function.CommitteesApi().request(page=page)['results']
+    print offices
     return render_template('show_committees.html', offices=offices, page=page)
 
 
@@ -298,6 +299,7 @@ class GetPoliticians(Resource):
         self.reqparse.add_argument('type', type=str)
         self.reqparse.add_argument('labels', type=str)
         self.reqparse.add_argument('government_department', type=str)
+        self.reqparse.add_argument('government_committee', type=str)
         self.reqparse.add_argument('interests_gt', type=int)
         self.reqparse.add_argument('interests_lt', type=int)
         self.reqparse.add_argument('donations_gt', type=int)
@@ -408,15 +410,15 @@ class GetInfluencer(Resource):
         return get_influencer_function.InfluencerApi().request(args)
 
 
-class GetGovernmentDepartments(Resource):
+class GetGovernmentCommittees(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str)
-        super(GetGovernmentDepartments, self).__init__()
+        super(GetGovernmentCommittees, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
-        return get_departments_function.DepartmentsApi().request()
+        return get_committees_function.CommitteesApi().request()
 
 
 class FindEntity(Resource):
@@ -453,7 +455,7 @@ api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluenc
 api.add_resource(GetLobbyists, '/api/v0.1/getLobbyAgencies', endpoint='getLobbyAgencies')
 api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
-api.add_resource(GetGovernmentDepartments, '/api/v0.1/getGovernmentDepartments', endpoint='getGovernmentDepartments')
+api.add_resource(GetGovernmentCommittees, '/api/v0.1/getGovernmentCommittees', endpoint='getGovernmentCommittees')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 api.add_resource(GetData, '/api/v0.1/data', endpoint='data')
 

@@ -28,7 +28,7 @@ class SummaryApi(BaseAPI):
             "lobby_agencies": url_for('getLobbyAgencies', _external=True),
             "political_parties": url_for('getPoliticalParties', _external=True),
             "politicians": url_for('getPoliticians', _external=True),
-            "government_departments": url_for('getGovernmentDepartments', _external=True),
+            "government_committees": url_for('getGovernmentCommittees', _external=True),
             "find_entity": url_for('findEntity', _external=True),
         }
         summary = {

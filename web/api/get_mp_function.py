@@ -28,7 +28,7 @@ class MpApi(BaseAPI):
                     "meetings": meetings
                 },
                 "government_positions": result[0]["government_positions"],
-                "government_departments": self._department_detail_urls(
+                "government_departments": self._committee_detail_urls(
                     result[0]["government_departments"]
                 ),
             }

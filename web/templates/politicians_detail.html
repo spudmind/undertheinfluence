@@ -142,16 +142,19 @@
                         <div class="row-content">
                             <div class="col-md-10">
                                 <div class="least-content">
-                                    {% if entry.party %}
-                                        <a href="{{ entry.party_url }}"><span class="label label-primary">{{ entry.party }}</span></a>
-                                    {% endif %}
-                                    {% for label in entry["labels"] %}
-                                        <span class="label label-success">{{ label }}</span>
-                                    {% endfor %}
+
                                 </div>
 
                                 <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
                                 <div class="row">
+                                    <p>
+                                        {% if entry.party %}
+                                            <a href="{{ entry.party_url }}"><span class="label label-primary">{{ entry.party }}</span></a>
+                                        {% endif %}
+                                        {% for label in entry["labels"] %}
+                                            <span class="label label-success">{{ label }}</span>
+                                        {% endfor %}
+                                    </p>
 
 
                                     {% if "Member of Parliament" in entry["labels"] %}
@@ -223,6 +226,7 @@
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
+
 
                                 </div >
                             </div >

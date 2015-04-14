@@ -3,7 +3,7 @@ from flask import url_for
 from utils import mongo
 
 
-class DepartmentsApi(BaseAPI):
+class CommitteesApi(BaseAPI):
     def __init__(self):
         BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
@@ -16,7 +16,7 @@ class DepartmentsApi(BaseAPI):
         if response['has_more']:
             next_query = args
             next_query['page'] = page + 1
-            response['next_url'] = url_for('getGovernmentDepartments', _external=True, **next_query)
+            response['next_url'] = url_for('getGovernmentCommittees', _external=True, **next_query)
 
         response["results"] = [
             {
@@ -28,7 +28,7 @@ class DepartmentsApi(BaseAPI):
                 ),
                 "mp_count": entry["mp_count"],
                 "detail_url": url_for(
-                    'show_politicians_detail', government_department=entry["name"], _external=True
+                    'show_politicians_detail', government_committee=entry["name"], _external=True
 
                 )
             }

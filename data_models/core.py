@@ -34,6 +34,14 @@ class BaseDataModel:
         else:
             return None
 
+    def delete(self):
+        delete = u"""
+            START n=node({0})
+            optional match n-[r]-x
+            delete n, r
+        """.format(self.vertex._id)
+        self.query(delete)
+
     def find_entity(self, name):
         results = []
         search_query = u"""
@@ -91,6 +99,17 @@ class BaseDataModel:
         """.format(vertex1._id, vertex2._id, relationship)
         return self.query(rel_query)
 
+    def connect_to_ids(self, relationships):
+        print "\nthis is really happening", relationships
+        for r in relationships:
+            print r
+            rel_query = u"""
+                START n=node({0}), m=node({1})
+                MERGE (n)-[r:{2}]-(m)
+                RETURN r
+            """.format(self.vertex._id, r["node_id"], r["relationship"])
+            self.query(rel_query)
+
     def query(self, query_string):
         return self.g.graph.cypher.execute(query_string)
 
@@ -99,6 +118,14 @@ class BaseDataModel:
         output = self.query(search_string)
         for result in output:
             yield result[0]
+
+    def _find_id(self, node_id):
+        rel_query = u"""
+            START n=node({0}) RETURN n
+        """.format(node_id)
+        output = self.query(rel_query)
+        self.vertex = output[0][0]
+        return self.vertex
 
     def set_date(self, date, relationship):
         if '/' in date:
@@ -165,6 +192,49 @@ class BaseDataModel:
     def _convert_month(text):
         month_to = {v: k for k, v in enumerate(calendar.month_abbr)}
         return month_to[text[:3]]
+
+
+class Utility(BaseDataModel):
+    def __init__(self, name=None, node_id=None):
+        BaseDataModel.__init__(self)
+        self.exists = False
+        if name:
+            self.name = name
+            self.label = "Named Entity"
+            self.primary_attribute = "name"
+            self.exists = self.fetch(
+                self.label, self.primary_attribute, self.name
+            )
+        if node_id:
+            self._find_id(node_id)
+            if self.vertex:
+                self.exists = True
+
+    def get_labels(self):
+        query = u"""
+            MATCH (n:`Named Entity` {{name:"{0}"}})
+            RETURN labels(n)
+        """.format(self.vertex["name"])
+        return self.query(query)[0][0]
+
+    def get_properties(self):
+        return self.vertex.properties
+
+    def get_relationships(self):
+        results = []
+        search = u"""
+            MATCH (n:`Named Entity` {{name:"{0}"}})
+            MATCH (n)-[rel]-(x)
+            RETURN DISTINCT type(rel) as relationship, id(x) as node_id
+        """.format(self.vertex["name"])
+        output = self.query(search)
+        for entry in output:
+            detail = {
+                "relationship": entry["relationship"],
+                "node_id": entry["node_id"]
+            }
+            results.append(detail)
+        return results
 
 
 class NamedEntity(BaseDataModel):

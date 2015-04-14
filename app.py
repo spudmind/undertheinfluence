@@ -23,6 +23,7 @@ static_dir = os.path.join(
 )
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(__name__)
+app.debug = True
 api = Api(app)
 
 
@@ -459,5 +460,5 @@ api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 api.add_resource(GetData, '/api/v0.1/data', endpoint='data')
 
 if __name__ == '__main__':
-    app.debug = True
+    # app.debug = True
     app.run(host='0.0.0.0')

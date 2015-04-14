@@ -225,8 +225,9 @@ class PopulateLordsApi():
         name = record[0]
         party = record[1]
         twfy_id = record[2]
-        weight = record[3]
-        labels = record[4]
+        image_url = record[3]
+        weight = record[4]
+        labels = record[5]
         if labels and "Named Entity" in labels:
             labels.remove("Named Entity")
 

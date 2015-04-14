@@ -279,7 +279,6 @@ def show_committees():
     except ValueError:
         page = 1
     offices = get_committees_function.CommitteesApi().request(page=page)['results']
-    print offices
     return render_template('show_committees.html', offices=offices, page=page)
 
 

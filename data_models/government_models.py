@@ -114,6 +114,7 @@ class MemberOfParliament(NamedEntity):
             self.committees = self._get_committees()
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meeting_summary()
+            self.interest_categories = self._interest_categories()
             self.interests = self._get_interests()
             self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
@@ -197,35 +198,93 @@ class MemberOfParliament(NamedEntity):
         return results
 
     def _get_interests(self):
+        common = [
+            "contributor",
+            "source_url",
+            "source_fetched",
+            "source_linked_from",
+            "recipient",
+            "`recorded date`",
+            "registered"
+        ]
+        category_fields = {
+            "directorships": common,
+            "remunerated directorships": common,
+            # "Clients": common,
+            "shareholdings": common,
+            "registrable shareholdings": common,
+            "sponsorships": common + ["amount", "donor_status"],
+            "overseas visits": common + ["amount", "visit_dates", "purpose"],
+            "miscellaneous": common,
+            "miscellaneous and unremunerated interests": common,
+            "sponsorship or financial or material support":
+                common + ["amount", "donor_status"],
+            "gifts, benefits and hospitality (uk)":
+                common + ["amount", "nature", "donor_status"],
+            "overseas benefits and gifts":
+                common + ["amount", "nature", "donor_status"],
+            "remunerated employment, office, profession etc":
+                common + ["amount"],
+            "remunerated employment, office, profession, etc_":
+                common + ["amount"],
+            "remunerated employment, office, profession et":
+                common + ["amount"],
+        }
         results = []
-        search_string = u"""
-            MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
-            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
-            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
-            MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
-            RETURN cat.category, int.name, int.donor_type, int.company_reg,
-                p.amount, p.received, p.registered, labels(int) as labels
-            ORDER BY p.received DESC
-        """.format(self.vertex["name"])
-        output = self.query(search_string)
-        for entry in output:
-            detail = {
-                "interest": {
-                    "name": entry["int.name"],
-                    "labels": entry["labels"],
-                    "donor_type": entry["int.donor_type"],
-                    "company_reg": entry["int.company_reg"],
-                    "details_url": None,
-                    "api_url": None
-                },
-                "category": entry["cat.category"],
-                "amount_int": entry["p.amount"],
-                "amount": self._convert_to_currency(entry["p.amount"]),
-                "received": entry["p.received"],
-                "registered": entry["p.registered"]
-            }
-            results.append(detail)
+        for category in self.interest_categories:
+            interests = []
+            category_low = category.lower()
+
+            values = [
+                "p.%s" % field for field in category_fields[category_low]
+            ]
+
+            search_string = u"""
+                MATCH (mp:`Member of Parliament` {{name:"{0}"}}) with mp
+                MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+                    WHERE cat.category = "{1}"
+                MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with mp, cat, rel
+                MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with mp, cat, rel, int
+                MATCH (rel)-[:REMUNERATION_RECEIVED]-(p) with mp, cat, rel, int, p
+                RETURN labels(int) as labels, {2}
+            """.format(self.vertex["name"], category, ", ".join(values))
+
+            output = self.query(search_string)
+            for entry in output:
+                interest = {
+                    "name": entry["p.contributor"],
+                    "labels": entry["labels"]
+                }
+                if "donor_status" in category_fields[category_low]:
+                    interest["donor_status"] = entry["p.donor_status"]
+                detail = {
+                    "interest": interest,
+                    "category": category,
+                    "recipient": entry["p.recipient"],
+                    "source_url": entry["p.source_url"],
+                    "source_fetched": entry["p.source_fetched"],
+                    "source_linked_from": entry["p.source_linked_from"],
+                    "recorded_date": entry["p.`recorded date`"],
+                    "registered": entry["p.registered"],
+                }
+
+                if "amount" in category_fields[category_low]:
+                    detail["amount"] = self._convert_to_currency(entry["p.amount"])
+                    detail["amount_int"] = entry["p.amount"]
+
+                if "visit_dates" in category_fields[category_low]:
+                    detail["visit_dates"] = entry["p.visit_dates"]
+
+                if "purpose" in category_fields[category_low]:
+                    detail["purpose"] = entry["p.purpose"]
+
+                if "nature" in category_fields[category_low]:
+                    detail["nature"] = entry["p.nature"]
+
+                interests.append(detail)
+
+            results.append({"category": category, "interests": interests})
+
         return results
     
     def _get_interests_summary(self):
@@ -233,7 +292,7 @@ class MemberOfParliament(NamedEntity):
         register = {
             "remuneration_total": self._convert_to_currency(total),
             "remuneration_total_int": total,
-            "interest_categories": self._interest_categories(),
+            "interest_categories": self._interest_categories_count(),
             "interest_relationships": self._interest_relationships(),
             "remuneration_count": self._remuneration_count(),
         }
@@ -250,6 +309,37 @@ class MemberOfParliament(NamedEntity):
         return self.query(query)[0]["total"]
 
     def _interest_categories(self):
+        results = []
+
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
+            RETURN DISTINCT cat.category
+        """.format(self.vertex["name"])
+        output = self.query(query)
+
+        # TODO include Clients once parser is fixed
+        # TODO include 'Loans and... ' once parsed
+        excluded_categories = [
+            u"Land and Property",
+            u"Clients",
+            u"Gifts, benefits and hospitality (UK) Hours: 8 hrs_",
+            u"Loans and other controlled transactions",
+            u"Remunerated employment, office, profession etc_",
+            u"remunerated employment, office, profession et"
+        ]
+
+        for entry in output:
+            results.append(entry[0])
+
+        for category in excluded_categories:
+            if category in results:
+                results.remove(category)
+                self._logger.debug(" ** excluded category: %s" % category)
+
+        return results
+
+    def _interest_categories_count(self):
         query = u"""
             MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
             MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat

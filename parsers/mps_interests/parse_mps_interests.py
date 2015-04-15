@@ -70,52 +70,59 @@ class ParseMPsInterests:
 
         #self._show_record(record)
 
-        category_name = record["category_name"]
+        category_name = self._fix_categories(record["category_name"])
 
         self._logger.debug("* %s" % category_name)
 
-        if category_name == "Directorships":
+        if category_name.lower() == "directorships":
             return self._parse_list_record(record)
-        elif category_name == "Remunerated directorships":
-            return self._parse_list_record(record)
-            #pass
-        elif category_name == "Remunerated employment, office, profession etc":
+        elif category_name.lower() == "remunerated directorships":
             return self._parse_list_record(record)
             #pass
-        elif category_name == "Remunerated employment, office, profession, etc_":
+        elif category_name.lower() == "remunerated employment, office, profession etc":
             return self._parse_list_record(record)
             #pass
-        elif category_name == "Clients":
+        elif category_name.lower() == "remunerated employment, office, profession, etc_":
+            return self._parse_list_record(record)
+            #pass
+        elif category_name.lower() == "clients":
+            # TODO Fix client parser
             return self._parse_clients(record)
             #pass
-        elif category_name == "Land and Property":
+        elif category_name.lower() == "land and property":
             pass
             #return self._parse_land_ownership(record)
             #pass
-        elif category_name == "Shareholdings":
+        elif category_name.lower() == "shareholdings":
             return self._parse_unstructured_record(record)
             #pass
-        elif category_name == "Registrable shareholdings":
+        elif category_name.lower() == "registrable shareholdings":
             return self._parse_unstructured_record(record)
             #pass
-        elif category_name == "Sponsorships":
+        elif category_name.lower() == "sponsorships":
             return self._parse_sponsorships(record)
             #pass
-        elif category_name == "Sponsorship or financial or material support":
+        elif category_name.lower() == "sponsorship or financial or material support":
             return self._parse_sponsorships(record)
             #pass
-        elif category_name == "Overseas visits":
+        elif category_name.lower() == "overseas visits":
             return self._parse_travel_record(record)
             #pass
-        elif category_name == "Gifts, benefits and hospitality (UK)":
+        elif category_name.lower() == "gifts, benefits and hospitality (UK)":
             return self._parse_gifts(record)
             #pass
-        elif category_name == "Overseas benefits and gifts":
+        elif category_name.lower() == "overseas benefits and gifts":
             return self._parse_gifts(record)
             #pass
-        elif category_name == "Miscellaneous":
+        elif category_name.lower() == "miscellaneous":
             return self._parse_unstructured_record(record)
             #pass
+        elif category_name.lower() == "miscellaneous and unremunerated interests":
+            return self._parse_unstructured_record(record)
+            #pass
+        elif category_name.lower() == "loans and other controlled transactions":
+            # TODO write a parser for this
+            pass
         else:
             self._logger.debug("   * %s" % category_name)
 
@@ -474,6 +481,21 @@ class ParseMPsInterests:
 
     def _print_out(self, key, value):
         self._logger.debug("  %-30s%-20s" % (key, value))
+
+    @staticmethod
+    def _fix_categories(cat):
+        if cat == "Remunerated employment, office, profession, etc_":
+            cat = "Remunerated employment, office, profession etc"
+
+        if cat == "Remunerated employment, office, profession etc_":
+            cat = "Remunerated employment, office, profession etc"
+
+        if cat == "remunerated employment, office, profession et":
+            cat = "Remunerated employment, office, profession etc"
+
+        if cat == "Gifts, benefits and hospitality (UK) Hours: 8 hrs_":
+            cat = "Gifts, benefits and hospitality (UK)"
+        return cat
 
 
 def parse(**kwargs):

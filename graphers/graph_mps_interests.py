@@ -112,7 +112,7 @@ class GraphMPsInterests():
             elif category_name == "Gifts, benefits and hospitality (UK)":
                 self._logger.debug(category_name)
                 self._graph_gifts(new_category, category["category_records"])
-            elif category_name == "Gifts, benefits and hospitality (UK)":
+            elif category_name == "Overseas benefits and gifts":
                 self._logger.debug(category_name)
                 self._graph_gifts(new_category, category["category_records"])
             elif category_name == "Miscellaneous":

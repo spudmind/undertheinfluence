@@ -183,7 +183,7 @@ class PopulateMpsApi():
 
         mp = government_models.MemberOfParliament(name)
         positions = mp.positions
-        departments = mp.committees
+        committees = mp.committees
         register = mp.interests_summary
         ec = mp.donations_summary
         meetings = mp.meetings_summary
@@ -202,7 +202,7 @@ class PopulateMpsApi():
             "image_url": image_url,
             "influences": data_sources,
             "labels": labels,
-            "government_departments": departments,
+            "government_committees": committees,
             "government_positions": positions
         }
         self.db.save("api_mps", mp_data)

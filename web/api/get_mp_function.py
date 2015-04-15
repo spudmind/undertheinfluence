@@ -10,13 +10,15 @@ class MpApi(BaseAPI):
         self._db_table = 'api_mps'
 
     def request(self, args):
+
         name = args['name']
         result, _ = self._db.query(self._db_table, query=args)
 
         if len(result) > 0:
             mp = government_models.MemberOfParliament(name)
             meetings = self._influencer_urls(mp.meetings)
-            interests = self._nest_category(self._interest_urls(mp.interests))
+            #interests = self._nest_category(self._interest_urls(mp.interests))
+            interests = self._interest_urls(mp.interests)
             donations = self._donor_urls(mp.donations)
             result = {
                 'name': result[0]['name'],
@@ -28,22 +30,29 @@ class MpApi(BaseAPI):
                     "meetings": meetings
                 },
                 "government_positions": result[0]["government_positions"],
-                "government_departments": self._committee_detail_urls(
-                    result[0]["government_departments"]
+                "government_committees": self._committee_detail_urls(
+                    result[0]["government_committees"]
                 ),
             }
         return result
 
     def _interest_urls(self, interests):
         results = []
-        for interest in interests:
-            updated = interest
-            interest_name = interest["interest"]["name"]
-            interest_labels = interest["interest"]["labels"]
-            urls = self.named_entity_resources(interest_name, interest_labels)
-            updated["interest"]["details_url"] = urls[0]
-            updated["interest"]["api_url"] = urls[1]
-            results.append(updated)
+        for entry in interests:
+            entry["category"]
+            updated_interests = []
+            for interest in entry["interests"]:
+                updated = interest
+                interest_name = interest["interest"]["name"]
+                interest_labels = interest["interest"]["labels"]
+                urls = self.named_entity_resources(interest_name, interest_labels)
+                updated["interest"]["details_url"] = urls[0]
+                updated["interest"]["api_url"] = urls[1]
+                updated_interests.append(updated)
+
+            if len(updated_interests) > 1:
+                entry["interests"] = updated_interests
+                results.append(entry)
         return results
 
     def _donor_urls(self, donations):

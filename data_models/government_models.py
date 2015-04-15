@@ -181,18 +181,25 @@ class MemberOfParliament(NamedEntity):
             MATCH (p)-[:ATTENDED_BY]-(m) with mp, p, m
                 WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with mp, p, m, a
-            RETURN p.name as position, a.name as attendee, m.meeting as meeting,
-                m.purpose as purpose, m.date as date
+            RETURN p.name as position, p.title as title, a.name as attendee, m.meeting as meeting,
+                m.purpose as purpose, m.date as date, m.source_url, m.source_linked_from, m.source_fetched
             ORDER BY date
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
+            title = entry["title"]
+            if not title:
+                title = entry["meeting"].split(" - ")[0]
             meeting = {
                 "position": entry["position"],
                 "attendee": entry["attendee"],
                 "purpose": entry["purpose"],
+                "title": title,
                 "meeting": entry["meeting"],
                 "date": entry["date"],
+                "source_url": entry["m.source_url"],
+                "source_fetched": entry["m.source_fetched"],
+                "source_linked_from": entry["m.source_linked_from"],
             }
             results.append(meeting)
         return results
@@ -200,6 +207,7 @@ class MemberOfParliament(NamedEntity):
     def _get_interests(self):
         common = [
             "contributor",
+            "amount",
             "source_url",
             "source_fetched",
             "source_linked_from",
@@ -213,22 +221,19 @@ class MemberOfParliament(NamedEntity):
             # "Clients": common,
             "shareholdings": common,
             "registrable shareholdings": common,
-            "sponsorships": common + ["amount", "donor_status"],
-            "overseas visits": common + ["amount", "visit_dates", "purpose"],
             "miscellaneous": common,
             "miscellaneous and unremunerated interests": common,
-            "sponsorship or financial or material support":
-                common + ["amount", "donor_status"],
+            "remunerated employment, office, profession etc": common,
+            "remunerated employment, office, profession, etc_": common,
+            "remunerated employment, office, profession et": common,
+            "overseas visits": common + ["visit_dates", "purpose"],
+            "sponsorships": common + ["donor_status"],
+            "sponsorship or financial or material support": common + ["donor_status"],
             "gifts, benefits and hospitality (uk)":
-                common + ["amount", "nature", "donor_status"],
+                common + ["donor_status", "nature", ],
             "overseas benefits and gifts":
-                common + ["amount", "nature", "donor_status"],
-            "remunerated employment, office, profession etc":
-                common + ["amount"],
-            "remunerated employment, office, profession, etc_":
-                common + ["amount"],
-            "remunerated employment, office, profession et":
-                common + ["amount"],
+                common + ["donor_status", "nature"],
+
         }
         results = []
         for category in self.interest_categories:
@@ -399,9 +404,11 @@ class MemberOfParliament(NamedEntity):
             MATCH (mp)-[:FUNDING_RELATIONSHIP]-(rel) with mp, rel
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with mp, rel, x
             MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(p) with mp, rel, p, x
-            RETURN p.name, p.donor_type, p.company_reg, x.amount, x.reported_date, x.received_date,
-                x.nature, x.purpose, x.ec_reference, x.accepted_date, x.recd_by, labels(p) as labels
-            ORDER BY x.received_date DESC
+            RETURN p.name, p.donor_type, p.company_reg, x.amount, x.reported_date,
+                x.received_date, x.nature, x.purpose, x.ec_reference,
+                x.accepted_date, x.recd_by, x.source_url, x.source_linked_from,
+                x.source_fetched, labels(p) as labels
+            ORDER BY x.accepted_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
         for entry in output:
@@ -422,7 +429,10 @@ class MemberOfParliament(NamedEntity):
                 "ec_reference": entry["x.ec_reference"],
                 "recd_by": entry["x.recd_by"],
                 "nature": entry["x.nature"],
-                "purpose": entry["x.purpose"]
+                "purpose": entry["x.purpose"],
+                "source_url": entry["x.source_url"],
+                "source_fetched": entry["x.source_fetched"],
+                "source_linked_from": entry["x.source_linked_from"],
             }
             results.append(detail)
         return results

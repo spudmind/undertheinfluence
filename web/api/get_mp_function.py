@@ -14,8 +14,6 @@ class MpApi(BaseAPI):
         name = args['name']
         result, _ = self._db.query(self._db_table, query=args)
 
-        print result
-
         if len(result) > 0:
             mp = government_models.MemberOfParliament(name)
             meetings = self._influencer_urls(mp.meetings)
@@ -51,8 +49,10 @@ class MpApi(BaseAPI):
                 updated["interest"]["details_url"] = urls[0]
                 updated["interest"]["api_url"] = urls[1]
                 updated_interests.append(updated)
-            entry["interests"] = updated_interests
-            results.append(entry)
+
+            if len(updated_interests) > 1:
+                entry["interests"] = updated_interests
+                results.append(entry)
         return results
 
     def _donor_urls(self, donations):

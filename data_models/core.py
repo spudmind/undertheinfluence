@@ -120,7 +120,7 @@ class BaseDataModel:
     @staticmethod
     def _convert_to_currency(number):
         if isinstance(number, int):
-            return u'£{:20,.2f}'.format(number)
+            return u'£{:20,}'.format(number)
         else:
             return None
 

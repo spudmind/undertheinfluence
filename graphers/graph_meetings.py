@@ -83,6 +83,7 @@ class GraphMeetings():
             "host_name": meeting["host_name"],
             "host_position": meeting["host_position"],
             "department": meeting["department"],
+            "title": meeting["title"],
             "attendee": meeting["organisation"],
             "purpose": meeting["purpose"],
             "date": date,

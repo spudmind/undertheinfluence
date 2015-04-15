@@ -280,7 +280,9 @@ influencer_entities = [
     u"Ladbrokes Betting and Gaming Ltd",
     u"Nestlé UK",
     u"Japan Tobacco International",
-    u"BP International Limited"
+    u"BP International Limited",
+    u"Sri Lanka Development Trust",
+    u"Government of Sri Lanka"
 
 ]
 

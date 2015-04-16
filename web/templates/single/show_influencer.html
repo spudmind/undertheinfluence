@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "single/single.html" %}
 {% block article %}
 
     <div class="row">
@@ -39,6 +39,9 @@
                                         <th>Date</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 5 %}
+                                        {% include "_partials/_tfooter.html" %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for meeting in influencer.influences_detail.meetings %}
                                         <tr>
@@ -78,6 +81,9 @@
                                         <th>Contact</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 3 %}
+                                        {% include "_partials/_tfooter.html" %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for lobby in influencer.influences_detail.lobby_registers %}
                                         <tr>
@@ -118,6 +124,9 @@
                                             <th>Registered</th>
                                         </tr>
                                         </thead>
+                                        {% with cols = 5 %}
+                                            {% include "_partials/_tfooter.html" %}
+                                        {% endwith %}
                                         <tbody>
                                         {% for interest in interest.interests %}
                                             <tr>
@@ -166,6 +175,9 @@
                                         <th>Purpose</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 8 %}
+                                        {% include "_partials/_tfooter.html" %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for donation in influencer.influences_detail.electoral_commission %}
                                         <tr>

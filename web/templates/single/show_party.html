@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "single/single.html" %}
 {% block article %}
 
     <div class="row">
@@ -40,6 +40,9 @@
                                         <th>Nature</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 7 %}
+                                        {% include '_partials/_tfooter.html' %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for donation in party.influences_detail.electoral_commission %}
                                         <tr>

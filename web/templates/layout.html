@@ -13,6 +13,8 @@
     <link href="{{ url_for('static', filename='material/css-compiled/ripples.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='material/css-compiled/material-wfont.css') }}" rel="stylesheet">
 
+    {% block css_extras %}{% endblock %}
+
     <style type="text/css">
         body {
             padding-top: 20px;
@@ -128,11 +130,11 @@
 <script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
 <!-- <script src="{{ url_for('static', filename='js/app/main.js') }}"></script> -->
 
-<script type="text/javascript">
-    $.material.init()
-</script>
+{% block js_extras %}{% endblock %}
+
 <script type="text/javascript">
     $(document).ready(function() {
+        $.material.init();
         $("[data-toggle=tooltip]").tooltip();
     });
 </script>

@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "single/single.html" %}
 {% block article %}
 
     <div class="row">
@@ -67,11 +67,14 @@
                         <th>Source</th>
                     </tr>
                     </thead>
+                    {% with cols = 5 %}
+                        {% include "_partials/_tfooter.html" %}
+                    {% endwith %}
                     <tbody>
                     {% for meeting in mp.influences_detail.meetings %}
                         <tr>
                             <td>{{ meeting.position }}</td>
-                            <td><a href="{{ meeting.attendee["details_url"] }}">{{ meeting.attendee["name"] }}</a></td>
+                            <td><a href="{{ meeting.attendee['details_url'] }}">{{ meeting.attendee["name"] }}</a></td>
                             <td>{{ meeting.purpose }}</td>
                             <td>{{ meeting.date }}</td>
                             <td>
@@ -115,11 +118,14 @@
                                 <th>Source</th>
                             </tr>
                             </thead>
+                            {% with cols = 6 %}
+                                {% include "_partials/_tfooter.html" %}
+                            {% endwith %}
                             <tbody>
                             {% for interest in interest.interests %}
                                 <tr>
                                     <td>{{ interest.amount }}</td>
-                                    <td><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></td>
+                                    <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
                                     <td>{{ interest.interest["donor_status"] }}</td>
                                     <td>{{ interest.nature }}</td>
                                     <td>{{ interest.registered }}</td>
@@ -155,11 +161,14 @@
                                 <th>Source</th>
                             </tr>
                             </thead>
+                            {% with cols = 6 %}
+                                {% include "_partials/_tfooter.html" %}
+                            {% endwith %}
                             <tbody>
                             {% for interest in interest.interests %}
                                 <tr>
                                     <td>{{ interest.amount }}</td>
-                                    <td><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></td>
+                                    <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
                                     <td>{{ interest.interest["visit_dates"] }}</td>
                                     <td>{{ interest.interest["purpose"] }}</td>
                                     <td>{{ interest.registered }}</td>
@@ -194,11 +203,14 @@
                                 <th>Source</th>
                             </tr>
                             </thead>
+                            {% with cols = 5 %}
+                                {% include "_partials/_tfooter.html" %}
+                            {% endwith %}
                             <tbody>
                             {% for interest in interest.interests %}
                                 <tr>
                                     <td>{{ interest.amount }}</td>
-                                    <td><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></td>
+                                    <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
                                     <td>{{ interest.interest["donor_status"] }}</td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
@@ -229,11 +241,14 @@
                                 <th>Source</th>
                             </tr>
                             </thead>
+                            {% with cols = 4 %}
+                                {% include "_partials/_tfooter.html" %}
+                            {% endwith %}
                             <tbody>
                             {% for interest in interest.interests %}
                                 <tr>
                                     <td>{{ interest.amount }}</td>
-                                    <td><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></td>
+                                    <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
                                         <small><a href="{{ interest.source_url }}">link</a></small> /
@@ -281,11 +296,14 @@
                         <th>Source</th>
                     </tr>
                     </thead>
+                    {% with cols = 8 %}
+                        {% include "_partials/_tfooter.html" %}
+                    {% endwith %}
                     <tbody>
                     {% for donation in mp.influences_detail.electoral_commission %}
                         <tr>
                             <td>{{ donation.amount }}</td>
-                            <td><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></td>
+                            <td><a href="{{ donation.donor['details_url'] }}">{{ donation.donor["name"] }}</a></td>
                             <td>{{ donation.nature }}</td>
                             <td>{{ donation.purpose }}</td>
                             <td>{{ donation.ec_reference }}</td>

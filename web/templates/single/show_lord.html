@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "single/single.html" %}
 {% block article %}
 
     <div class="row">
@@ -41,6 +41,9 @@
                                         <th>Date</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 5 %}
+                                        {% include "_partials/_tfooter.html" %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for meeting in lord.influences_detail.meetings %}
                                         <tr>
@@ -80,6 +83,9 @@
                                             <th>Company Reg</th>
                                         </tr>
                                         </thead>
+                                        {% with cols = 4 %}
+                                            {% include "_partials/_tfooter.html" %}
+                                        {% endwith %}
                                         <tbody>
                                         {% for interest in interest.interests %}
                                             <tr>
@@ -112,6 +118,9 @@
                                         <th>Company Reg</th>
                                     </tr>
                                     </thead>
+                                    {% with cols = 4 %}
+                                        {% include "_partials/_tfooter.html" %}
+                                    {% endwith %}
                                     <tbody>
                                     {% for donation in lord.influences_detail.electoral_commission %}
                                         <tr>

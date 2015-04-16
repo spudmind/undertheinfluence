@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block css_extras %}
+<link href="{{ url_for('static', filename='css/lib/theme.bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/lib/jquery.tablesorter.pager.min.css') }}" rel="stylesheet">
+{% endblock css_extras %}
+
+{% block js_extras %}
+<script src="{{ url_for('static', filename='js/lib/jquery.tablesorter.combined.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/jquery.tablesorter.pager.min.js') }}"></script>
+
+<script>
+$(function() {
+    $("table").tablesorter({
+        theme : "bootstrap",
+        widthFixed: true,
+        headerTemplate : '{content} {icon}',
+        widgets : ["uitheme", "filter", "zebra"],
+        widgetOptions : {
+          zebra : ["odd", "even"],
+          filter_reset : ".reset"
+        }
+    })
+    .each(function() {
+        $(this).tablesorterPager({
+            // target the pager markup - see the HTML block below
+            container: $(this).find(".ts-pager"),
+            // target the pager page select dropdown - choose a page
+            cssGoto  : ".pagenum",
+            // remove rows from the table to speed up the sort of large tables.
+            // setting this to false, only hides the non-visible rows; needed if you plan to add/remove rows with the pager enabled.
+            removeRows: false
+        });
+    });
+});
+</script>
+{% endblock js_extras %}

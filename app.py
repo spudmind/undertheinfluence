@@ -238,21 +238,21 @@ def _build_title(args):
 def show_influencer(name):
     args = {"name": name}
     influencer = get_influencer_function.InfluencerApi().request(args)
-    return render_template('show_influencer.html', influencer=influencer)
+    return render_template('single/show_influencer.html', influencer=influencer)
 
 
 @app.route('/mp/<name>')
 def show_mp(name):
     args = {"name": name}
     mp = get_mp_function.MpApi().request(args)
-    return render_template('show_mp.html', mp=mp)
+    return render_template('single/show_mp.html', mp=mp)
 
 
 @app.route('/lord/<name>')
 def show_lord(name):
     args = {"name": name}
     lord = get_lord_function.LordApi().request(args)
-    return render_template('show_lord.html', lord=lord)
+    return render_template('single/show_lord.html', lord=lord)
 
 
 @app.route('/parties/')
@@ -269,7 +269,7 @@ def show_parties():
 def show_party(name):
     args = {"name": name}
     party = get_party_function.PoliticalPartyApi().request(args)
-    return render_template('show_party.html', party=party)
+    return render_template('single/show_party.html', party=party)
 
 
 @app.route('/committees/')

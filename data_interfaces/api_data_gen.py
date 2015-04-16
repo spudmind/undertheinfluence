@@ -273,6 +273,9 @@ class PopulatePoliticalPartyApi():
         name = record[0]
         image_url = record[1]
         weight = record[2]
+        labels = record[3]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
 
         party = government_models.PoliticalParty(name)
         ec = party.donations_summary
@@ -289,7 +292,8 @@ class PopulatePoliticalPartyApi():
             "mp_count": mp_count,
             "lord_count": lord_count,
             "influences": data_sources,
-            "image_url": image_url
+            "image_url": image_url,
+            "labels": labels
         }
         self.db.save("api_political_parties", party_data)
 

@@ -444,7 +444,6 @@ class GetData(Resource):
         return get_summary_data.DataApi().request(**args)
 
 
-
 api.add_resource(GetSummary, '/api/v0.1/', endpoint='getSummary')
 api.add_resource(GetPoliticians, '/api/v0.1/getPoliticians', endpoint='getPoliticians')
 api.add_resource(GetMp, '/api/v0.1/getMp', endpoint='getMp')

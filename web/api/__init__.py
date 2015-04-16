@@ -18,15 +18,15 @@ class BaseAPI:
                 #api = u"/api/v0.1/getLord?name={0}".format(name)
                 api = url_for('getLord', name=name, _external=True)
                 web = url_for('show_lord', name=name, _external=True)
+            elif "party" in labels or "Political Party" in labels:
+                #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
+                api = url_for('getPoliticalParty', name=name, _external=True)
+                web = url_for('show_party', name=name, _external=True)
             elif "influencer" in labels or "Donor" in labels \
                     or "Registered Interest" or "Lobby Agency Client" in labels:
                 #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
                 api = url_for('getInfluencer', name=name, _external=True)
                 web = url_for('show_influencer', name=name, _external=True)
-            elif "party" in labels or "Political Party" in labels:
-                #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
-                api = url_for('getPoliticalParty', name=name, _external=True)
-                web = url_for('show_party', name=name, _external=True)
             elif "Government Committee" in labels:
                 api = url_for('getPoliticians', government_committee=name, _external=True)
                 web = url_for('show_politicians', government_committee=name, _external=True)

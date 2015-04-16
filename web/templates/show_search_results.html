@@ -27,211 +27,286 @@
             </div>
         {% endif %}
         <div class="row-content">
-            <div class="least-content">
-                {% for label in entry["labels"] %}
-                    <span class="label label-success">{{ label }}</span>
-                {% endfor %}
-            </div>
+        <div class="least-content">
+
+        </div>
+        {% if "Lobby Agency" in entry["labels"] %}
+
             <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                 {% if entry.party %}
                     - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
                 {% endif %}
             </h4>
             <div class="row">
-                <div class="col-md-12">
-                    {% if "Lobby Agency" in entry["labels"] %}
-                        <div class="well well-sm">
-                            {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
-                                <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
-                                {% for client in entry.influences_summary.lobbying_registers.clients %}
-                                    * <a href="{{ client.details_url }}">{{ client.name }}</a>
-                                {% endfor %}
-                            {% endif %}
-                        </div >
-                    {% endif %}
-                    {% if "Lord" in entry["labels"] %}
+            <div class="col-md-12">
+            <p>
+                {% for label in entry["labels"] %}
+                    <span class="label label-success">{{ label }}</span>
+                {% endfor %}
+            </p>
 
-                        {% if "meetings" in entry.influences_summary %}
-                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
-                                <div class="well well-sm">
-                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
-                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
-                                        <br>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if "register_of_interests" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Register of Interests</b><br>
-                                {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
-                                {{ entry.influences_summary.register_of_interests.interest_categories }} categories
-                            </div>
-                        {% endif %}
-
-                        {% if "electoral_commission" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Electoral Commission</b><br>
-                                {{ entry.influences_summary.electoral_commission.donation_total }} donated across
-                                {{ entry.influences_summary.electoral_commission.donation_count }} donations
-
-                            </div>
-                        {% endif %}
-                    {% endif %}
-
-                    {% if "Member of Parliament" in entry["labels"] %}
-
-                        {% if "meetings" in entry.influences_summary %}
-                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
-                                <div class="well well-sm">
-                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
-                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
-                                        <br>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if entry["government_positions"] %}
-                            <div class="well well-sm">
-                                <b>Government Positions</b><br>
-                                {% for position in entry["government_positions"] %}
-                                    {{ position }} <br>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        {% if entry["government_departments"] %}
-                            <div class="well well-sm">
-                                <b>Government Roles</b><br>
-                                {% for position in entry["government_departments"] %}
-                                    {{ position }} <br>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        {% if "register_of_interests" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Register of Interests</b><br>
-                                {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
-                                {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
-                                {{ entry.influences_summary.register_of_interests.interest_categories }} categories
-                            </div>
-                        {% endif %}
-                        {% if "electoral_commission" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Electoral Commission</b><br>
-                                {{ entry.influences_summary.electoral_commission.donation_total }} received from
-                                {{ entry.influences_summary.electoral_commission.donor_count }} donations
-                            </div>
-                        {% endif %}
-                    {% endif %}
-
-                    {% if "Lobby Agency Client" in entry["labels"] or "Donor" in entry["labels"] or "Registered Interest" in entry["labels"] or "Meeting Attendee" in entry["labels"] %}
-
-                        {% if "meetings" in entry.influences_summary %}
-                            {% if entry.influences_summary.meetings.meeting_count > 1 %}
-                                <div class="well well-sm">
-                                    <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if "lobby_registers" in entry.influences_summary %}
-                            {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
-                                <div class="well well-sm">
-                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
-                                </div>
-                            {% else %}
-                                <div class="well well-sm">
-                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if "register_of_interests" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Register of Interests</b><br>
-                                {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
-                                    {{ entry.influences_summary.register_of_interests.remuneration_total }} in
-                                {% endif %}
-                                {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
-                                    {{ entry.influences_summary.register_of_interests.remuneration_count }} registered interests
-                                    across
-                                {% endif %}
-                                {{ entry.influences_summary.register_of_interests.relationship_count }} relationships
-                            </div>
-                        {% endif %}
-                        {% if "electoral_commission" in entry.influences_summary %}
-                            <div class="well well-sm">
-                                <b>Electoral Commission</b><br>
-                                {{ entry.influences_summary.electoral_commission.donation_total }} donated across
-                                {{ entry.influences_summary.electoral_commission.donation_count }} donations
-                            </div>
-                        {% endif %}
-                    {% endif %}
-
-                    {% if "Political Party" in entry["labels"] %}
-                        <div class="well well-sm">
-                            {% if party.mp_count > 0%}
-                                {{ party.mp_count }} Members of Parliament.
-                            {% endif %}
-                            {% if party.lord_count > 0%}
-                                {{ party.lord_count }} Lords
-                            {% endif %}
-                            {% if "electoral_commission" in party.influences_summary %}
-                                <br>
-                                {{ party.influences_summary.electoral_commission.donation_total }} donations received from
-                                {{ party.influences_summary.electoral_commission.donation_count }} donations
-                            {% endif %}
-                        </div >
-                    {% endif %}
-
-                    {% if "Government Department" in entry["labels"] or "Government Position" in entry["labels"] %}
-                        <div class="well well-sm">
-                            <b>Summary</b>
-                            {% if "register_of_interests" in entry.influences_summary %}
-                                <br>
-                                {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
-                                {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
-                                {{ entry.influences_summary.register_of_interests.interest_categories }} categories.
-                            {% endif %}
-                            {% if "electoral_commission" in entry.influences_summary %}
-                                <br>
-                                {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
-                                {{ entry.influences_summary.electoral_commission.donor_count }} donations.
-                            {% endif %}
-                        </div >
-
-                        <div class="well well-sm">
-                            {% if entry.weight > 0 %}
-                                <b>{{ entry.weight }} Members:</b>
-                                {% for member in entry.members %}
-                                    <a href="{{ member.detail_url }}">{{ member.name }}</a>.
-                                {% endfor %}
-                            {% endif %}
-                        </div >
-
-                    {% endif %}
-                </div >
+            <div class="well well-sm">
+                {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
+                    <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
+                    {% for client in entry.influences_summary.lobbying_registers.clients %}
+                        * <a href="{{ client.details_url }}">{{ client.name }}</a>
+                    {% endfor %}
+                {% endif %}
             </div >
-        </div>
-        </div>
+
+
+        {% elif "Political Party" in entry["labels"] %}
+            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                {% if entry.party %}
+                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                {% endif %}
+            </h4>
+            <div class="row">
+            <div class="col-md-12">
+            <p>
+                {% for label in entry["labels"] %}
+                    <span class="label label-success">{{ label }}</span>
+                {% endfor %}
+            </p>
+
+            <div class="well well-sm">
+
+                {% if "electoral_commission" in entry.influences_summary %}
+                    <b>Electoral Commission</b><br>
+                    {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
+                    {{ entry.influences_summary.electoral_commission.donation_count }} donations
+                {% endif %}
+
+            </div >
+
+
+        {% elif "Lord" in entry["labels"] %}
+
+            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                {% if entry.party %}
+                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                {% endif %}
+            </h4>
+            <div class="row">
+            <div class="col-md-12">
+            <p>
+                {% for label in entry["labels"] %}
+                    <span class="label label-success">{{ label }}</span>
+                {% endfor %}
+            </p>
+
+            {% if "meetings" in entry.influences_summary %}
+                {% if "meeting_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meeting_count > 1 %}
+                    <div class="well well-sm">
+                        {% for position in entry.influences_summary.meetings.meetings_per_position %}
+                            <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
+                            <br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if "register_of_interests" in entry.influences_summary %}
+                <div class="well well-sm">
+                    <b>Register of Interests</b><br>
+                    {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
+                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
+                </div>
+            {% endif %}
+
+            {% if "electoral_commission" in entry.influences_summary %}
+                <div class="well well-sm">
+                    <b>Electoral Commission</b><br>
+                    {{ entry.influences_summary.electoral_commission.donation_total }} donated across
+                    {{ entry.influences_summary.electoral_commission.donation_count }} donations
+
+                </div>
+            {% endif %}
+
+
+        {% elif "Member of Parliament" in entry["labels"] %}
+
+            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                {% if entry.party %}
+                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                {% endif %}
+            </h4>
+            <div class="row">
+            <div class="col-md-12">
+            <p>
+                {% for label in entry["labels"] %}
+                    <span class="label label-success">{{ label }}</span>
+                {% endfor %}
+            </p>
+
+
+            {% if "meetings" in entry.influences_summary %}
+                {% if "meeting_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meeting_count > 1 %}
+                    <div class="well well-sm">
+                        {% for position in entry.influences_summary.meetings.meetings_per_position %}
+                            <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
+                            <br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if entry["government_positions"] %}
+                <div class="well well-sm">
+                    <b>Government Positions</b><br>
+                    {% for position in entry["government_positions"] %}
+                        {{ position }} <br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if entry["government_departments"] %}
+                <div class="well well-sm">
+                    <b>Government Roles</b><br>
+                    {% for position in entry["government_departments"] %}
+                        {{ position }} <br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if "register_of_interests" in entry.influences_summary %}
+                <div class="well well-sm">
+                    <b>Register of Interests</b><br>
+                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
+                    {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
+                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
+                </div>
+            {% endif %}
+            {% if "electoral_commission" in entry.influences_summary %}
+                <div class="well well-sm">
+                    <b>Electoral Commission</b><br>
+                    {{ entry.influences_summary.electoral_commission.donation_total }} received from
+                    {{ entry.influences_summary.electoral_commission.donor_count }} donations
+                </div>
+            {% endif %}
+
+
+        {% elif "Government Committee" in entry["labels"] or "Government Position" in entry["labels"] %}
+
+            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                {% if entry.party %}
+                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                {% endif %}
+            </h4>
+            <div class="row">
+            <div class="col-md-12">
+            <p>
+                {% for label in entry["labels"] %}
+                    <span class="label label-success">{{ label }}</span>
+                {% endfor %}
+            </p>
+
+            <div class="well well-sm">
+                <b>Summary</b>
+                {% if "register_of_interests" in entry.influences_summary %}
+                    <br>
+                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
+                    {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
+                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories.
+                {% endif %}
+                {% if "electoral_commission" in entry.influences_summary %}
+                    <br>
+                    {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
+                    {{ entry.influences_summary.electoral_commission.donor_count }} donations.
+                {% endif %}
+            </div >
+
+            <div class="well well-sm">
+                {% if entry.weight > 0 %}
+                    <b>{{ entry.weight }} Members:</b>
+                    {% for member in entry.members %}
+                        <a href="{{ member.detail_url }}">{{ member.name }}</a>.
+                    {% endfor %}
+                {% endif %}
+            </div >
+
+
+        {% elif "Lobby Agency Client" in entry["labels"] or "Donor" in entry["labels"] or "Registered Interest" in entry["labels"] or "Meeting Attendee" in entry["labels"] and not "Political Party" in entry["labels"] %}
+
+            {% if not "Political Party" in entry["labels"] %}
+                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                    {% if entry.party %}
+                        - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                    {% endif %}
+                </h4>
+                <div class="row">
+                <div class="col-md-12">
+                <p>
+                    {% for label in entry["labels"] %}
+                        <span class="label label-success">{{ label }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
+            {% if "meetings" in entry.influences_summary %}
+                {% if entry.influences_summary.meetings.meeting_count > 1 %}
+                    <div class="well well-sm">
+                        <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if "lobby_registers" in entry.influences_summary %}
+                {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
+                    <div class="well well-sm">
+                        <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
+                    </div>
+                {% else %}
+                    <div class="well well-sm">
+                        <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if "register_of_interests" in entry.influences_summary %}
+                <div class="well well-sm">
+                    <b>Register of Interests</b><br>
+                    {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
+                        {{ entry.influences_summary.register_of_interests.remuneration_total }} in
+                    {% endif %}
+                    {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
+                        {{ entry.influences_summary.register_of_interests.remuneration_count }} registered interests
+                        across
+                    {% endif %}
+                    {{ entry.influences_summary.register_of_interests.relationship_count }} relationships
+                </div>
+            {% endif %}
+
+            {% if not "Political Party" in entry["labels"] %}
+                {% if "electoral_commission" in entry.influences_summary %}
+                    <div class="well well-sm">
+                        <b>Electoral Commission</b><br>
+                        {{ entry.influences_summary.electoral_commission.donation_total }} donated across
+                        {{ entry.influences_summary.electoral_commission.donation_count }} donations
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        {% endif %}
+
+
+    </div >
+    </div >
+    </div>
+    </div>
         <div class="list-group-separator"></div>
 
     {% endfor %}
-    </div>
-    <ul class="pager">
-        {% if page == 1  %}
-            <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-        {% else %}
-            <li class="previous"><a href="{{ url_for('show_search_result', page=page-1) }}">Previous page</a></li>
-        {% endif %}
-        <li class="next disabled"><a href="{{ url_for('show_search_result', page=page+1) }}">Next page</a></li>
-    </ul>
-    </div>
-    </div>
-    </div>
+</div>
+<ul class="pager">
+    {% if page == 1  %}
+        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
+    {% else %}
+        <li class="previous"><a href="{{ url_for('show_search_result', page=page-1) }}">Previous page</a></li>
+    {% endif %}
+    <li class="next disabled"><a href="{{ url_for('show_search_result', page=page+1) }}">Next page</a></li>
+</ul>
+</div>
+</div>
+</div>
 
 {% endblock article %}

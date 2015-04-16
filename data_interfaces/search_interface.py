@@ -11,7 +11,8 @@ class SearchInterface:
             "api_politicians",
             "api_influencers",
             "api_government",
-            "api_lobbyists"
+            "api_lobbyists",
+            "api_political_parties"
         ]
         search_query = {
             "query": {

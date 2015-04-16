@@ -205,43 +205,13 @@ class MemberOfParliament(NamedEntity):
         return results
 
     def _get_interests(self):
-        common = [
-            "contributor",
-            "amount",
-            "source_url",
-            "source_fetched",
-            "source_linked_from",
-            "recipient",
-            "`recorded date`",
-            "registered"
-        ]
-        category_fields = {
-            "directorships": common,
-            "remunerated directorships": common,
-            # "Clients": common,
-            "shareholdings": common,
-            "registrable shareholdings": common,
-            "miscellaneous": common,
-            "miscellaneous and unremunerated interests": common,
-            "remunerated employment, office, profession etc": common,
-            "remunerated employment, office, profession, etc_": common,
-            "remunerated employment, office, profession et": common,
-            "overseas visits": common + ["visit_dates", "purpose"],
-            "sponsorships": common + ["donor_status"],
-            "sponsorship or financial or material support": common + ["donor_status"],
-            "gifts, benefits and hospitality (uk)":
-                common + ["donor_status", "nature", ],
-            "overseas benefits and gifts":
-                common + ["donor_status", "nature"],
-
-        }
         results = []
         for category in self.interest_categories:
             interests = []
             category_low = category.lower()
 
             values = [
-                "p.%s" % field for field in category_fields[category_low]
+                "p.%s" % field for field in self.category_fields[category_low]
             ]
 
             search_string = u"""
@@ -256,11 +226,12 @@ class MemberOfParliament(NamedEntity):
 
             output = self.query(search_string)
             for entry in output:
+                this_category = self.category_fields[category_low]
                 interest = {
                     "name": entry["p.contributor"],
                     "labels": entry["labels"]
                 }
-                if "donor_status" in category_fields[category_low]:
+                if "donor_status" in this_category:
                     interest["donor_status"] = entry["p.donor_status"]
                 detail = {
                     "interest": interest,
@@ -273,17 +244,17 @@ class MemberOfParliament(NamedEntity):
                     "registered": entry["p.registered"],
                 }
 
-                if "amount" in category_fields[category_low]:
+                if "amount" in this_category:
                     detail["amount"] = self._convert_to_currency(entry["p.amount"])
                     detail["amount_int"] = entry["p.amount"]
 
-                if "visit_dates" in category_fields[category_low]:
+                if "visit_dates" in this_category:
                     detail["visit_dates"] = entry["p.visit_dates"]
 
-                if "purpose" in category_fields[category_low]:
+                if "purpose" in this_category:
                     detail["purpose"] = entry["p.purpose"]
 
-                if "nature" in category_fields[category_low]:
+                if "nature" in this_category:
                     detail["nature"] = entry["p.nature"]
 
                 interests.append(detail)
@@ -727,7 +698,7 @@ class PoliticalParties(BaseDataModel):
         search_string = u"""
             MATCH (d:`Political Party`)
             MATCH (d)-[x]-()
-            RETURN d.name, d.image_url, count(x) as weight
+            RETURN d.name, d.image_url, count(x) as weight, labels(d) as labels
             ORDER BY weight DESC
         """
         search_result = self.query(search_string)

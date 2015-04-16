@@ -13,6 +13,7 @@ class BaseDataModel:
         self.label = None
         self.document_label = 'Document'
         self.named_label = "Named Entity"
+        self.category_fields = self._set_categories()
 
     def fetch(self, label, primary_attribute, search):
         exists = False
@@ -99,6 +100,39 @@ class BaseDataModel:
         output = self.query(search_string)
         for result in output:
             yield result[0]
+
+    def _set_categories(self):
+        common = [
+            "contributor",
+            "amount",
+            "source_url",
+            "source_fetched",
+            "source_linked_from",
+            "recipient",
+            "`recorded date`",
+            "registered"
+        ]
+        category_fields = {
+            "directorships": common,
+            "remunerated directorships": common,
+            # "Clients": common,
+            "shareholdings": common,
+            "registrable shareholdings": common,
+            "miscellaneous": common,
+            "miscellaneous and unremunerated interests": common,
+            "remunerated employment, office, profession etc": common,
+            "remunerated employment, office, profession, etc_": common,
+            "remunerated employment, office, profession et": common,
+            "overseas visits": common + ["visit_dates", "purpose"],
+            "sponsorships": common + ["donor_status"],
+            "sponsorship or financial or material support": common + ["donor_status"],
+            "gifts, benefits and hospitality (uk)":
+                common + ["donor_status", "nature", ],
+            "overseas benefits and gifts":
+                common + ["donor_status", "nature"],
+
+        }
+        return category_fields
 
     def set_date(self, date, relationship):
         if '/' in date:

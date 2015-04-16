@@ -26,19 +26,19 @@
                                 <p class="list-group-item-text">
                                 <table class="table table-striped table-hover ">
                                     <colgroup>
-                                        <col span="1" style="width: 40%;">
                                         <col span="1" style="width: 20%;">
                                         <col span="1" style="width: 20%;">
                                         <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 8%;">
+                                        <col span="1" style="width: 5%;">
                                     </colgroup>
                                     <thead>
                                     <tr>
                                         <th>Position</th>
-                                        <th>Host</th>
-                                        <th>Meeting</th>
+                                        <th>Attendee</th>
                                         <th>Purpose</th>
                                         <th>Date</th>
+                                        <th>Source</th>
                                     </tr>
                                     </thead>
                                     {% with cols = 5 %}
@@ -47,11 +47,14 @@
                                     <tbody>
                                     {% for meeting in lord.influences_detail.meetings %}
                                         <tr>
-                                            <td><small>{{ meeting.position }}</small></td>
-                                            <td><small><a href="{{ meeting.attendee["details_url"] }}">{{ meeting.attendee["name"] }}</a></small></td>
-                                            <td><small>{{ meeting.meeting }}</small></td>
-                                            <td><small>{{ meeting.purpose }}</small></td>
-                                            <td><small>{{ meeting.date }}</small></td>
+                                            <td>{{ meeting.position }}</td>
+                                            <td><a href="{{ meeting.attendee['details_url'] }}">{{ meeting.attendee["name"] }}</a></td>
+                                            <td>{{ meeting.purpose }}</td>
+                                            <td>{{ meeting.date }}</td>
+                                            <td>
+                                                <small><a href="{{ meeting.source_url }}">link</a></small> /
+                                                <small><a href="{{ meeting.source_linked_from }}">from</a></small>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -79,8 +82,8 @@
                                         <tr>
                                             <th>Position</th>
                                             <th>Interest</th>
-                                            <th>Type</th>
-                                            <th>Company Reg</th>
+                                            <th>Registered</th>
+                                            <th>Source</th>
                                         </tr>
                                         </thead>
                                         {% with cols = 4 %}
@@ -89,45 +92,68 @@
                                         <tbody>
                                         {% for interest in interest.interests %}
                                             <tr>
-                                                <td><small>{{ interest.position }}</small></td>
-                                                <td><small><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></small></td>
-                                                <td><small>{{ interest.interest["donor_type"] }}</small></td>
-                                                <td><small>{{ interest.interest["company_reg"] }}</small></td>
+                                                <td>{{ interest.position }}</td>
+                                                <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
+
+                                                <td>{{ interest.registered }}</td>
+                                                <td>
+                                                    <a href="{{ interest.source_url }}">link</a>
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
 
-                                    <div class="list-group-separator"></div>
-
                                 {% endfor %}
                             </div>
                         </div>
                     {% endif %}
-                    <hr>
+
+
                     {% if lord.influences_detail.electoral_commission %}
                         <div class="list-group-item">
                             <div class="row-content">
                                 <h4 class="list-group-item-heading">Electoral Commission</h4>
                                 <table class="table table-striped table-hover ">
+                                    <colgroup>
+                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 20%;">
+                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 30%;">
+                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 10%;">
+                                        <col span="1" style="width: 10%;">
+                                    </colgroup>
                                     <thead>
                                     <tr>
                                         <th>Donation</th>
-                                        <th>Recipient</th>
-                                        <th>Type</th>
-                                        <th>Company Reg</th>
+                                        <th>Donor</th>
+                                        <th>Nature</th>
+                                        <th>Purpose</th>
+                                        <th>EC Reference</th>
+                                        <th>Accepted</th>
+                                        <th>Reported</th>
+                                        <th>Source</th>
                                     </tr>
                                     </thead>
-                                    {% with cols = 4 %}
+                                    {% with cols = 8 %}
                                         {% include "_partials/_tfooter.html" %}
                                     {% endwith %}
                                     <tbody>
                                     {% for donation in lord.influences_detail.electoral_commission %}
                                         <tr>
-                                            <td><small>{{ donation.amount }}</small></td>
-                                            <td><small><a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></small></td>
-                                            <td><small>{{ donation.recipient["donor_type"] }}</small></td>
-                                            <td><small>{{ donation.recipient["company_reg"] }}</small></td>
+                                            <td>{{ donation.amount }}</td>
+                                            <td><a href="{{ donation.recipient['details_url'] }}">{{ donation.recipient["name"] }}</a></td>
+                                            <td>{{ donation.nature }}</td>
+                                            <td>{{ donation.purpose }}</td>
+                                            <td>{{ donation.ec_reference }}</td>
+                                            <td>{{ donation.accepted }}</td>
+                                            <td>{{ donation.reported }}</td>
+                                            <td>
+                                                <small><a href="{{ donation.source_url }}">link</a></small> /
+                                                <small><a href="{{ donation.source_linked_from }}">from</a></small>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

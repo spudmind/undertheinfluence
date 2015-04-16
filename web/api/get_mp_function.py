@@ -39,7 +39,6 @@ class MpApi(BaseAPI):
     def _interest_urls(self, interests):
         results = []
         for entry in interests:
-            entry["category"]
             updated_interests = []
             for interest in entry["interests"]:
                 updated = interest

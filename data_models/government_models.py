@@ -489,6 +489,7 @@ class Lord(NamedEntity):
         if self.exists:
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meetings_summary()
+            self.interest_categories = self._interest_categories()
             self.interests = self._get_interests()
             self.interests_summary = self._get_interests_summary()
             self.donations = self._get_donations()
@@ -558,57 +559,98 @@ class Lord(NamedEntity):
             MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
                 WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
-            RETURN p.name as position, a.name as attendee, m.meeting as meeting,
-                m.purpose as purpose, m.date as date
+            RETURN p.name as position, a.name as attendee, m.title, m.meeting as meeting,
+                m.purpose as purpose, m.date as date, m.source_url,
+                m.source_linked_from, m.source_fetched
             ORDER BY date
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
+            title = entry["title"]
+            if not title:
+                title = entry["meeting"].split(" - ")[0]
             meeting = {
                 "position": entry["position"],
                 "attendee": entry["attendee"],
                 "purpose": entry["purpose"],
+                "title": title,
                 "meeting": entry["meeting"],
                 "date": entry["date"],
+                "source_url": entry["m.source_url"],
+                "source_fetched": entry["m.source_fetched"],
+                "source_linked_from": entry["m.source_linked_from"],
             }
             results.append(meeting)
         return results
 
     def _get_interests(self):
         results = []
-        search_string = u"""
-            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
-            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
-            MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with lord, cat, rel
-            MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with lord, cat, rel, int
-            RETURN cat.category, rel.position, int.name, int.donor_type,
-                int.company_reg, labels(int) as labels
-        """.format(self.vertex["name"])
-        output = self.query(search_string)
-        for entry in output:
-            detail = {
-                "category": entry["cat.category"],
-                "interest": {
-                    "name": entry["int.name"],
-                    "labels": entry["labels"],
-                    "donor_type": entry["int.donor_type"],
-                    "company_reg": entry["int.company_reg"],
-                    "details_url": None,
-                    "api_url": None
-                },
-                "position": entry["rel.position"]
-            }
-            results.append(detail)
+        for category in self.interest_categories:
+            interests = []
+
+            search_string = u"""
+                MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+                MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with cat
+                    WHERE cat.category = "{1}"
+                MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel) with cat, rel
+                MATCH (rel)-[:REMUNERATION_RECEIVED]-(det) with cat, rel, det
+                MATCH (rel)-[:REGISTERED_CONTRIBUTOR]-(int) with cat, rel, int, det
+                RETURN cat.category, det.contributor, det.position, det.source_url,
+                    det.registered, labels(int) as labels
+            """.format(self.vertex["name"], category)
+            output = self.query(search_string)
+            for entry in output:
+                detail = {
+                    "category": entry["cat.category"],
+                    "interest": {
+                        "name": entry["det.contributor"],
+                        "labels": entry["labels"],
+                        "details_url": None,
+                        "api_url": None
+                    },
+                    "position": entry["det.position"],
+                    "source_url": entry["det.source_url"],
+                    "registered": entry["det.registered"],
+                }
+
+                interests.append(detail)
+
+            results.append({"category": category, "interests": interests})
+
         return results
 
     def _get_interests_summary(self):
         register = {
             "interest_relationships": self._interest_relationships(),
-            "interest_categories": self._interest_categories()
+            "interest_categories": self._interest_categories_count()
         }
         return register
 
     def _interest_categories(self):
+        results = []
+
+        query = u"""
+            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
+            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with cat
+            RETURN DISTINCT cat.category
+        """.format(self.vertex["name"])
+        output = self.query(query)
+
+        excluded_categories = [
+            u"Land and Property",
+        ]
+
+        for entry in output:
+            results.append(entry[0])
+
+        for category in excluded_categories:
+            if category in results:
+                results.remove(category)
+                self._logger.debug(" ** excluded category: %s" % category)
+
+        return results
+
+    def _interest_categories_count(self):
         query = u"""
             MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
             MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
@@ -633,8 +675,9 @@ class Lord(NamedEntity):
             MATCH (rel)-[:DONATION_RECEIVED]-(x) with rel, x
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN donr.name, donr.donee_type, donr.recipient_type,
-            x.amount, x.reported_date,x.received_date, x.nature,
-            x.purpose,x.accepted_date, x.ec_reference, x.recd_by, labels(donr) as labels
+                x.amount, x.reported_date,x.received_date, x.nature,
+                x.purpose,x.accepted_date, x.ec_reference, x.recd_by,
+                labels(donr) as labels, x.source_url, x.source_linked_from
             ORDER by x.reported_date DESC
         """.format(self.vertex["name"])
         output = self.query(search_string)
@@ -657,7 +700,9 @@ class Lord(NamedEntity):
                 "ec_reference": entry["x.ec_reference"],
                 "recd_by": entry["x.recd_by"],
                 "nature": entry["x.nature"],
-                "purpose": entry["x.purpose"]
+                "purpose": entry["x.purpose"],
+                "source_url": entry["x.source_url"],
+                "source_linked_from": entry["x.source_linked_from"],
             }
             results.append(detail)
         return results

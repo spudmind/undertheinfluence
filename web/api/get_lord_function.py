@@ -18,9 +18,7 @@ class LordApi(BaseAPI):
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
-                    "register_of_interests": self._nest_category(
-                        self._interest_urls(lord.interests)
-                    ),
+                    "register_of_interests": self._interest_urls(lord.interests),
                     "electoral_commission": self._recipient_urls(lord.donations),
                 },
             }
@@ -28,14 +26,20 @@ class LordApi(BaseAPI):
 
     def _interest_urls(self, interests):
         results = []
-        for interest in interests:
-            updated = interest
-            interest_name = interest["interest"]["name"]
-            interest_labels = interest["interest"]["labels"]
-            urls = self.named_entity_resources(interest_name, interest_labels)
-            updated["interest"]["details_url"] = urls[0]
-            updated["interest"]["api_url"] = urls[1]
-            results.append(updated)
+        for entry in interests:
+            updated_interests = []
+            for interest in entry["interests"]:
+                updated = interest
+                interest_name = interest["interest"]["name"]
+                interest_labels = interest["interest"]["labels"]
+                urls = self.named_entity_resources(interest_name, interest_labels)
+                updated["interest"]["details_url"] = urls[0]
+                updated["interest"]["api_url"] = urls[1]
+                updated_interests.append(updated)
+
+            if len(updated_interests) > 1:
+                entry["interests"] = updated_interests
+                results.append(entry)
         return results
 
     def _recipient_urls(self, donations):

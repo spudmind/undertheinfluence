@@ -18,6 +18,7 @@ class LordApi(BaseAPI):
                 'name': result[0]['name'],
                 'influences_summary': result[0]['influences'],
                 'influences_detail': {
+                    "meetings": self._influencer_urls(lord.meetings),
                     "register_of_interests": self._interest_urls(lord.interests),
                     "electoral_commission": self._recipient_urls(lord.donations),
                 },
@@ -45,6 +46,7 @@ class LordApi(BaseAPI):
     def _recipient_urls(self, donations):
         results = []
         for donation in donations:
+            print
             updated = donation
             recipient_name = donation["recipient"]["name"]
             recipient_labels = donation["recipient"]["labels"]
@@ -54,3 +56,14 @@ class LordApi(BaseAPI):
             results.append(updated)
         return results
 
+    def _influencer_urls(self, meetings):
+        results = []
+        for meeting in meetings:
+            updated = meeting
+            attendee_name = {"name": meeting["attendee"], "details_url": None}
+            if meeting["attendee"]:
+                urls = self.named_entity_resources(meeting["attendee"], "influencer")
+                attendee_name["details_url"] = urls[0]
+                updated["attendee"] = attendee_name
+            results.append(updated)
+        return results

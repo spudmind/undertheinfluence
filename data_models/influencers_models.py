@@ -1,4 +1,4 @@
-import json
+
 from datetime import datetime
 from data_models.core import NamedEntity, BaseDataModel
 
@@ -28,15 +28,16 @@ class Influencer(BaseDataModel):
             MATCH (n:`Named Entity` {{name: "{0}"}}) WITH n
             MATCH (n)-[:HIRED]-(rel) with n, rel
             MATCH (rel)-[:REGISTERED_LOBBYIST]-(lob) with n, rel, lob
-            RETURN lob.name, lob.data_source, lob.contact_details, lob.address
+            RETURN lob.name, rel.from_date, rel.to_date,
+                lob.contact_details, lob.address
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "name": entry["lob.name"],
+                "from": entry["rel.from_date"],
+                "to": entry["rel.to_date"],
                 "contact_details": entry["lob.contact_details"],
-                "address": entry["lob.address"],
-                "data_source": entry["lob.data_source"],
             }
             results.append(detail)
         return results
@@ -98,21 +99,29 @@ class Influencer(BaseDataModel):
         results = []
         query = u"""
             MATCH (a:`Meeting Attendee` {{name: "{0}"}})
-            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
+            MATCH (m)-[:ATTENDED_BY]-(a) with m, a
             MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
             MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
-            RETURN g.name as position, mp.name as host, m.meeting as meeting,
-                m.title as title, m.purpose as purpose, m.date as date
+            RETURN g.name as position, mp.name as host, mp.party as party,
+                m.meeting as meeting, m.title as title, m.purpose as purpose,
+                m.date as date, m.source_url, m.source_linked_from, m.source_fetched
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
+            title = entry["title"]
+            if not title:
+                title = entry["meeting"].split(" - ")[0]
             meeting = {
                 "position": entry["position"],
                 "host": entry["host"],
+                "party": entry["party"],
                 "title": entry["title"],
                 "purpose": entry["purpose"],
                 "meeting": entry["meeting"],
                 "date": entry["date"],
+                "source_url": entry["m.source_url"],
+                "source_fetched": entry["m.source_fetched"],
+                "source_linked_from": entry["m.source_linked_from"],
             }
             results.append(meeting)
         return results
@@ -124,10 +133,11 @@ class Influencer(BaseDataModel):
             MATCH (n)-[:REGISTERED_CONTRIBUTOR]-(rel)
             MATCH (cat)-[:INTEREST_RELATIONSHIP]-(rel)
             MATCH (p)-[:INTERESTS_REGISTERED_IN]-(cat)
-            OPTIONAL MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
-            RETURN p.name, p.party, cat.category, x.amount,
-                labels(p) as labels
-            ORDER by x.reported_date DESC
+            MATCH (rel)-[:REMUNERATION_RECEIVED]-(x)
+                WHERE x.contributor = "{0}"
+            RETURN p.name, p.party, cat.category, x.amount, x.source_url, x.registered,
+            labels(p) as labels
+            ORDER by x.registered DESC
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
@@ -141,7 +151,9 @@ class Influencer(BaseDataModel):
                 },
                 "category": entry["cat.category"],
                 "amount": self._convert_to_currency(entry["x.amount"]),
-                "amount_int": entry["x.amount"]
+                "amount_int": entry["x.amount"],
+                "source_url": entry["x.source_url"],
+                "registered": entry["x.registered"],
             }
             results.append(detail)
         return results
@@ -194,7 +206,7 @@ class Influencer(BaseDataModel):
             MATCH (rel)-[:FUNDING_RELATIONSHIP]-(donr) with rel, x, donr
             RETURN donr.name, donr.donee_type, donr.recipient_type,
             x.amount, x.reported_date,x.received_date, x.nature,
-            x.purpose, x.accepted_date, x.ec_reference,x.recd_by, labels(donr) as labels
+            x.purpose, x.accepted_date, x.ec_reference, x.recd_by, labels(donr) as labels
             ORDER by x.reported_date DESC
         """.format(self.name)
         output = self.query(search_string)

@@ -559,9 +559,9 @@ class Lord(NamedEntity):
             MATCH (p)-[:ATTENDED_BY]-(m) with lord, p, m
                 WHERE m.host_name = "{0}"
             MATCH (m)-[:ATTENDED_BY]-(a:`Meeting Attendee`) with lord, p, m, a
-            RETURN p.name as position, a.name as attendee, m.title, m.meeting as meeting,
-                m.purpose as purpose, m.date as date, m.source_url,
-                m.source_linked_from, m.source_fetched
+            RETURN p.name as position, a.name as attendee, m.title as title,
+                m.meeting as meeting, m.purpose as purpose, m.date as date,
+                m.source_url, m.source_linked_from, m.source_fetched
             ORDER BY date
         """.format(self.vertex["name"])
         output = self.query(query)

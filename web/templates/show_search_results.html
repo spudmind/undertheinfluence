@@ -243,9 +243,9 @@
                 </p>
             {% endif %}
             {% if "meetings" in entry.influences_summary %}
-                {% if entry.influences_summary.meetings.meeting_count > 1 %}
+                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 1 %}
                     <div class="well well-sm">
-                        <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b>
+                        <b>{{ entry.influences_summary.meetings.meetings_count }} Ministerial Meetings</b>
                     </div>
                 {% endif %}
             {% endif %}

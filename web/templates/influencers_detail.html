@@ -114,7 +114,7 @@
 
                                         {% if "meetings" in entry.influences_summary %}
 
-                                            {% if "meeting_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meeting_count > 1 %}
+                                            {% if entry.influences_summary.meetings.meetings_count > 1 %}
                                                 <div class="well well-sm">
                                                     <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b> with:
                                                     {% for politician in entry.influences_summary.meetings.politicians_met %}

@@ -10,195 +10,213 @@
         <hr>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <div id="government-container">
+    <div class="col-md-12">
+    <div id="government-container">
 
-                <div class="list-group">
-                    {% if influencer.influences_detail["meetings"] %}
-                        <div class="list-group-item">
-                            <div class="row-content">
+    <div class="list-group">
+        {% if influencer.influences_detail["meetings"] %}
+            <div class="list-group-item">
+                <div class="row-content">
 
-                                <h4 class="list-group-item-heading">Ministerial Meetings</h4>
-                                <p class="list-group-item-text">
+                    <h4 class="list-group-item-heading">Ministerial Meetings</h4>
+                    <p class="list-group-item-text">
 
-                                <p class="list-group-item-text">
-                                <table class="table table-striped table-hover ">
-                                    <colgroup>
-                                        <col span="1" style="width: 40%;">
-                                        <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 10%;">
-                                    </colgroup>
-                                    <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Host</th>
-                                        <th>Meeting</th>
-                                        <th>Purpose</th>
-                                        <th>Date</th>
-                                    </tr>
-                                    </thead>
-                                    {% with cols = 5 %}
-                                        {% include "_partials/_tfooter.html" %}
-                                    {% endwith %}
-                                    <tbody>
-                                    {% for meeting in influencer.influences_detail.meetings %}
-                                        <tr>
-                                            <td><small>{{ meeting.position }}</small></td>
-                                            <td><small><a href="{{ meeting.host["details_url"] }}">{{ meeting.host["name"] }}</a></small></td>
-                                            <td><small>{{ meeting.meeting }}</small></td>
-                                            <td><small>{{ meeting.purpose }}</small></td>
-                                            <td><small>{{ meeting.date }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                                <div class="list-group-separator"></div>
-                            </div>
-                        </div>
-                    {% endif %}
+                    <p class="list-group-item-text">
+                    <table class="table table-striped table-hover ">
+                        <colgroup>
+                            <col span="1" style="width: 20%;">
+                            <col span="1" style="width: 20%;">
+                            <col span="1" style="width: 15%;">
+                            <col span="1" style="width: 20%;">
+                            <col span="1" style="width: 8%;">
+                            <col span="1" style="width: 4%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Host</th>
+                            <th>Party</th>
+                            <th>Purpose</th>
+                            <th>Date</th>
+                            <th>Source</th>
+                        </tr>
+                        </thead>
+                        {% with cols = 6 %}
+                            {% include "_partials/_tfooter.html" %}
+                        {% endwith %}
+                        <tbody>
+                        {% for meeting in influencer.influences_detail.meetings %}
+                            <tr>
+                                <td>{{ meeting.position }}</td>
+                                <td><a href="{{ meeting.host["details_url"] }}">{{ meeting.host["name"] }}</a></td>
+                                <td>{{ meeting.party }}</td>
+                                <td>{{ meeting.purpose }}</td>
+                                <td>{{ meeting.date }}</td>
+                                <td>
+                                    <small><a href="{{ meeting.source_url }}">link</a></small> /
+                                    <small><a href="{{ meeting.source_linked_from }}">from</a></small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
-                    {% if influencer.influences_detail["lobby_registers"] %}
-                        <div class="list-group-item">
-                            <div class="row-content">
-
-                                <h4 class="list-group-item-heading">Lobby Registers</h4>
-                                <p class="list-group-item-text">
-
-
-                                <p class="list-group-item-text">
-                                <table class="table table-striped table-hover ">
-                                    <colgroup>
-                                        <col span="1" style="width: 40%;">
-                                        <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 20%;">
-                                    </colgroup>
-                                    <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Address</th>
-                                        <th>Contact</th>
-                                    </tr>
-                                    </thead>
-                                    {% with cols = 3 %}
-                                        {% include "_partials/_tfooter.html" %}
-                                    {% endwith %}
-                                    <tbody>
-                                    {% for lobby in influencer.influences_detail.lobby_registers %}
-                                        <tr>
-                                            <td><small>{{ lobby.name }}</small></td>
-                                            <td><small>{{ lobby.address }}</small></td>
-                                            <td><small>{{ lobby.contact_details }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-
-                                <div class="list-group-separator"></div>
-                            </div>
-                        </div>
-
-                    {% endif %}
-
-                    {% if influencer.influences_detail["register_of_interests"] %}
-                        <div class="list-group-item">
-                            <div class="row-content">
-                                {% for interest in influencer.influences_detail.register_of_interests %}
-                                    <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
-                                    <p class="list-group-item-text">
-                                    <table class="table table-striped table-hover ">
-                                        <colgroup>
-                                            <col span="1" style="width: 10%;">
-                                            <col span="1" style="width: 40%;">
-                                            <col span="1" style="width: 20%;">
-                                            <col span="1" style="width: 15%;">
-                                            <col span="1" style="width: 15%;">
-                                        </colgroup>
-                                        <thead>
-                                        <tr>
-                                            <th>Amount</th>
-                                            <th>Politician</th>
-                                            <th>Party</th>
-                                            <th>Received</th>
-                                            <th>Registered</th>
-                                        </tr>
-                                        </thead>
-                                        {% with cols = 5 %}
-                                            {% include "_partials/_tfooter.html" %}
-                                        {% endwith %}
-                                        <tbody>
-                                        {% for interest in interest.interests %}
-                                            <tr>
-                                                <td><small>{{ interest.amount }}</small></td>
-                                                <td><small><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></small></td>
-                                                <td><small>{{ interest.interest["party"] }}</small></td>
-                                                <td><small>{{ interest.received }}</small></td>
-                                                <td><small>{{ interest.registered }}</small></td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-
-                                    <div class="list-group-separator"></div>
-
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                    {% endif %}
-
-                    {% if influencer.influences_detail["electoral_commission"] %}
-                        <div class="list-group-item">
-                            <div class="row-content">
-                                <h4 class="list-group-item-heading">Electoral Commission</h4>
-                                <table class="table table-striped table-hover ">
-                                    <colgroup>
-                                        <col span="1" style="width: 10%;">
-                                        <col span="1" style="width: 12%;">
-                                        <col span="1" style="width: 10%;">
-                                        <col span="1" style="width: 10%;">
-                                        <col span="1" style="width: 12%;">
-                                        <col span="1" style="width: 9%;">
-                                        <col span="1" style="width: 9%;">
-                                        <col span="1" style="width: 17%;">
-                                    </colgroup>
-                                    <thead>
-                                    <tr>
-                                        <th>Donation</th>
-                                        <th>Recipient</th>
-                                        <th>EC Reference</th>
-                                        <th>Recipient Type</th>
-                                        <th>Received By</th>
-                                        <th>Reported</th>
-                                        <th>Accepted</th>
-                                        <th>Purpose</th>
-                                    </tr>
-                                    </thead>
-                                    {% with cols = 8 %}
-                                        {% include "_partials/_tfooter.html" %}
-                                    {% endwith %}
-                                    <tbody>
-                                    {% for donation in influencer.influences_detail.electoral_commission %}
-                                        <tr>
-                                            <td><small>{{ donation.amount }}</small></td>
-                                            <td><small><a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></small></td>
-                                            <td><small>{{ donation.ec_reference }}</small></td>
-                                            <td><small>{{ donation.recipient["recipient_type"] }}</small></td>
-                                            <td><small>{{ donation.recd_by }}</small></td>
-                                            <td><small>{{ donation.reported }}</small></td>
-                                            <td><small>{{ donation.accepted }}</small></td>
-                                            <td><small>{{ donation.purpose }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
-        </div>
+        {% endif %}
+
+        {% if influencer.influences_detail["lobby_registers"] %}
+            <div class="list-group-item">
+                <div class="row-content">
+
+                    <h4 class="list-group-item-heading">Lobby Registers</h4>
+                    <p class="list-group-item-text">
+
+
+                    <p class="list-group-item-text">
+                    <table class="table table-striped table-hover ">
+                        <colgroup>
+                            <col span="1" style="width: 40%;">
+                            <col span="1" style="width: 20%;">
+                            <col span="1" style="width: 20%;">
+                            <col span="1" style="width: 20%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Contact</th>
+                        </tr>
+                        </thead>
+                        {% with cols = 4 %}
+                            {% include "_partials/_tfooter.html" %}
+                        {% endwith %}
+                        <tbody>
+                        {% for lobby in influencer.influences_detail.lobby_registers %}
+                            <tr>
+                                <td>{{ lobby.name }}</td>
+                                <td>{{ lobby.from }}</td>
+                                <td>{{ lobby.to }}</td>
+                                <td>{{ lobby.contact_details }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        {% endif %}
+
+        {% if influencer.influences_detail["register_of_interests"] %}
+            <div class="list-group-item">
+                <div class="row-content">
+                    {% for interest in influencer.influences_detail.register_of_interests %}
+                        <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
+                        <p class="list-group-item-text">
+                        <table class="table table-striped table-hover ">
+                            <colgroup>
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 15%;">
+                                <col span="1" style="width: 40%;">
+                                <col span="1" style="width: 10%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 15%;">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>Politician</th>
+                                <th>Party</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Registered</th>
+                                <th>Source</th>
+                            </tr>
+                            </thead>
+                            {% with cols = 6 %}
+                                {% include "_partials/_tfooter.html" %}
+                            {% endwith %}
+                            <tbody>
+                            {% for interest in interest.interests %}
+                                <tr>
+                                    <td><a href="{{ interest.interest["details_url"] }}">{{ interest.interest["name"] }}</a></td>
+                                    <td>{{ interest.interest["party"] }}</td>
+                                    <td>{{ interest.category }}</td>
+                                    <td>{{ interest.amount }}</td>
+                                    <td>{{ interest.registered }}</td>
+                                    <td>
+                                        <small><a href="{{ interest.source_url }}">link</a></small> /
+                                        <small><a href="{{ interest.source_linked_from }}">from</a></small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% endfor %}
+                </div>
+            </div>
+
+        {% endif %}
+
+        {% if influencer.influences_detail["electoral_commission"] %}
+            <div class="list-group-item">
+                <div class="row-content">
+                    <h4 class="list-group-item-heading">Electoral Commission</h4>
+                    <table class="table table-striped table-hover ">
+                        <colgroup>
+                            <col span="1" style="width: 5%;">
+                            <col span="1" style="width: 15%;">
+                            <col span="1" style="width: 10%;">
+                            <col span="1" style="width: 10%;">
+                            <col span="1" style="width: 12%;">
+                            <col span="1" style="width: 9%;">
+                            <col span="1" style="width: 10%;">
+                            <col span="1" style="width: 10%;">
+                            <col span="1" style="width: 5%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Donation</th>
+                            <th>Recipient</th>
+                            <th>Recipient Type</th>
+                            <th>EC Reference</th>
+                            <th>Received By</th>
+                            <th>Purpose</th>
+                            <th>Accepted</th>
+                            <th>Reported</th>
+                            <th>Source</th>
+                        </tr>
+                        </thead>
+                        {% with cols = 9 %}
+                            {% include "_partials/_tfooter.html" %}
+                        {% endwith %}
+                        <tbody>
+                        {% for donation in influencer.influences_detail.electoral_commission %}
+                            <tr>
+                                <td>{{ donation.amount }}</td>
+                                <td><a href="{{ donation.recipient["details_url"] }}">{{ donation.recipient["name"] }}</a></td>
+                                <td>{{ donation.recipient["recipient_type"] }}</td>
+                                <td>{{ donation.ec_reference }}</td>
+                                <td>{{ donation.recd_by }}</td>
+                                <td>{{ donation.purpose }}</td>
+                                <td>{{ donation.accepted }}</td>
+                                <td>{{ donation.reported }}</td>
+                                <td>
+                                    <small><a href="{{ donation.source_url }}">link</a></small> /
+                                    <small><a href="{{ donation.source_linked_from }}">from</a></small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+    </div>
     </div>
 
 {% endblock article %}

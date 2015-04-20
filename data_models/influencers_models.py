@@ -301,6 +301,7 @@ class LobbyAgency(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
         if self.exists:
+            self.contact_details = self._get_contact_details()
             self.clients = self._get_clients()
             self.employees = self._get_employees()
             count = self._get_counts()
@@ -314,6 +315,13 @@ class LobbyAgency(NamedEntity):
         labels = ["Lobby Agency", "Named Entity"]
         self.set_node_properties(properties, labels)
 
+    def _get_contact_details(self):
+        query = u"""
+            MATCH (f:`Lobby Agency` {{name: "{0}"}})
+            RETURN f.contact_details
+        """.format(self.name)
+        return self.query(query)[0][0]
+
     def _get_clients(self):
         results = []
         search_string = u"""
@@ -321,7 +329,8 @@ class LobbyAgency(NamedEntity):
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             MATCH (r)-[:HIRED]-(c) with f, r, c
             MATCH (c)-[x]-() with f, r, c, x
-            RETURN c.name as name, labels(c) as labels, count(x) as weight
+            RETURN c.name as name, labels(c) as labels,
+                count(x) as weight, r.to_date, r.from_date
                 ORDER BY weight DESC
         """.format(self.name)
         output = self.query(search_string)
@@ -329,7 +338,11 @@ class LobbyAgency(NamedEntity):
             detail = {
                 "name": entry["name"],
                 "weight": entry["weight"],
-                "labels": entry["labels"]
+                "to_date": entry["r.to_date"],
+                "from_date": entry["r.from_date"],
+                "labels": entry["labels"],
+                "source_url": None,
+                "source_linked_from": None
             }
             results.append(detail)
         return results
@@ -340,13 +353,18 @@ class LobbyAgency(NamedEntity):
             MATCH (f:`Lobby Agency` {{name: "{0}"}})
             MATCH (f)-[:REGISTERED_LOBBYIST]-(r) with f, r
             MATCH (r)-[:WORKS_FOR]-(e) with f, r, e
-            RETURN e.name as name, labels(e) as labels
+            RETURN e.name as name, labels(e) as labels,
+                r.to_date, r.from_date
         """.format(self.name)
         output = self.query(search_string)
         for entry in output:
             detail = {
                 "name": entry["name"],
-                "labels": entry["labels"]
+                "to_date": entry["r.to_date"],
+                "from_date": entry["r.from_date"],
+                "labels": entry["labels"],
+                "source_url": None,
+                "source_linked_from": None
             }
             results.append(detail)
         return results

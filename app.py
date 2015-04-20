@@ -12,6 +12,7 @@ from web.api import get_politicians_function
 from web.api import get_committees_function
 from web.api import get_departments_function
 from web.api import get_lobbyists_function
+from web.api import get_lobby_agency_function
 from web.api import find_entity_function
 from web.api import get_summary_data
 import os
@@ -82,6 +83,12 @@ def show_lobbyists():
     lobbyists = get_lobbyists_function.LobbyistsApi().request(page=page)['results']
     return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
 
+
+@app.route('/lobbyists/<name>')
+def show_lobby_agency(name):
+    args = {"name": name}
+    agency = get_lobby_agency_function.LobbyAgencyApi().request(args)
+    return render_template('single/show_lobby_agency.html', agency=agency)
 
 @app.route('/influencers')
 def show_influencers():
@@ -299,7 +306,6 @@ def show_departments():
     return render_template('show_departments.html', departments=departments, page=page)
 
 
-
 class GetSummary(Resource):
     def __init__(self):
         super(GetSummary, self).__init__()
@@ -394,6 +400,18 @@ class GetLobbyists(Resource):
         return get_lobbyists_function.LobbyistsApi().request(**args)
 
 
+class GetLobbyAgency(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetLobbyAgency, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        # set a default for 'page'
+        return get_lobby_agency_function.LobbyAgencyApi().request(args)
+
+
 class GetInfluencers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -480,6 +498,7 @@ api.add_resource(GetLord, '/api/v0.1/getLord', endpoint='getLord')
 api.add_resource(GetInfluencers, '/api/v0.1/getInfluencers', endpoint='getInfluencers')
 api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluencer')
 api.add_resource(GetLobbyists, '/api/v0.1/getLobbyAgencies', endpoint='getLobbyAgencies')
+api.add_resource(GetLobbyAgency, '/api/v0.1/getLobbyAgency', endpoint='getLobbyAgency')
 api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
 api.add_resource(GetCommittees, '/api/v0.1/getCommittees', endpoint='getCommittees')

@@ -18,7 +18,7 @@ class InfluencerApi(BaseAPI):
             influencer = Influencer(name)
             register = self._nest_category(self._interest_urls(influencer.interests))
             ec = self._recipient_urls(influencer.donations)
-            lobby = influencer.lobbyists
+            lobby = self._lobby_urls(influencer.lobbyists)
             meetings = self._politician_urls(influencer.meetings)
             result = {
                 'name': result[0]['name'],
@@ -31,6 +31,24 @@ class InfluencerApi(BaseAPI):
                 },
             }
         return result
+
+    def _lobby_urls(self, lobbyists):
+        results = []
+        for lobby in lobbyists:
+            updated = {
+                "agency": {
+                    "name": lobby["name"],
+                    "details_url": self.named_entity_resources(
+                        lobby["name"], "Lobby Agency"
+                    )[0],
+                    "contact_details": lobby["contact_details"]
+                },
+                "from": lobby["from"],
+                "to": lobby["to"]
+            }
+
+            results.append(updated)
+        return results
 
     def _interest_urls(self, interests):
         results = []

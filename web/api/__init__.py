@@ -22,6 +22,9 @@ class BaseAPI:
                 #api = u"/api/v0.1/getPoliticalParty?name={0}".format(name)
                 api = url_for('getPoliticalParty', name=name, _external=True)
                 web = url_for('show_party', name=name, _external=True)
+            elif "Lobby Agency" in labels and not "Lobby Agency Client" in labels:
+                api = url_for('getLobbyAgency', name=name, _external=True)
+                web = url_for('show_lobby_agency', name=name, _external=True)
             elif "influencer" in labels or "Donor" in labels \
                     or "Registered Interest" or "Lobby Agency Client" in labels:
                 #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
@@ -30,6 +33,9 @@ class BaseAPI:
             elif "Government Committee" in labels:
                 api = url_for('getPoliticians', government_committee=name, _external=True)
                 web = url_for('show_politicians', government_committee=name, _external=True)
+            elif "Government Department" in labels:
+                api = url_for('getPoliticians', government_department=name, _external=True)
+                web = url_for('show_politicians', government_department=name, _external=True)
         return web, api
 
     @staticmethod

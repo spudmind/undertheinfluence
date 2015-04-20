@@ -85,13 +85,15 @@ class PopulateLobbyAgenciesApi():
                 "employee_count": employee_count,
                 "clients": agency.clients,
                 "employees": agency.employees,
-                "meetings": agency.meetings_summary
+                "meetings_summary": agency.meetings_summary,
+                "meetings": agency.meetings
             }
         }
         agency_data = {
             "name": name,
             "influences": data_sources,
-            "labels": labels
+            "labels": labels,
+            "contact_details": agency.contact_details,
         }
         self.db.save("api_lobbyists", agency_data)
 

@@ -95,10 +95,10 @@
                         <tbody>
                         {% for lobby in influencer.influences_detail.lobby_registers %}
                             <tr>
-                                <td>{{ lobby.name }}</td>
+                                <td><a href="{{ lobby.agency["details_url"] }}">{{ lobby.agency["name"] }}</a></td>
                                 <td>{{ lobby.from }}</td>
                                 <td>{{ lobby.to }}</td>
-                                <td>{{ lobby.contact_details }}</td>
+                                <td>{{ lobby.agency["contact_details"] }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

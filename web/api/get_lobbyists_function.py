@@ -23,8 +23,9 @@ class LobbyistsApi(BaseAPI):
                 "name": entry["name"],
                 "influences_summary": self._influencer_urls(entry["influences"]),
                 "labels": entry["labels"],
+                "contact_details": entry["contact_details"],
                 "detail_url": url_for(
-                    'show_politicians', government_department=entry["name"], _external=True
+                    'show_lobby_agency', name=entry["name"], _external=True
                 )
             }
             for entry in results
@@ -34,8 +35,7 @@ class LobbyistsApi(BaseAPI):
     def _influencer_urls(self, influences):
         results = []
         for entry in influences["lobbying_registers"]["clients"]:
-            updated = {}
-            updated["name"] = entry["name"]
+            updated = entry
             updated["details_url"] = self.named_entity_resources(
                 entry["name"], entry["labels"]
             )[0]

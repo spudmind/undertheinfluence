@@ -148,11 +148,13 @@ class PopulatePoliticiansApi():
         }
 
         if role == "mp":
+            politician_data["government_departments"] = politician.departments
             politician_data["government_committees"] = politician.committees
             politician_data["government_positions"] = politician.positions
         else:
+            politician_data["government_departments"] = politician.departments
             politician_data["government_committees"] = None
-            politician_data["government_positions"] = None
+            politician_data["government_positions"] = politician.positions
 
         self.db.save("api_politicians", politician_data)
 
@@ -184,6 +186,7 @@ class PopulateMpsApi():
         mp = government_models.MemberOfParliament(name)
         positions = mp.positions
         committees = mp.committees
+        departments = mp.departments
         register = mp.interests_summary
         ec = mp.donations_summary
         meetings = mp.meetings_summary
@@ -203,6 +206,7 @@ class PopulateMpsApi():
             "influences": data_sources,
             "labels": labels,
             "government_committees": committees,
+            "government_departments": departments,
             "government_positions": positions
         }
         self.db.save("api_mps", mp_data)
@@ -236,6 +240,9 @@ class PopulateLordsApi():
         register = lord.interests_summary
         ec = lord.donations_summary
         meetings = lord.meetings_summary
+        positions = lord.positions
+        departments = lord.departments
+
 
         data_sources = {}
         if register["interest_categories"] > 0 and register["interest_relationships"] > 0:
@@ -250,7 +257,9 @@ class PopulateLordsApi():
             "twfy_id": twfy_id,
             "weight": weight,
             "labels": labels,
-            "influences": data_sources
+            "influences": data_sources,
+            "government_departments": departments,
+            "government_positions": positions
         }
         self.db.save("api_lords", lord_data)
 
@@ -304,10 +313,10 @@ class PopulateCommitteesApi():
         self.db = mongo.MongoInterface()
 
     def run(self):
-        self.db.drop("api_government")
-        all_offices = government_models.GovernmentOffices().get_all()
+        self.db.drop("api_committees")
+        all_offices = government_models.GovernmentOffices().get_all("committee")
 
-        self._logger.debug("Populating Government Offices Api")
+        self._logger.debug("\nPopulating Government Offices Api")
         for doc in all_offices:
             name = doc[0]
             self._logger.debug("%s, %s" % (name, doc[2]))
@@ -324,12 +333,12 @@ class PopulateCommitteesApi():
 
         office = government_models.GovernmentOffice(name)
         members = office.members
-        register = office.interests_summary
-        ec = office.donation_summary
+        #register = office.interests_summary
+        #ec = office.donation_summary
 
         data_sources = {
-            "register_of_interests": register,
-            "electoral_commission": ec
+            "register_of_interests": [],
+            "electoral_commission": []
         }
 
         office_data = {
@@ -339,7 +348,51 @@ class PopulateCommitteesApi():
             "influences": data_sources,
             "members": members
         }
-        self.db.save("api_government", office_data)
+        self.db.save("api_committees", office_data)
+
+
+class PopulateDepartmentsApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_departments")
+        all_offices = government_models.GovernmentOffices().get_all("department")
+
+        self._logger.debug("\nPopulating Government Departments Api")
+        for doc in all_offices:
+            name = doc[0]
+            self._logger.debug("%s, %s" % (name, doc[2]))
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        labels = record[1]
+        mp_count = record[2]
+
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+            labels.remove("Government Office")
+
+        office = government_models.GovernmentOffice(name)
+        members = office.members
+        #register = office.interests_summary
+        #ec = office.donation_summary
+
+        data_sources = {
+            "register_of_interests": [],
+            "electoral_commission": []
+        }
+
+        office_data = {
+            "name": name,
+            "labels": labels,
+            "mp_count": mp_count,
+            "influences": data_sources,
+            "members": members
+        }
+        self.db.save("api_departments", office_data)
 
 
 def _convert_to_currency(number):

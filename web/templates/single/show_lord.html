@@ -15,7 +15,25 @@
         <div class="col-md-12">
             <div id="government-container">
                 <div class="list-group">
+                    <div class="row">
+                        <div class="col-md-6">
 
+                            {% if lord["government_departments"] %}
+                                <div class="well well-sm">
+                                    <b>Government Departments</b><br>
+                                    {% for dept in lord["government_departments"] %}
+                                        <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                    {% if lord["government_departments"] %}
+                        <hr>
+                    {% endif %}
                     {% if lord.influences_detail["meetings"] %}
                         <div class="list-group-item">
                             <div class="row-content">

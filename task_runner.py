@@ -109,6 +109,7 @@ if args.api_gen is not None:
         api_data_gen.PopulateInfluencersApi().run()
     if "government" in args.api_gen:
         api_data_gen.PopulateCommitteesApi().run()
+        api_data_gen.PopulateDepartmentsApi().run()
     if "parties" in args.api_gen:
         api_data_gen.PopulatePoliticalPartyApi().run()
     if "lobbyists" in args.api_gen:

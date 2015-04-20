@@ -10,6 +10,7 @@ from web.api import get_parties_function
 from web.api import get_party_function
 from web.api import get_politicians_function
 from web.api import get_committees_function
+from web.api import get_departments_function
 from web.api import get_lobbyists_function
 from web.api import find_entity_function
 from web.api import get_summary_data
@@ -122,6 +123,7 @@ def show_lobbying_landing():
 def show_sources():
     return render_template('show_sources.html')
 
+
 @app.route('/politicians/detail', methods=['GET', 'POST'])
 def show_politicians_detail():
     args = {}
@@ -150,6 +152,7 @@ def show_politicians_detail():
     elif request.method == 'GET':
         args["type"] = request.args.get('type', None)
         args["government_committee"] = request.args.get('government_committee', None)
+        args["government_department"] = request.args.get('government_department', None)
 
     title = _build_title(args)
     reply = get_politicians_function.PoliticiansApi().request(**args)
@@ -206,10 +209,14 @@ def _build_title(args):
             title["header"] = "Members of Parliament"
         if args["type"] == "lord":
             title["header"] = "Lords"
+    if "government_committee" in args:
+        if args["government_committee"]:
+            title["header"] = args["government_committee"]
+            filters.append("Select Committee: %s" % args["government_committee"])
     if "government_department" in args:
         if args["government_department"]:
             title["header"] = args["government_department"]
-            filters.append("Select Committee: %s" % args["government_department"])
+            filters.append("Government Department: %s" % args["government_department"])
     if "party" in args:
         if len(args["party"]) > 0:
             filters.append("%s Members" % args["party"])
@@ -280,6 +287,17 @@ def show_committees():
         page = 1
     offices = get_committees_function.CommitteesApi().request(page=page)['results']
     return render_template('show_committees.html', offices=offices, page=page)
+
+
+@app.route('/departments/')
+def show_departments():
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    departments = get_departments_function.DepartmentsApi().request(page=page)['results']
+    return render_template('show_departments.html', departments=departments, page=page)
+
 
 
 class GetSummary(Resource):
@@ -409,15 +427,26 @@ class GetInfluencer(Resource):
         return get_influencer_function.InfluencerApi().request(args)
 
 
-class GetGovernmentCommittees(Resource):
+class GetCommittees(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str)
-        super(GetGovernmentCommittees, self).__init__()
+        super(GetCommittees, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
         return get_committees_function.CommitteesApi().request()
+
+
+class GetDepartments(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str)
+        super(GetDepartments, self).__init__()
+
+    def get(self):
+        args = self.reqparse.parse_args()
+        return get_departments_function.DepartmentsApi().request()
 
 
 class FindEntity(Resource):
@@ -453,7 +482,8 @@ api.add_resource(GetInfluencer, '/api/v0.1/getInfluencer', endpoint='getInfluenc
 api.add_resource(GetLobbyists, '/api/v0.1/getLobbyAgencies', endpoint='getLobbyAgencies')
 api.add_resource(GetPoliticalParties, '/api/v0.1/getPoliticalParties', endpoint='getPoliticalParties')
 api.add_resource(GetPoliticalParty, '/api/v0.1/getPoliticalParty', endpoint='getPoliticalParty')
-api.add_resource(GetGovernmentCommittees, '/api/v0.1/getGovernmentCommittees', endpoint='getGovernmentCommittees')
+api.add_resource(GetCommittees, '/api/v0.1/getCommittees', endpoint='getCommittees')
+api.add_resource(GetDepartments, '/api/v0.1/getDepartments', endpoint='getDepartments')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 api.add_resource(GetData, '/api/v0.1/data', endpoint='data')
 

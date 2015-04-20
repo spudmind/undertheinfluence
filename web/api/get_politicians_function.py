@@ -25,6 +25,7 @@ class PoliticiansApi(BaseAPI):
         self._filter_interests(args)
         self._filter_funding(args)
         self._filter_committees(args)
+        self._filter_departments(args)
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
         if response['has_more']:
@@ -110,6 +111,15 @@ class PoliticiansApi(BaseAPI):
                 {
                     "government_committees": {
                     "$in": [args.get("government_committee")]}
+                }
+            ]
+
+    def _filter_departments(self, args):
+        if args.get("government_department"):
+            self.query["$and"] = [
+                {
+                    "government_departments": {
+                    "$in": [args.get("government_department")]}
                 }
             ]
 

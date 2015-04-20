@@ -208,13 +208,45 @@
                                     {% endif %}
 
                                     {% if "Lord" in entry["labels"] %}
-                                        {% if "register_of_interests" in entry.influences_summary %}
+
+                                        {% if entry["government_positions"] %}
                                             <div class="well well-sm">
-                                                <b>Register of Interests</b><br>
-                                                {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
-                                                {{ entry.influences_summary.register_of_interests.interest_categories }} categories
+                                                {% for position in entry["government_positions"] %}
+                                                    <b>{{ position }}</b><br>
+                                                {% endfor %}
                                             </div>
                                         {% endif %}
+
+                                        {% if entry["government_departments"] %}
+                                            <div class="well well-sm">
+                                                <b>Government Departments</b><br>
+                                                {% for dept in entry["government_departments"] %}
+                                                    <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+
+                                        {% if "meetings" in entry.influences_summary %}
+                                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
+                                                <div class="well well-sm">
+                                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
+                                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
+                                                        <br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% if "register_of_interests" in entry.influences_summary %}
+                                            {% if "remuneration_count" in entry.influences_summary.register_of_interests and entry.influences_summary.register_of_interests.remuneration_count > 0 %}
+                                                <div class="well well-sm">
+                                                    <b>Register of Interests</b><br>
+                                                    {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
+                                                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+
                                         {% if "electoral_commission" in entry.influences_summary %}
                                             {% if entry.influences_summary.electoral_commission.donation_count > 0 %}
                                                 <div class="well well-sm">

@@ -29,6 +29,9 @@ class MpApi(BaseAPI):
                     "electoral_commission": donations,
                     "meetings": meetings
                 },
+                "government_departments": self._department_detail_urls(
+                    result[0]["government_departments"]
+                ),
                 "government_positions": result[0]["government_positions"],
                 "government_committees": self._committee_detail_urls(
                     result[0]["government_committees"]

@@ -58,14 +58,30 @@ class BaseAPI:
             return None
 
     @staticmethod
-    def _committee_detail_urls(departments):
+    def _committee_detail_urls(committees):
+        if committees:
+            updated = []
+            for committee in committees:
+                entry = {
+                    "name": committee,
+                    "detail_url": url_for(
+                        'show_politicians_detail', government_committee=committee, _external=True
+                    )
+                }
+                updated.append(entry)
+            return updated
+        else:
+            return None
+
+    @staticmethod
+    def _department_detail_urls(departments):
         if departments:
             updated = []
             for dept in departments:
                 entry = {
                     "name": dept,
                     "detail_url": url_for(
-                        'show_politicians', government_committee=dept, _external=True
+                        'show_politicians_detail', government_department=dept, _external=True
                     )
                 }
                 updated.append(entry)

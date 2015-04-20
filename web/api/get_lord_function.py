@@ -22,6 +22,10 @@ class LordApi(BaseAPI):
                     "register_of_interests": self._interest_urls(lord.interests),
                     "electoral_commission": self._recipient_urls(lord.donations),
                 },
+                "government_departments": self._department_detail_urls(
+                    result[0]["government_departments"]
+                ),
+                "government_positions": result[0]["government_positions"],
             }
         return result
 

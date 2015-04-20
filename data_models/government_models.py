@@ -52,12 +52,13 @@ class Politician(NamedEntity):
     def _set_properties(self):
         if self.type == "mp":
             politician = MemberOfParliament(self.name)
-            self.positions = politician.positions
             self.committees = politician.committees
         elif self.type == "lord":
             politician = Lord(self.name)
         else:
             print "something wrong with:", self.name
+        self.positions = politician.positions
+        self.departments = politician.departments
         self.meetings = politician.meetings
         self.meetings_summary = politician.meetings_summary
         self.interests = politician.interests
@@ -110,7 +111,8 @@ class MemberOfParliament(NamedEntity):
         )
         if self.exists and self._get_properties:
             self.party, self.image_url = self._set_properties()
-            self.positions = self._get_positions()
+            self.departments, positions = self._get_government_departments()
+            self.positions = list(set(self._get_positions() + positions))
             self.committees = self._get_committees()
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meeting_summary()
@@ -120,12 +122,6 @@ class MemberOfParliament(NamedEntity):
             self.donations = self._get_donations()
             self.donations_summary = self._get_donations_summary()
 
-    def _get_positions(self):
-        return self._get_government_positions("Government Position")
-
-    def _get_committees(self):
-        return self._get_government_positions("Government Committee")
-
     def _set_properties(self):
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}})
@@ -133,6 +129,12 @@ class MemberOfParliament(NamedEntity):
         """.format(self.vertex["name"])
         output = self.query(search_string)
         return output[0]["mp.party"], output[0]["mp.image"]
+
+    def _get_positions(self):
+        return self._get_government_positions("Government Position")
+
+    def _get_committees(self):
+        return self._get_government_positions("Government Committee")
 
     def _get_government_positions(self, pos_type):
         results = []
@@ -148,6 +150,21 @@ class MemberOfParliament(NamedEntity):
         for entry in output:
             results.append(entry[0])
         return results
+
+    def _get_government_departments(self):
+        departments, positions = [], []
+        search_string = u"""
+            MATCH (d:`Government Department`)
+            MATCH (p)-[:OFFICE_IN]-(d) with d, p
+            MATCH (p)-[:SERVED_IN]-(x:`Named Entity` {{name:"{0}"}}) with d, p, x
+            MATCH (p)-[:ATTENDED_BY]-(m) with d, p, m, x
+            RETURN DISTINCT d.name as department, p.name as position
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            departments.append(entry[0])
+            positions.append(entry[0])
+        return departments, positions
 
     def _get_meeting_summary(self):
         results = []
@@ -487,6 +504,8 @@ class Lord(NamedEntity):
             "Named Entity", self.primary_attribute, self.name
         )
         if self.exists:
+            self.departments, positions = self._get_government_departments()
+            self.positions = list(set(positions))
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meetings_summary()
             self.interest_categories = self._interest_categories()
@@ -504,6 +523,21 @@ class Lord(NamedEntity):
         self.create_relationship(
             self.vertex, "INTERESTS_REGISTERED_IN", category.vertex
         )
+
+    def _get_government_departments(self):
+        departments, positions = [], []
+        search_string = u"""
+            MATCH (d:`Government Department`)
+            MATCH (p)-[:OFFICE_IN]-(d) with d, p
+            MATCH (p)-[:SERVED_IN]-(x:`Named Entity` {{name:"{0}"}}) with d, p, x
+            MATCH (p)-[:ATTENDED_BY]-(m) with d, p, m, x
+            RETURN DISTINCT d.name as department, p.name as position
+        """.format(self.vertex["name"])
+        output = self.query(search_string)
+        for entry in output:
+            departments.append(entry[0])
+            positions.append(entry[0])
+        return departments, positions
 
     def link_party(self, name):
         party = PoliticalParty(name)
@@ -857,7 +891,13 @@ class GovernmentOffices(BaseDataModel):
         BaseDataModel.__init__(self)
         self.count = self._get_count()
 
-    def get_all(self):
+    def get_all(self, office_type):
+        if office_type == 'committee':
+            return self._get_committees()
+        if office_type == 'department':
+            return self._get_departments()
+
+    def _get_committees(self):
         search_string = u"""
             MATCH (n:`Government Committee`) with n
             MATCH (n)-[:SERVED_IN]-(x) with n, x
@@ -866,6 +906,17 @@ class GovernmentOffices(BaseDataModel):
             MATCH (x)-[:ELECTED_FOR]-(p) with n, x, p
             RETURN n.name, labels(n), count(p)
             ORDER BY count(p) DESC
+        """
+        search_result = self.query(search_string)
+        return search_result
+
+    def _get_departments(self):
+        search_string = u"""
+            MATCH (d:`Government Department`)
+            MATCH (p)-[:OFFICE_IN]-(d) with d, p
+            MATCH (p)-[:SERVED_IN]-(x:`Member of Parliament`) with d, p, x
+            RETURN DISTINCT d.name as name, labels(d), count(x.name) as count
+            ORDER BY count DESC
         """
         search_result = self.query(search_string)
         return search_result
@@ -891,9 +942,11 @@ class GovernmentOffice(NamedEntity):
         )
         if self.exists:
             self.mp_count = self._mp_count()
+            self.labels = self._get_labels()
+            self.office_type = self._get_office_type(self.labels)
             self.members = self._get_members()
-            self.interests_summary, self.donation_summary =\
-                self._get_office_summary()
+            #self.interests_summary, self.donation_summary =\
+            #    self._get_office_summary()
 
     def is_committee(self):
         properties = {"image_url": None}
@@ -925,7 +978,33 @@ class GovernmentOffice(NamedEntity):
         """.format(self.vertex["name"])
         return self.query(query)[0]["mp_count"]
 
+    def _get_labels(self):
+        query = u"""
+            MATCH (n:`Government Office` {{name: "{0}"}})
+            RETURN labels(n) as labels
+        """.format(self.vertex["name"])
+        return self.query(query)[0]["labels"]
+
     def _get_members(self):
+        if self.office_type == "committee":
+            return self._get_committee_members()
+        elif self.office_type == "department":
+            return self._get_department_members()
+        else:
+            return []
+
+    def _get_department_members(self):
+        search_string = u"""
+            MATCH (d:`Government Office` {{name: "{0}"}})
+            MATCH (p)-[:OFFICE_IN]-(d) with d, p
+            MATCH (p)-[:SERVED_IN]-(x:`Member of Parliament`) with d, p, x
+            MATCH (p)-[:ATTENDED_BY]-(m) with d, p, m, x
+            RETURN DISTINCT  p.name as position, x.name as name
+        """.format(self.vertex["name"])
+        result = self.query(search_string)
+        return [r["name"] for r in result]
+
+    def _get_committee_members(self):
         search_string = u"""
             MATCH (n:`Government Office` {{name: "{0}"}}) with n
             MATCH (n)-[:SERVED_IN]-(t) with n, t
@@ -965,6 +1044,15 @@ class GovernmentOffice(NamedEntity):
             )
         }
         return register, donations
+
+    @staticmethod
+    def _get_office_type(labels):
+        office_type = None
+        if "Government Department" in labels:
+            office_type = "department"
+        if "Government Committee" in labels:
+            office_type = "committee"
+        return office_type
 
 
 class GovernmentMeeting(BaseDataModel):

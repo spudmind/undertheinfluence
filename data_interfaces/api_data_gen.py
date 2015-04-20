@@ -379,12 +379,14 @@ class PopulateDepartmentsApi():
 
         office = government_models.GovernmentOffice(name)
         members = office.members
+        meetings = office.meetings_summary
         #register = office.interests_summary
         #ec = office.donation_summary
 
         data_sources = {
             "register_of_interests": [],
-            "electoral_commission": []
+            "electoral_commission": [],
+            "meetings_summary": meetings,
         }
 
         office_data = {
@@ -395,6 +397,48 @@ class PopulateDepartmentsApi():
             "members": members
         }
         self.db.save("api_departments", office_data)
+
+
+class PopulateMeetingsApi():
+    def __init__(self):
+        self._logger = logging.getLogger('spud')
+        self.db = mongo.MongoInterface()
+
+    def run(self):
+        self.db.drop("api_meetings")
+        all_agencies = LobbyAgencies().get_all()
+        self._logger.debug("Populating Lobby Agencies Api")
+        for doc in all_agencies:
+            name = doc[0]
+            self._logger.debug(name)
+            self._get_stats(doc)
+
+    def _get_stats(self, record):
+        name = record[0]
+        client_count = record[1]
+        employee_count = record[2]
+        labels = record[3]
+        if labels and "Named Entity" in labels:
+            labels.remove("Named Entity")
+
+        agency = LobbyAgency(name)
+        data_sources = {
+            "meetings": {
+                "client_count": client_count,
+                "employee_count": employee_count,
+                "clients": agency.clients,
+                "employees": agency.employees,
+                "meetings_summary": agency.meetings_summary,
+                "meetings": agency.meetings
+            }
+        }
+        agency_data = {
+            "name": name,
+            "influences": data_sources,
+            "labels": labels,
+            "contact_details": agency.contact_details,
+        }
+        self.db.save("api_meetings", agency_data)
 
 
 def _convert_to_currency(number):

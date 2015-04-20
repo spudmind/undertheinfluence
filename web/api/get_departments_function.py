@@ -1,6 +1,7 @@
 from web.api import BaseAPI
 from flask import url_for
 from utils import mongo
+from utils import config
 
 
 class DepartmentsApi(BaseAPI):
@@ -8,6 +9,7 @@ class DepartmentsApi(BaseAPI):
         BaseAPI.__init__(self)
         self._db = mongo.MongoInterface()
         self._db_table = 'api_departments'
+        self.lords_titles = config.lords_titles
 
     def request(self, **args):
         page = args.get('page', 1)
@@ -22,7 +24,7 @@ class DepartmentsApi(BaseAPI):
         response["results"] = [
             {
                 "name": entry["name"],
-                "influences_summary": entry["influences"],
+                "influences_summary": self._politician_urls(entry["influences"]),
                 "labels": entry["labels"],
                 "members": self._members_detail_url(
                     entry["members"]
@@ -37,3 +39,25 @@ class DepartmentsApi(BaseAPI):
         ]
         return response
 
+    def _politician_urls(self, influences):
+        results = []
+        if "meetings_summary" in influences:
+            for entry in influences["meetings_summary"]:
+                updated = {}
+                if any(title in entry["host"] for title in self.lords_titles):
+                    label = "lord"
+                else:
+                    label = "mp"
+                host = {
+                    "name": entry["host"],
+                    "details_url": self.named_entity_resources(
+                        entry["host"], label
+                    )[0]
+                }
+                updated["host"] = host
+                updated["position"] = entry["position"]
+                updated["meetings"] = entry["meetings"]
+                #print "updated", updated
+                results.append(updated)
+            influences["meetings_summary"] = results
+        return influences

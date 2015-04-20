@@ -32,13 +32,15 @@
                             <div class="row-content">
                                 <div class="col-md-10">
                                     <div class="least-content">
-                                        {% for label in entry["labels"] %}
-                                            <span class="label label-success">{{ label }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                                    <div class="row">
 
+                                        <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+                                        <div class="row">
+                                            <p>
+                                                {% for label in entry["labels"] %}
+                                                    <span class="label label-success">{{ label }}</span>
+                                                {% endfor %}
+                                        </div>
+                                        </p>
                                         <div class="well well-sm">
                                             {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
                                                 <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>

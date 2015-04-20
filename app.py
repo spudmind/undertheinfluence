@@ -84,6 +84,16 @@ def show_lobbyists():
     return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
 
 
+@app.route('/meetings')
+def show_meetings():
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    departments = get_departments_function.DepartmentsApi().request(page=page)['results']
+    return render_template('show_meetings.html', departments=departments, page=page)
+
+
 @app.route('/lobbyists/<name>')
 def show_lobby_agency(name):
     args = {"name": name}
@@ -202,50 +212,6 @@ def show_influencers_detail():
     return render_template(
         'influencers_detail.html', influencers=influencers, page=page, title=title, pager=pager
     )
-
-
-def _build_title(args):
-    filters = []
-    title = {"header": None}
-    if "labels" in args:
-        if args["labels"]:
-            title["header"] = args["labels"]
-            filters.append(" & ".join(args["labels"].split(",")))
-    if "type" in args:
-        if args["type"] == "mp":
-            title["header"] = "Members of Parliament"
-        if args["type"] == "lord":
-            title["header"] = "Lords"
-    if "government_committee" in args:
-        if args["government_committee"]:
-            title["header"] = args["government_committee"]
-            filters.append("Select Committee: %s" % args["government_committee"])
-    if "government_department" in args:
-        if args["government_department"]:
-            title["header"] = args["government_department"]
-            filters.append("Government Department: %s" % args["government_department"])
-    if "party" in args:
-        if len(args["party"]) > 0:
-            filters.append("%s Members" % args["party"])
-    if "interests_lt" in args:
-        value = _convert_to_currency(int(args["interests_lt"]))
-        filters.append("Interests less than: %s" % value)
-    if "interests_gt" in args:
-        value = _convert_to_currency(int(args["interests_gt"]))
-        filters.append("Interests greater than: %s" % value)
-    if "donations_lt" in args:
-        value = _convert_to_currency(int(args["donations_lt"]))
-        filters.append("Donations less than: %s" % value)
-    if "donations_gt" in args:
-        value = _convert_to_currency(int(args["donations_gt"]))
-        filters.append("Donations greater than: %s" % value)
-    if "lobbyists_lt" in args:
-        filters.append("Less than %s lobbyists hired" % args["lobbyists_lt"])
-    if "lobbyists_gt" in args:
-        filters.append("More than %s lobbyists hired" % args["lobbyists_gt"])
-    title["filter"] = "; ".join(filters)
-    return title
-
 
 
 @app.route('/influencer/detail/<name>')
@@ -505,6 +471,50 @@ api.add_resource(GetCommittees, '/api/v0.1/getCommittees', endpoint='getCommitte
 api.add_resource(GetDepartments, '/api/v0.1/getDepartments', endpoint='getDepartments')
 api.add_resource(FindEntity, '/api/v0.1/findEntity', endpoint='findEntity')
 api.add_resource(GetData, '/api/v0.1/data', endpoint='data')
+
+
+def _build_title(args):
+    filters = []
+    title = {"header": None}
+    if "labels" in args:
+        if args["labels"]:
+            title["header"] = args["labels"]
+            filters.append(" & ".join(args["labels"].split(",")))
+    if "type" in args:
+        if args["type"] == "mp":
+            title["header"] = "Members of Parliament"
+        if args["type"] == "lord":
+            title["header"] = "Lords"
+    if "government_committee" in args:
+        if args["government_committee"]:
+            title["header"] = args["government_committee"]
+            filters.append("Select Committee: %s" % args["government_committee"])
+    if "government_department" in args:
+        if args["government_department"]:
+            title["header"] = args["government_department"]
+            filters.append("Government Department: %s" % args["government_department"])
+    if "party" in args:
+        if len(args["party"]) > 0:
+            filters.append("%s Members" % args["party"])
+    if "interests_lt" in args:
+        value = _convert_to_currency(int(args["interests_lt"]))
+        filters.append("Interests less than: %s" % value)
+    if "interests_gt" in args:
+        value = _convert_to_currency(int(args["interests_gt"]))
+        filters.append("Interests greater than: %s" % value)
+    if "donations_lt" in args:
+        value = _convert_to_currency(int(args["donations_lt"]))
+        filters.append("Donations less than: %s" % value)
+    if "donations_gt" in args:
+        value = _convert_to_currency(int(args["donations_gt"]))
+        filters.append("Donations greater than: %s" % value)
+    if "lobbyists_lt" in args:
+        filters.append("Less than %s lobbyists hired" % args["lobbyists_lt"])
+    if "lobbyists_gt" in args:
+        filters.append("More than %s lobbyists hired" % args["lobbyists_gt"])
+    title["filter"] = "; ".join(filters)
+    return title
+
 
 if __name__ == '__main__':
     app.debug = True

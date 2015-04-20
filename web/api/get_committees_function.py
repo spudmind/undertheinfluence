@@ -29,7 +29,6 @@ class CommitteesApi(BaseAPI):
                 "mp_count": entry["mp_count"],
                 "detail_url": url_for(
                     'show_politicians_detail', government_committee=entry["name"], _external=True
-
                 )
             }
             for entry in results

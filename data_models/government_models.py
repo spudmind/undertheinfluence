@@ -149,7 +149,7 @@ class MemberOfParliament(NamedEntity):
         output = self.query(search_string)
         for entry in output:
             results.append(entry[0])
-        return results
+        return list(set(results))
 
     def _get_government_departments(self):
         departments, positions = [], []
@@ -164,7 +164,7 @@ class MemberOfParliament(NamedEntity):
         for entry in output:
             departments.append(entry[0])
             positions.append(entry[0])
-        return departments, positions
+        return list(set(departments)), list(set(positions))
 
     def _get_meeting_summary(self):
         results = []
@@ -945,6 +945,7 @@ class GovernmentOffice(NamedEntity):
             self.labels = self._get_labels()
             self.office_type = self._get_office_type(self.labels)
             self.members = self._get_members()
+            self.meetings_summary = self._get_meetings_summary()
             #self.interests_summary, self.donation_summary =\
             #    self._get_office_summary()
 
@@ -999,7 +1000,7 @@ class GovernmentOffice(NamedEntity):
             MATCH (p)-[:OFFICE_IN]-(d) with d, p
             MATCH (p)-[:SERVED_IN]-(x:`Member of Parliament`) with d, p, x
             MATCH (p)-[:ATTENDED_BY]-(m) with d, p, m, x
-            RETURN DISTINCT  p.name as position, x.name as name
+            RETURN DISTINCT x.name as name
         """.format(self.vertex["name"])
         result = self.query(search_string)
         return [r["name"] for r in result]
@@ -1015,6 +1016,27 @@ class GovernmentOffice(NamedEntity):
         """.format(self.vertex["name"])
         result = self.query(search_string)
         return [r["name"] for r in result]
+
+    def _get_meetings_summary(self):
+        results = []
+        query = u"""
+            MATCH (d:`Government Office` {{name: "{0}"}})
+            MATCH (p)-[:OFFICE_IN]-(d) with d, p
+            MATCH (p)-[:SERVED_IN]-(x:`Member of Parliament`) with d, p, x
+            MATCH (p)-[:ATTENDED_BY]-(m) with d, p, m, x
+                WHERE x.name = m.host_name
+            RETURN DISTINCT  p.name as position, x.name as host, count(m) as meetings
+            ORDER BY count(m) DESC
+        """.format(self.vertex["name"])
+        output = self.query(query)
+        for entry in output:
+            department_summary = {
+                "position": entry["position"],
+                "host": entry["host"],
+                "meetings": entry["meetings"],
+            }
+            results.append(department_summary)
+        return results
 
     def _get_office_summary(self):
         results = []

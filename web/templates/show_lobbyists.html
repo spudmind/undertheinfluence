@@ -30,25 +30,28 @@
                                 </div>
                             {% endif %}
                             <div class="row-content">
-                                <div class="col-md-10">
+                                <div class="col-md-11">
                                     <div class="least-content">
 
-                                        <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                                        <div class="row">
-                                            <p>
-                                                {% for label in entry["labels"] %}
-                                                    <span class="label label-success">{{ label }}</span>
-                                                {% endfor %}
-                                        </div>
+                                    </div>
+
+                                    <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+                                    <div class="row">
+                                        <p>
+                                            {% for label in entry["labels"] %}
+                                                <span class="label label-success">{{ label }}</span>
+                                            {% endfor %}
                                         </p>
+
                                         <div class="well well-sm">
                                             {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
                                                 <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
                                                 {% for client in entry.influences_summary.lobbying_registers.clients %}
                                                     * <a href="{{ client.details_url }}">{{ client.name }}</a>
                                                 {% endfor %}
+                                            {% else %}
+                                                WTF???
                                             {% endif %}
-
                                         </div >
                                     </div >
                                 </div >

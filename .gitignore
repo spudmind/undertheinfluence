@@ -54,6 +54,9 @@ target/
 # sqlite databases
 *.sqlite
 
+# OSX
+.DS_Store
+
 # warren test code and data
 members_test.py
 dump.txt

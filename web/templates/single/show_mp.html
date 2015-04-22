@@ -16,6 +16,27 @@
     <div id="government-container">
     <div class="row">
         <div class="col-md-6">
+
+            {% if "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
+                <div class="well well-sm">
+                    {% if mp["mp_website"] %}
+                        <a href="{{ mp.mp_website }}">MP website</a>
+                    {% endif %}
+                    {% if "mp_website" in mp and "wikipedia" in mp %}
+                        /
+                    {% endif %}
+                    {% if mp["wikipedia"] %}
+                        <a href="{{ mp.wikipedia }}">Wikipedia</a>
+                    {% endif %}
+                    {% if mp["guardian"] %}
+                        / <a href="{{ mp.guardian }}">Guardian</a>
+                    {% endif %}
+                    {% if mp["bbc"] %}
+                        / <a href="{{ mp.bbc }}">BBC</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
             {% if mp["government_positions"] %}
                 <div class="well well-sm">
                     {% for position in mp["government_positions"] %}

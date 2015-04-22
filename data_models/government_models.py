@@ -105,15 +105,21 @@ class MemberOfParliament(NamedEntity):
         self.label = "Member of Parliament"
         self.primary_attribute = "name"
         self.name = name
-        self._get_properties = get_properties
+        self._fetch_properties = get_properties
         self.exists = self.fetch(
             self.label, self.primary_attribute, self.name
         )
-        if self.exists and self._get_properties:
-            self.party, self.image_url = self._set_properties()
-            self.departments, positions = self._get_government_departments()
-            self.positions = list(set(self._get_positions() + positions))
-            self.committees = self._get_committees()
+        if self.exists and self._fetch_properties:
+            info = self._get_mp_info()
+            offices = self._get_offices()
+            self.party, self.image_url = info["party"], info["image"]
+            self.mp_website = info["mp_website"]
+            self.wikipedia = info["wikipedia"]
+            self.guardian = info["guardian"]
+            self.bbc = info["bbc"]
+            self.departments = offices["departments"]
+            self.positions = offices["positions"]
+            self.committees = offices["committees"]
             self.meetings = self._get_meetings()
             self.meetings_summary = self._get_meeting_summary()
             self.interest_categories = self._interest_categories()
@@ -122,13 +128,35 @@ class MemberOfParliament(NamedEntity):
             self.donations = self._get_donations()
             self.donations_summary = self._get_donations_summary()
 
-    def _set_properties(self):
+    def _get_mp_info(self):
         search_string = u"""
             MATCH (mp:`Member of Parliament` {{name:"{0}"}})
-            return mp.party, mp.image
+            return mp.party as party, mp.image as image,
+                mp.wikipedia_url as wikipedia,
+                mp.guardian_mp_summary as guardian,
+                mp.bbc_profile_url as bbc,
+                mp.mp_website as mp_website
         """.format(self.vertex["name"])
         output = self.query(search_string)
-        return output[0]["mp.party"], output[0]["mp.image"]
+        return {
+            "party": output[0]["party"],
+            "image": output[0]["image"],
+            "wikipedia": output[0]["wikipedia"],
+            "guardian": output[0]["guardian"],
+            "bbc": output[0]["bbc"],
+            "mp_website": output[0]["mp_website"],
+        }
+
+    def _get_offices(self):
+        departments, positions = self._get_government_departments()
+        positions = list(set(self._get_positions() + positions))
+        positions = [p for p in positions if p not in departments]
+        committees = self._get_committees()
+        return {
+            "departments": departments,
+            "positions": positions,
+            "committees": committees
+        }
 
     def _get_positions(self):
         return self._get_government_positions("Government Position")

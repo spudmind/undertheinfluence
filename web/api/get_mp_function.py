@@ -36,6 +36,10 @@ class MpApi(BaseAPI):
                 "government_committees": self._committee_detail_urls(
                     result[0]["government_committees"]
                 ),
+                'mp': mp.mp_website,
+                'wikipedia': mp.wikipedia,
+                'guardian': mp.guardian,
+                'bbc': mp.bbc,
             }
         return result
 

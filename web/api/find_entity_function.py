@@ -37,11 +37,6 @@ class EntityApi(BaseAPI):
         field = 'name'
         query = args["search"]
         results, response = self._elastic.search(field, query)
-
-        for entry in results:
-            print entry
-            print entry["labels"]
-
         response["results"] = [
             {
                 "name": entry["name"],

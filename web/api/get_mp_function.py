@@ -41,9 +41,9 @@ class MpApi(BaseAPI):
 
     def _interest_urls(self, interests):
         results = []
-        for entry in interests:
+        for category in interests:
             updated_interests = []
-            for interest in entry["interests"]:
+            for interest in category["interests"]:
                 updated = interest
                 interest_name = interest["interest"]["name"]
                 interest_labels = interest["interest"]["labels"]
@@ -53,8 +53,9 @@ class MpApi(BaseAPI):
                 updated_interests.append(updated)
 
             if len(updated_interests) > 1:
-                entry["interests"] = updated_interests
-                results.append(entry)
+                category["interests"] = updated_interests
+                results.append(category)
+
         return results
 
     def _donor_urls(self, donations):

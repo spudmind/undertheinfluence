@@ -250,11 +250,18 @@ class MemberOfParliament(NamedEntity):
                 }
                 if "donor_status" in this_category:
                     interest["donor_status"] = entry["p.donor_status"]
+
+                source_url = entry["p.source_url"]
+                if not source_url or source_url == "":
+                    source_url = self._build_source_url(
+                        entry["p.recipient"], entry["p.`recorded date`"]
+                    )
+
                 detail = {
                     "interest": interest,
                     "category": category,
                     "recipient": entry["p.recipient"],
-                    "source_url": entry["p.source_url"],
+                    "source_url": source_url,
                     "source_fetched": entry["p.source_fetched"],
                     "source_linked_from": entry["p.source_linked_from"],
                     "recorded_date": entry["p.`recorded date`"],
@@ -467,6 +474,24 @@ class MemberOfParliament(NamedEntity):
         self.create_relationship(
             self.vertex, "ELECTED_FOR", term.vertex
         )
+
+    @staticmethod
+    def _build_source_url(name, recorded_date):
+        if "," in recorded_date:
+            dates = recorded_date.split(",")
+            recorded_date = dates[-1]
+        url_date = "{}{}{}".format(
+            recorded_date.split("-")[0][2:],
+            recorded_date.split("-")[1],
+            recorded_date.split("-")[2],
+        )
+        url_name = u"{}_{}".format(
+            name.split(" ")[1].lower(),
+            name.split(" ")[0].lower()
+        )
+        page = u"{0}/{1}.htm".format(url_date, url_name)
+        url = u"http://www.publications.parliament.uk/pa/cm/cmregmem/{}".format(page)
+        return url
 
 
 class Lords(BaseDataModel):

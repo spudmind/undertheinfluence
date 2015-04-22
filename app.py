@@ -235,7 +235,7 @@ def show_lord(name):
     return render_template('single/show_lord.html', lord=lord)
 
 
-@app.route('/parties/')
+@app.route('/parties')
 def show_parties():
     try:
         page = int(request.args.get('page', 1))
@@ -252,7 +252,7 @@ def show_party(name):
     return render_template('single/show_party.html', party=party)
 
 
-@app.route('/committees/')
+@app.route('/committees')
 def show_committees():
     try:
         page = int(request.args.get('page', 1))
@@ -262,7 +262,7 @@ def show_committees():
     return render_template('show_committees.html', offices=offices, page=page)
 
 
-@app.route('/departments/')
+@app.route('/departments')
 def show_departments():
     try:
         page = int(request.args.get('page', 1))

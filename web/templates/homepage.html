@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    The Big Picture
+{% endblock %}
+
+{% block article %}
+<div class="col-md-1"></div>
+<div class="col-md-10">
+    <div id="government-container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well well-sm">
+
+                        <p><b>Under The Influence:</b></p>
+
+                        <ul>
+                            <li>maps the hidden relationships between the British government, business and other interests, and lobbyists;</li>
+                            <li>lets us know who is trying to influence British politics; and</li>
+                            <li>allows us to find out how money in politics affects our lives.</li>
+                        </ul>
+
+                        <p><a href="{{ url_for('show_about')}}">Read more</a></p>
+                        <p>Find out more about the <a href="{{ url_for('show_influencers')}}">influencers</a> and our <a href="{{ url_for('show_politicians')}}">politicians and officials</a></p>
+
+
+                </div>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+
+            </div>
+
+            <div class="col-md-6">
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-1"></div>
+{% endblock article %}

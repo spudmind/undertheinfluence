@@ -1,21 +1,15 @@
 {% extends "layout.html" %}
+
+{% block title %}
+    Search Results: {{ search_string }}
+{% endblock title %}
+
 {% block article %}
-
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Search Results: {{ search_string }}</h1>
-            <hr>
-        </div >
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-        <h1></h1>
-    </div >
-    <div class="col-md-8">
+<div class="col-md-4"></div>
+<div class="col-md-8">
     <div id="government-container">
-    <div class="list-group">
-    {% for entry in results %}
+        <div class="list-group">
+        {% for entry in results %}
         <div class="list-group-item" >
         {% if entry.image_url %}
             <div class="row-picture">
@@ -52,7 +46,7 @@
                         * <a href="{{ client.details_url }}">{{ client.name }}</a>
                     {% endfor %}
                 {% endif %}
-            </div >
+            </div>
 
 
         {% elif "Political Party" in entry["labels"] %}
@@ -77,7 +71,7 @@
                     {{ entry.influences_summary.electoral_commission.donation_count }} donations
                 {% endif %}
 
-            </div >
+            </div>
 
 
         {% elif "Lord" in entry["labels"] %}
@@ -214,7 +208,7 @@
                     {{ entry.influences_summary.electoral_commission.donation_total }} donations received from
                     {{ entry.influences_summary.electoral_commission.donor_count }} donations.
                 {% endif %}
-            </div >
+            </div>
 
             <div class="well well-sm">
                 {% if entry.weight > 0 %}
@@ -223,7 +217,7 @@
                         <a href="{{ member.detail_url }}">{{ member.name }}</a>.
                     {% endfor %}
                 {% endif %}
-            </div >
+            </div>
 
 
         {% elif "Lobby Agency Client" in entry["labels"] or "Donor" in entry["labels"] or "Registered Interest" in entry["labels"] or "Meeting Attendee" in entry["labels"] and not "Political Party" in entry["labels"] %}
@@ -289,8 +283,8 @@
         {% endif %}
 
 
-    </div >
-    </div >
+    </div>
+    </div>
     </div>
     </div>
         <div class="list-group-separator"></div>
@@ -307,6 +301,4 @@
 </ul>
 </div>
 </div>
-</div>
-
 {% endblock article %}

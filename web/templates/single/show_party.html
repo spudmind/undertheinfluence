@@ -1,69 +1,60 @@
 {% extends "single/single.html" %}
+
+{% block title %}
+    {{ party.name }}
+{% endblock %}
+
 {% block article %}
-
-    <div class="row">
-        <div class="col-md-12">
-            <h1>{{ party.name }}</h1>
-        </div >
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <hr>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div id="government-container">
-                <div class="list-group">
-                    {% if "electoral_commission" in party["influences_detail"] %}
-                        <div class="list-group-item">
-                            <div class="row-content">
-                                <h4 class="list-group-item-heading">Electoral Commission</h4>
-                                <table class="table table-striped table-hover ">
-                                    <colgroup>
-                                        <col span="1" style="width: 10%;">
-                                        <col span="1" style="width: 20%;">
-                                        <col span="1" style="width: 15%;">
-                                        <col span="1" style="width: 9%;">
-                                        <col span="1" style="width: 9%;">
-                                        <col span="1" style="width: 9%;">
-                                        <col span="1" style="width: 15%;">
-                                    </colgroup>
-                                    <thead>
-                                    <tr>
-                                        <th>Donation</th>
-                                        <th>Donor</th>
-                                        <th>Type</th>
-                                        <th>Received</th>
-                                        <th>Reported</th>
-                                        <th>Accepted</th>
-                                        <th>Nature</th>
-                                    </tr>
-                                    </thead>
-                                    {% with cols = 7 %}
-                                        {% include '_partials/_tfooter.html' %}
-                                    {% endwith %}
-                                    <tbody>
-                                    {% for donation in party.influences_detail.electoral_commission %}
-                                        <tr>
-                                            <td><small>{{ donation.amount }}</small></td>
-                                            <td><small><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></small></td>
-                                            <td><small>{{ donation.donor["donor_type"] }}</small></td>
-                                            <td><small>{{ donation.received }}</small></td>
-                                            <td><small>{{ donation.reported }}</small></td>
-                                            <td><small>{{ donation.accepted }}</small></td>
-                                            <td><small>{{ donation.nature }}</small></td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                                <div class="list-group-separator"></div>
-                            </div>
-                        </div>
-                    {% endif %}
+<div class="col-md-12">
+    <div id="government-container">
+        <div class="list-group">
+            {% if "electoral_commission" in party["influences_detail"] %}
+                <div class="list-group-item">
+                    <div class="row-content">
+                        <h4 class="list-group-item-heading">Electoral Commission</h4>
+                        <table class="table table-striped table-hover ">
+                            <colgroup>
+                                <col span="1" style="width: 10%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 15%;">
+                                <col span="1" style="width: 9%;">
+                                <col span="1" style="width: 9%;">
+                                <col span="1" style="width: 9%;">
+                                <col span="1" style="width: 15%;">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>Donation</th>
+                                <th>Donor</th>
+                                <th>Type</th>
+                                <th>Received</th>
+                                <th>Reported</th>
+                                <th>Accepted</th>
+                                <th>Nature</th>
+                            </tr>
+                            </thead>
+                            {% with cols = 7 %}
+                                {% include '_partials/_tfooter.html' %}
+                            {% endwith %}
+                            <tbody>
+                            {% for donation in party.influences_detail.electoral_commission %}
+                                <tr>
+                                    <td><small>{{ donation.amount }}</small></td>
+                                    <td><small><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></small></td>
+                                    <td><small>{{ donation.donor["donor_type"] }}</small></td>
+                                    <td><small>{{ donation.received }}</small></td>
+                                    <td><small>{{ donation.reported }}</small></td>
+                                    <td><small>{{ donation.accepted }}</small></td>
+                                    <td><small>{{ donation.nature }}</small></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="list-group-separator"></div>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
-
+</div>
 {% endblock article %}

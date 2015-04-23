@@ -1,23 +1,16 @@
 {% extends "single/single.html" %}
+
+{% block title %}
+    {{ mp.name }}{% if mp.party %} – {{ mp.party }}{% endif %}
+{% endblock %}
+
 {% block article %}
-
-    <div class="row">
-        <div class="col-md-12">
-            <h1>{{ mp.name }} – {{ mp.party }}</h1>
-        </div >
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <hr>
-        </div>
-    </div>
-    <div class="row">
-    <div class="col-md-12">
+<div class="col-md-12">
     <div id="government-container">
-    <div class="row">
-        <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6">
 
-            {% if "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
+                {% if "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
                 <div class="well well-sm">
                     {% if mp["mp_website"] %}
                         <a href="{{ mp.mp_website }}">MP website</a>
@@ -35,42 +28,39 @@
                         / <a href="{{ mp.bbc }}">BBC</a>
                     {% endif %}
                 </div>
-            {% endif %}
+                {% endif %}
 
-            {% if mp["government_positions"] %}
+                {% if mp["government_positions"] %}
                 <div class="well well-sm">
                     {% for position in mp["government_positions"] %}
                         <b>{{ position }}</b><br>
                     {% endfor %}
                 </div>
-            {% endif %}
-            {% if mp["government_departments"] %}
+                {% endif %}
+                {% if mp["government_departments"] %}
                 <div class="well well-sm">
                     <b>Government Departments</b><br>
                     {% for dept in mp["government_departments"] %}
                         <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
                     {% endfor %}
                 </div>
+                {% endif %}
+
+            </div>
+            <div class="col-md-6">
+            {% if mp["government_positions"] or mp["government_departments"] %}
+                <hr>
             {% endif %}
-
+            </div>
         </div>
-        <div class="col-md-6">
+        <div class="list-group">
 
-        </div>
-        {% if mp["government_positions"] or mp["government_departments"] %}
-            <hr>
-        {% endif %}
-    </div>
-    <div class="list-group">
-
-    {% if mp.influences_detail["meetings"] %}
+        {% if mp.influences_detail["meetings"] %}
         <div class="list-group-item">
             <div class="row-content">
 
                 <h4 class="list-group-item-heading">Ministerial Meetings</h4>
-                <p class="list-group-item-text">
 
-                <p class="list-group-item-text">
                 <table class="table table-striped table-hover ">
                     <colgroup>
                         <col span="1" style="width: 25%;">
@@ -109,17 +99,16 @@
 
             </div>
         </div>
-    {% endif %}
+        {% endif %}
 
 
-    {% if mp.influences_detail.register_of_interests %}
+        {% if mp.influences_detail.register_of_interests %}
         <div class="list-group-item">
             <div class="row-content">
                 {% for interest in mp.influences_detail.register_of_interests %}
 
                     {% if "gifts" in interest.category.lower() %}
                         <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
-                        <p class="list-group-item-text">
                         <table class="table table-striped table-hover ">
                             <colgroup>
                                 <col span="1" style="width: 10%;">
@@ -162,7 +151,6 @@
                     {%  elif "overseas visits" in interest.category.lower() %}
 
                         <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
-                        <p class="list-group-item-text">
                         <table class="table table-striped table-hover ">
                             <colgroup>
                                 <col span="1" style="width: 10%;">
@@ -206,7 +194,6 @@
                     {%  elif "sponsorship" in interest.category.lower() %}
 
                         <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
-                        <p class="list-group-item-text">
                         <table class="table table-striped table-hover ">
                             <colgroup>
                                 <col span="1" style="width: 10%;">
@@ -246,7 +233,6 @@
                     {%  else %}
 
                         <h4 class="list-group-item-heading">Register Of Interests - {{ interest.category }}</h4>
-                        <p class="list-group-item-text">
                         <table class="table table-striped table-hover ">
                             <colgroup>
                                 <col span="1" style="width: 10%;">
@@ -286,12 +272,11 @@
             </div>
         </div>
         <hr>
-    {% endif %}
+        {% endif %}
 
-    {% if mp.influences_detail.electoral_commission %}
+        {% if mp.influences_detail.electoral_commission %}
         <div class="list-group-item">
             <div class="row-content">
-                <p class="list-group-item-text">
                 <h4 class="list-group-item-heading">Electoral Commission</h4>
                 <table class="table table-striped table-hover ">
                     <colgroup>
@@ -343,10 +328,8 @@
 
             </div>
         </div>
-    {% endif %}
+        {% endif %}
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
-
+</div>
 {% endblock article %}

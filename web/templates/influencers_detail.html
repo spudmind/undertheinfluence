@@ -1,189 +1,185 @@
 {% extends "layout.html" %}
-{% block article %}
 
-    <div class="row">
-        <div class="col-md-12">
-            {% if title.header %}
-                <h1>Influence Detail: {{ title.header }}</h1>
-            {% else %}
-                <h1>All Influencers</h1>
-            {% endif %}
-            <hr>
-        </div >
+{% block title %}
+    {% if title.header %}
+        <h1>Influence Detail: {{ title.header }}</h1>
+    {% else %}
+        <h1>All Influencers</h1>
+    {% endif %}
+{% endblock %}
+
+{% block article %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="alert alert-dismissable alert-success">
+            <p><em>"The influence of lobbyists increases when it goes largely unnoticed by the public." </em></p>
+            <p>Lobbyists succeed by owning the terms of debate, steering conversations away from those they can't win and on to those they can. If a public discussion on a company's environmental impact is unwelcome, lobbyists will push instead to have a debate with politicians and the media on the hypothetical economic benefits of their ambitions. Once this narrowly framed conversation becomes dominant, dissenting voices will appear marginal and irrelevant.</p>
+        </div>
+        <form class="form-horizontal" action="{{ url_for('show_influencers_detail') }}" method="post">
+            <fieldset>
+                <legend>Dig Deeper</legend>
+
+                <div class="form-group">
+                    <label for="select" class="col-lg-3 control-label">Type</label>
+                    <div class="col-lg-8">
+                        <select multiple="" class="form-control" name="labels" >
+                            <option>Donor</option>
+                            <option>Registered Interest</option>
+                            <option>Lobby Agency Client</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">Meetings</label>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="meetings_lt" id="focusedInput" type="text" placeholder="less than">
+                    </div>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="meetings_gt" id="focusedInput" type="text" placeholder="greater than" >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">Interests</label>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="interests_lt" id="focusedInput" type="text" placeholder="less than">
+                    </div>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="interests_gt" id="focusedInput" type="text" placeholder="greater than" >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">Donations</label>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="donations_lt" id="focusedInput" type="text" placeholder="less than">
+                    </div>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="donations_gt" id="focusedInput" type="text" placeholder="greater than" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">Lobbyists</label>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="lobbyists_lt" id="focusedInput" type="text" placeholder="less than">
+                    </div>
+                    <div class="col-lg-4">
+                        <input class="form-control floating-label" name="lobbyists_gt" id="focusedInput" type="text" placeholder="greater than" >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-7">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="alert alert-dismissable alert-success">
-                <p><em>"The influence of lobbyists increases when it goes largely unnoticed by the public." </em></p>
-                <p>Lobbyists succeed by owning the terms of debate, steering conversations away from those they can't win and on to those they can. If a public discussion on a company's environmental impact is unwelcome, lobbyists will push instead to have a debate with politicians and the media on the hypothetical economic benefits of their ambitions. Once this narrowly framed conversation becomes dominant, dissenting voices will appear marginal and irrelevant.</p>
-            </div >
-            <form class="form-horizontal" action="/influencers/detail" method="post">
-                <fieldset>
-                    <legend>Dig Deeper</legend>
-
-                    <div class="form-group">
-                        <label for="select" class="col-lg-3 control-label">Type</label>
-                        <div class="col-lg-8">
-                            <select multiple="" class="form-control" name="labels" >
-                                <option>Donor</option>
-                                <option>Registered Interest</option>
-                                <option>Lobby Agency Client</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-lg-3 control-label">Meetings</label>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="meetings_lt" id="focusedInput" type="text" placeholder="less than">
-                        </div>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="meetings_gt" id="focusedInput" type="text" placeholder="greater than" >
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-lg-3 control-label">Interests</label>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="interests_lt" id="focusedInput" type="text" placeholder="less than">
-                        </div>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="interests_gt" id="focusedInput" type="text" placeholder="greater than" >
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-lg-3 control-label">Donations</label>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="donations_lt" id="focusedInput" type="text" placeholder="less than">
-                        </div>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="donations_gt" id="focusedInput" type="text" placeholder="greater than" >
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-lg-3 control-label">Lobbyists</label>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="lobbyists_lt" id="focusedInput" type="text" placeholder="less than">
-                        </div>
-                        <div class="col-lg-4">
-                            <input class="form-control floating-label" name="lobbyists_gt" id="focusedInput" type="text" placeholder="greater than" >
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-lg-10 col-lg-offset-7">
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-        </div >
-
-        <div class="col-md-8">
-            <div id="government-container">
-                <div class="list-group">
-                    {% if title.filter %}
-                        <div class="list-group-item" >
-                            <div class="row-content">
-                                <div class="alert alert-dismissable alert-warning">
-                                    <b>Filtering for: </b>{{ title.filter }}
-                                </div >
-                            </div >
-                        </div >
-                    {% endif %}
-                    {% for entry in influencers %}
-                        <div class="list-group-item" >
-                            <div class="row-action-primary">
-                                <i class="icon-material-folder" ></i>
-                            </div>
-                            <div class="row-content">
-                                <div class="col-md-10">
-                                    <div class="least-content ">
-
-                                    </div>
-                                    <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                                    <div class="row">
-
-                                        <p>
-                                            {% for label in entry["labels"] %}
-                                                <span class="label label-success">{{ label }}</span>
-                                            {% endfor %}
-                                        </p>
-
-                                        {% if "meetings" in entry.influences_summary %}
-
-                                            {% if entry.influences_summary.meetings.meetings_count > 1 %}
-                                                <div class="well well-sm">
-                                                    <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b> with:
-                                                    {% for politician in entry.influences_summary.meetings.politicians_met %}
-                                                        <a href="{{ politician.details_url }}">{{ politician.name }}</a>
-                                                        {% if not loop.last %}
-                                                            ,
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-
-                                        {% if "lobby_registers" in entry.influences_summary %}
-                                            {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
-                                                <div class="well well-sm">
-                                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
-                                                </div>
-                                            {% else %}
-                                                <div class="well well-sm">
-                                                    <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if "register_of_interests" in entry.influences_summary %}
-                                            <div class="well well-sm">
-                                                <b>Register of Interests</b><br>
-                                                {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_total }} in
-                                                {% endif %}
-                                                {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_count }} registered interests
-                                                    across
-                                                {% endif %}
-                                                {{ entry.influences_summary.register_of_interests.relationship_count }} relationships
-                                            </div>
-                                        {% endif %}
-                                        {% if "electoral_commission" in entry.influences_summary %}
-                                            <div class="well well-sm">
-                                                <b>Electoral Commission</b><br>
-                                                {{ entry.influences_summary.electoral_commission.donation_total }} donated across
-                                                {{ entry.influences_summary.electoral_commission.donation_count }} donations
-                                            </div>
-                                        {% endif %}
-
-
-
-                                    </div >
-                                </div >
+    <div class="col-md-8">
+        <div id="government-container">
+            <div class="list-group">
+                {% if title.filter %}
+                    <div class="list-group-item" >
+                        <div class="row-content">
+                            <div class="alert alert-dismissable alert-warning">
+                                <b>Filtering for: </b>{{ title.filter }}
                             </div>
                         </div>
-                        <div class="list-group-separator"></div>
-                    {% endfor %}
-                </div>
-                <ul class="pager">
-                    {% if not pager.previous %}
-                        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-                    {% else %}
-                        <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
-                    {% endif %}
-                    {% if pager.next %}
-                        <li class="next"><a href="{{ pager.next }}">Next page</a></li>
-                    {% else %}
-                        <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
-                    {% endif %}
-                </ul>
+                    </div>
+                {% endif %}
+                {% for entry in influencers %}
+                    <div class="list-group-item" >
+                        <div class="row-action-primary">
+                            <i class="icon-material-folder" ></i>
+                        </div>
+                        <div class="row-content">
+                            <div class="col-md-10">
+                                <div class="least-content ">
+
+                                </div>
+                                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+                                <div class="row">
+
+                                    <p>
+                                        {% for label in entry["labels"] %}
+                                            <span class="label label-success">{{ label }}</span>
+                                        {% endfor %}
+                                    </p>
+
+                                    {% if "meetings" in entry.influences_summary %}
+
+                                        {% if entry.influences_summary.meetings.meetings_count > 1 %}
+                                            <div class="well well-sm">
+                                                <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b> with:
+                                                {% for politician in entry.influences_summary.meetings.politicians_met %}
+                                                    <a href="{{ politician.details_url }}">{{ politician.name }}</a>
+                                                    {% if not loop.last %}
+                                                        ,
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+
+
+                                    {% if "lobby_registers" in entry.influences_summary %}
+                                        {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
+                                            <div class="well well-sm">
+                                                <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
+                                            </div>
+                                        {% else %}
+                                            <div class="well well-sm">
+                                                <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {% if "register_of_interests" in entry.influences_summary %}
+                                        <div class="well well-sm">
+                                            <b>Register of Interests</b><br>
+                                            {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
+                                                {{ entry.influences_summary.register_of_interests.remuneration_total }} in
+                                            {% endif %}
+                                            {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
+                                                {{ entry.influences_summary.register_of_interests.remuneration_count }} registered interests
+                                                across
+                                            {% endif %}
+                                            {{ entry.influences_summary.register_of_interests.relationship_count }} relationships
+                                        </div>
+                                    {% endif %}
+                                    {% if "electoral_commission" in entry.influences_summary %}
+                                        <div class="well well-sm">
+                                            <b>Electoral Commission</b><br>
+                                            {{ entry.influences_summary.electoral_commission.donation_total }} donated across
+                                            {{ entry.influences_summary.electoral_commission.donation_count }} donations
+                                        </div>
+                                    {% endif %}
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-separator"></div>
+                {% endfor %}
             </div>
+            <ul class="pager">
+                {% if not pager.previous %}
+                    <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
+                {% else %}
+                    <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
+                {% endif %}
+                {% if pager.next %}
+                    <li class="next"><a href="{{ pager.next }}">Next page</a></li>
+                {% else %}
+                    <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
+                {% endif %}
+            </ul>
         </div>
     </div>
-
+</div>
 {% endblock article %}

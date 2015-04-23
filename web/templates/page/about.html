@@ -1,48 +1,40 @@
 {% extends "layout.html" %}
+
+{% block title %}
+    About this site
+{% endblock %}
+
 {% block article %}
+<div class="col-md-1"></div>
+<div class="col-md-10">
+    <div id="government-container">
+        <div class="row">
+            <div class="col-md-8">
+                <p>Under The Influence catalogues the people and organisations that are influencing British politics.</p>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h1>About this site</h1>
-        </div >
-    </div>
-    <div class="col-md-12">
-        <hr>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10">
-            <div id="government-container">
-                <div class="row">
-                    <div class="col-md-8">
-                        <p>Under The Influence catalogues the people and organisations that are influencing British politics.</p>
+                This includes: individuals and organisations that:
+                <ul>
+                    <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">fund political parties</a></li>
+                    <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">organisations that employ</a> MPs and Lords</li>
+                    <li>organisations that meet with government ministers</li>
+                    <li><a href="{{ url_for('show_lobbyists' )}}">organisations that hire</a> lobbyists</li>
+                </ul>
 
-                        This includes: individuals and organisations that:
-                        <ul>
-                            <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">fund political parties</a></li>
-                            <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">organisations that employ</a> MPs and Lords</li>
-                            <li>organisations that meet with government ministers</li>
-                            <li><a href="{{ url_for('show_lobbyists' )}}">organisations that hire</a> lobbyists</li>
-                        </ul>
+                <p>We’ve brought this information together here for the first time so that you can search across the board who is influencing our politics. The data is all publicly available, but a lot of the time it is hard to find, and at the moment it is all unconnected, having numerous publishers.</p>
 
-                        <p>We’ve brought this information together here for the first time so that you can search across the board who is influencing our politics. The data is all publicly available, but a lot of the time it is hard to find, and at the moment it is all unconnected, having numerous publishers.</p>
+                <p>The UK government has the ambition of being the most transparent in the world, with more information being put into the public domain all the time. It is currently being done badly, however, and often fails to increase transparency, or create more accountable government (the ultimate aim of transparency).</p>
 
-                        <p>The UK government has the ambition of being the most transparent in the world, with more information being put into the public domain all the time. It is currently being done badly, however, and often fails to increase transparency, or create more accountable government (the ultimate aim of transparency).</p>
+                <p>Another of the aims of Under The Influence, then, is to demonstrate what real transparency in this context looks like. We have tried to fix the government’s data where possible, and iron out the most obvious glitches. You find find that we haven’t caught them all (we recommend that you verify information by going to the original source, a link to which is always provided).</p>
 
-                        <p>Another of the aims of Under The Influence, then, is to demonstrate what real transparency in this context looks like. We have tried to fix the government’s data where possible, and iron out the most obvious glitches. You find find that we haven’t caught them all (we recommend that you verify information by going to the original source, a link to which is always provided).</p>
+                <p>We welcome comments and suggestions for ways to improve the site, so please get in touch. We would also encourage you to let us know if you would like to contribute to the site. [link to Contact Us page]</p>
 
-                        <p>We welcome comments and suggestions for ways to improve the site, so please get in touch. We would also encourage you to let us know if you would like to contribute to the site. [link to Contact Us page]</p>
+                <p><b>Who we are</b></p>
+                <p>Under The Influence is a project of <a href="http://www.spinwatch.org/">Spinwatch</a> and <a href="http://www.unlockdemocracy.org.uk/">Unlock Democracy</a>, with generous funding from the <a href="http://www.jrrt.org.uk/">Joseph Rowntree Reform Trust</a>. It has been built by <a href="https://github.com/wrrrrn">Warren Ali</a> and <a href="http://treadsoft.ly/">Andy Lulham</a>.</p>
 
-                        <p><b>Who we are</b></p>
-                        <p>Under The Influence is a project of <a href="http://www.spinwatch.org/">Spinwatch</a> and <a href="http://www.unlockdemocracy.org.uk/">Unlock Democracy</a>, with generous funding from the <a href="http://www.jrrt.org.uk/">Joseph Rowntree Reform Trust</a>. It has been built by <a href="https://github.com/wrrrrn">Warren Ali</a> and <a href="http://treadsoft.ly/">Andy Lulham</a>.</p>
-
-                        <p>Spinwatch investigates the way that the public relations (PR) industry and corporate and government propaganda distort public debate and undermine democracy. Unlock Democracy campaigns for democratic reform in the UK, including party funding reform and a constitutional convention. Both organisations lead the campaign for robust transparency regulations for commercial lobbyists, in the form of a statutory lobbying register.</p>
-                    </div>
-                </div>
+                <p>Spinwatch investigates the way that the public relations (PR) industry and corporate and government propaganda distort public debate and undermine democracy. Unlock Democracy campaigns for democratic reform in the UK, including party funding reform and a constitutional convention. Both organisations lead the campaign for robust transparency regulations for commercial lobbyists, in the form of a statutory lobbying register.</p>
             </div>
         </div>
     </div>
-    <div class="col-md-1"></div>
-    </div>
-
+</div>
+<div class="col-md-1"></div>
 {% endblock article %}

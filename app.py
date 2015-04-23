@@ -36,9 +36,9 @@ def _convert_to_currency(number):
 
 
 @app.route('/')
-def show_summary():
+def home():
     summary = get_summary_function.SummaryApi().request()['results']["summary"]
-    return render_template('summary/show_summary.html', summary=summary)
+    return render_template('homepage.html', summary=summary)
 
 
 @app.route('/search', methods=['POST'])

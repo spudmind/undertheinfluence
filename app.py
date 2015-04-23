@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for as flask_url_for
 from flask.ext.restful import Api, Resource, reqparse
 from web.api import get_summary_function
 from web.api import get_mp_function
@@ -27,6 +27,11 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(__name__)
 api = Api(app)
 
+def url_for(endpoint, **kwargs):
+    kwargs.setdefault('_external', True)
+    return flask_url_for(endpoint, **kwargs)
+
+app.jinja_env.globals['url_for'] = url_for
 
 def _convert_to_currency(number):
     if isinstance(number, int):

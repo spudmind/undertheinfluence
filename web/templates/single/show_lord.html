@@ -3,7 +3,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h1>{{ lord.name }}. {{ lord.party }}</h1>
+            <h1>{{ lord.name }}{% if lord.party %} – {{ lord.party }}{% endif %}</h1>
         </div >
     </div>
     <div class="row">

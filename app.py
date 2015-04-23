@@ -38,7 +38,7 @@ def _convert_to_currency(number):
 @app.route('/')
 def show_summary():
     summary = get_summary_function.SummaryApi().request()['results']["summary"]
-    return render_template('show_summary.html', summary=summary)
+    return render_template('summary/show_summary.html', summary=summary)
 
 
 @app.route('/search', methods=['POST'])
@@ -51,18 +51,18 @@ def show_search_result():
         page = 1
     results = find_entity_function.EntityApi().request(args)['results']
     return render_template(
-        'show_search_results.html', search_string=search, results=results, page=page
+        'search_results.html', search_string=search, results=results, page=page
     )
 
 
 @app.route('/about')
 def show_about():
-    return render_template('show_about.html')
+    return render_template('page/about.html')
 
 
 @app.route('/contact')
 def show_contact():
-    return render_template('show_contact.html')
+    return render_template('page/contact.html')
 
 
 @app.route('/politicians')
@@ -71,7 +71,7 @@ def show_politicians():
     mps_summary = reply["results"]["summary"]["mps"]
     lords_summary = reply["results"]["summary"]["lords"]
     return render_template(
-        'politicians_summary.html', mps=mps_summary, lords=lords_summary)
+        'summary/politicians_summary.html', mps=mps_summary, lords=lords_summary)
 
 
 @app.route('/lobbyists')
@@ -106,7 +106,7 @@ def show_influencers():
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
     influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('influencers_summary.html', influencers=influencer_summary)
+    return render_template('summary/influencers_summary.html', influencers=influencer_summary)
 
 
 @app.route('/funding')
@@ -115,7 +115,7 @@ def show_funding_landing():
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
     influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('funding_summary.html', influencers=influencer_summary)
+    return render_template('summary/funding_summary.html', influencers=influencer_summary)
 
 
 @app.route('/interests')
@@ -124,7 +124,7 @@ def show_interests_landing():
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
     influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('interests_summary.html', influencers=influencer_summary)
+    return render_template('summary/interests_summary.html', influencers=influencer_summary)
 
 
 @app.route('/lobbying')
@@ -133,12 +133,12 @@ def show_lobbying_landing():
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
     influencer_summary = reply["results"]["summary"]["influencers"]
-    return render_template('lobbying_summary.html', influencers=influencer_summary)
+    return render_template('summary/lobbying_summary.html', influencers=influencer_summary)
 
 
 @app.route('/sources')
 def show_sources():
-    return render_template('show_sources.html')
+    return render_template('page/sources.html')
 
 
 @app.route('/politicians/detail', methods=['GET', 'POST'])

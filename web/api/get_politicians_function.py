@@ -18,6 +18,8 @@ class PoliticiansApi(BaseAPI):
         pager = {}
         page = args.get('page', 1)
 
+        print args
+
         self._filter_party(args)
         self._filter_type(args)
         self._filter_labels(args)
@@ -26,6 +28,8 @@ class PoliticiansApi(BaseAPI):
         self._filter_funding(args)
         self._filter_committees(args)
         self._filter_departments(args)
+
+        print self.query
 
         results, response = self._db.query(self._db_table, query=self.query, page=page)
         if response['has_more']:

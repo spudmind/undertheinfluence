@@ -238,7 +238,7 @@
                                         {% endif %}
 
                                         {% if "register_of_interests" in entry.influences_summary %}
-                                            {% if "remuneration_count" in entry.influences_summary.register_of_interests and entry.influences_summary.register_of_interests.remuneration_count > 0 %}
+                                            {% if "interest_relationships" in entry.influences_summary.register_of_interests and entry.influences_summary.register_of_interests.interest_relationships > 0 %}
                                                 <div class="well well-sm">
                                                     <b>Register of Interests</b><br>
                                                     {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import os.path
+
 from flask import Flask, render_template, request, url_for as flask_url_for
 from flask.ext.restful import Api, Resource, reqparse
+
 from web.api import get_summary_function
 from web.api import get_mp_function
 from web.api import get_lord_function
@@ -15,14 +18,12 @@ from web.api import get_lobbyists_function
 from web.api import get_lobby_agency_function
 from web.api import find_entity_function
 from web.api import get_summary_data
-import os
 
-template_dir = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), 'web/templates'
-)
-static_dir = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), 'web/static'
-)
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'web/templates')
+static_dir = os.path.join(current_dir, 'web/static')
+
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config.from_object(__name__)
 api = Api(app)
@@ -38,7 +39,6 @@ def _convert_to_currency(number):
         return u'£{:20,}'.format(number)
     else:
         return 0
-
 
 @app.route('/')
 def home():

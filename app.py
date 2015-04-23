@@ -86,7 +86,7 @@ def show_lobbyists():
     except ValueError:
         page = 1
     lobbyists = get_lobbyists_function.LobbyistsApi().request(page=page)['results']
-    return render_template('show_lobbyists.html', lobbyists=lobbyists, page=page)
+    return render_template('collections/lobby_agency_collection.html', lobbyists=lobbyists, page=page)
 
 
 @app.route('/meetings')
@@ -96,7 +96,7 @@ def show_meetings():
     except ValueError:
         page = 1
     departments = get_departments_function.DepartmentsApi().request(page=page)['results']
-    return render_template('show_meetings.html', departments=departments, page=page)
+    return render_template('collections/meetings_collection.html', departments=departments, page=page)
 
 
 @app.route('/lobbyists/<name>')
@@ -180,7 +180,7 @@ def show_politicians_detail():
     reply = get_politicians_function.PoliticiansApi().request(**args)
     politicians, pager = reply['results'], reply['pager']
     return render_template(
-        'politicians_detail.html', politicians=politicians, pager=pager, title=title
+        'collections/politicians_collection.html', politicians=politicians, pager=pager, title=title
     )
 
 
@@ -215,7 +215,7 @@ def show_influencers_detail():
     reply = get_influencers_function.InfluencersApi().request(**args)
     influencers, pager = reply['results'], reply['pager']
     return render_template(
-        'influencers_detail.html', influencers=influencers, page=page, title=title, pager=pager
+        'collections/influencers_collection.html', influencers=influencers, page=page, title=title, pager=pager
     )
 
 
@@ -247,7 +247,7 @@ def show_parties():
     except ValueError:
         page = 1
     parties = get_parties_function.PoliticalPartiesApi().request(page=page)['results']
-    return render_template('show_parties.html', parties=parties, page=page)
+    return render_template('collections/parties_collection.html', parties=parties, page=page)
 
 
 @app.route('/party/<name>')
@@ -264,7 +264,7 @@ def show_committees():
     except ValueError:
         page = 1
     offices = get_committees_function.CommitteesApi().request(page=page)['results']
-    return render_template('show_committees.html', offices=offices, page=page)
+    return render_template('collections/committees_collection.html', offices=offices, page=page)
 
 
 @app.route('/departments')
@@ -274,7 +274,7 @@ def show_departments():
     except ValueError:
         page = 1
     departments = get_departments_function.DepartmentsApi().request(page=page)['results']
-    return render_template('show_departments.html', departments=departments, page=page)
+    return render_template('collections/departments_collection.html', departments=departments, page=page)
 
 
 class GetSummary(Resource):
@@ -488,8 +488,10 @@ def _build_title(args):
     if "type" in args:
         if args["type"] == "mp":
             title["header"] = "Members of Parliament"
+            filters.append("Members of Parliament")
         if args["type"] == "lord":
             title["header"] = "Lords"
+            filters.append("Lords")
     if "government_committee" in args:
         if args["government_committee"]:
             title["header"] = args["government_committee"]

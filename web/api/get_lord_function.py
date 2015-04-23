@@ -30,10 +30,11 @@ class LordApi(BaseAPI):
         return result
 
     def _interest_urls(self, interests):
+
         results = []
-        for entry in interests:
+        for category in interests:
             updated_interests = []
-            for interest in entry["interests"]:
+            for interest in category["interests"]:
                 updated = interest
                 interest_name = interest["interest"]["name"]
                 interest_labels = interest["interest"]["labels"]
@@ -42,15 +43,15 @@ class LordApi(BaseAPI):
                 updated["interest"]["api_url"] = urls[1]
                 updated_interests.append(updated)
 
-            if len(updated_interests) > 1:
-                entry["interests"] = updated_interests
-                results.append(entry)
+            if len(updated_interests) > 0:
+                category["interests"] = updated_interests
+                results.append(category)
+
         return results
 
     def _recipient_urls(self, donations):
         results = []
         for donation in donations:
-            print
             updated = donation
             recipient_name = donation["recipient"]["name"]
             recipient_labels = donation["recipient"]["labels"]

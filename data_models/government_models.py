@@ -320,7 +320,7 @@ class MemberOfParliament(NamedEntity):
         register = {
             "remuneration_total": self._convert_to_currency(total),
             "remuneration_total_int": total,
-            "interest_categories": self._interest_categories_count(),
+            "interest_categories": len(self.interest_categories),
             "interest_relationships": self._interest_relationships(),
             "remuneration_count": self._remuneration_count(),
         }
@@ -366,14 +366,6 @@ class MemberOfParliament(NamedEntity):
                 self._logger.debug(" ** excluded category: %s" % category)
 
         return results
-
-    def _interest_categories_count(self):
-        query = u"""
-            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
-            MATCH (mp)-[:INTERESTS_REGISTERED_IN]-(cat) with mp, cat
-            RETURN count(cat) as category_count
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["category_count"]
 
     def _interest_relationships(self):
         query = u"""
@@ -709,7 +701,7 @@ class Lord(NamedEntity):
     def _get_interests_summary(self):
         register = {
             "interest_relationships": self._interest_relationships(),
-            "interest_categories": self._interest_categories_count()
+            "interest_categories": len(self.interest_categories)
         }
         return register
 
@@ -725,6 +717,7 @@ class Lord(NamedEntity):
 
         excluded_categories = [
             u"Land and Property",
+            u"Land and property",
         ]
 
         for entry in output:
@@ -736,14 +729,6 @@ class Lord(NamedEntity):
                 self._logger.debug(" ** excluded category: %s" % category)
 
         return results
-
-    def _interest_categories_count(self):
-        query = u"""
-            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
-            MATCH (lord)-[:INTERESTS_REGISTERED_IN]-(cat) with lord, cat
-            RETURN count(cat) as category_count
-        """.format(self.vertex["name"])
-        return self.query(query)[0]["category_count"]
 
     def _interest_relationships(self):
         query = u"""
@@ -805,8 +790,9 @@ class Lord(NamedEntity):
 
     def _donation_count(self):
         query = u"""
-            MATCH (lord:`Lord` {{name: "{0}"}}) WITH lord
-            MATCH (lord)-[x:REGISTERED_CONTRIBUTOR]-() with x
+            MATCH (lord:`Lord` {{name: "{0}"}})
+            MATCH (lord)-[:REGISTERED_CONTRIBUTOR]-(rel)
+            MATCH (rel)-[:DONATION_RECEIVED]-(x)
             RETURN count(x) as donation_count
         """.format(self.vertex["name"])
         return self.query(query)[0]["donation_count"]

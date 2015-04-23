@@ -56,7 +56,7 @@ class MpApi(BaseAPI):
                 updated["interest"]["api_url"] = urls[1]
                 updated_interests.append(updated)
 
-            if len(updated_interests) > 1:
+            if len(updated_interests) > 0:
                 category["interests"] = updated_interests
                 results.append(category)
 

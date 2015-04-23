@@ -98,9 +98,13 @@
     </nav>
 
     <div class="row">
-    {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-    {% endfor %}
+        <div class="col-md-12">
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+        </div>
     </div>
 
     <div class="row">

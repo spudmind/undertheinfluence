@@ -7,50 +7,52 @@
 {% block article %}
     <div class="col-md-12">
     <div id="government-container">
-    <div class="row">
-        <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6">
 
-            {% if "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
-                <div class="well well-sm">
-                    {% if mp["mp_website"] %}
-                        <a href="{{ mp.mp_website }}">MP website</a>
-                    {% endif %}
-                    {% if "mp_website" in mp and "wikipedia" in mp %}
-                        /
-                    {% endif %}
-                    {% if mp["wikipedia"] %}
-                        <a href="{{ mp.wikipedia }}">Wikipedia</a>
-                    {% endif %}
-                    {% if mp["guardian"] %}
-                        / <a href="{{ mp.guardian }}">Guardian</a>
-                    {% endif %}
-                    {% if mp["bbc"] %}
-                        / <a href="{{ mp.bbc }}">BBC</a>
-                    {% endif %}
-                </div>
-            {% endif %}
+                {% if "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
+                    <div class="well well-sm">
+                        {% if mp["mp_website"] %}
+                            <a href="{{ mp.mp_website }}">MP website</a>
+                        {% endif %}
+                        {% if "mp_website" in mp and "wikipedia" in mp %}
+                            /
+                        {% endif %}
+                        {% if mp["wikipedia"] %}
+                            <a href="{{ mp.wikipedia }}">Wikipedia</a>
+                        {% endif %}
+                        {% if mp["guardian"] %}
+                            / <a href="{{ mp.guardian }}">Guardian</a>
+                        {% endif %}
+                        {% if mp["bbc"] %}
+                            / <a href="{{ mp.bbc }}">BBC</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
 
-            {% if mp["government_positions"] %}
-                <div class="well well-sm">
-                    {% for position in mp["government_positions"] %}
-                        <b>{{ position }}</b><br>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            {% if mp["government_departments"] %}
-                <div class="well well-sm">
-                    <b>Government Departments</b><br>
-                    {% for dept in mp["government_departments"] %}
-                        <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
-                    {% endfor %}
-                </div>
-            {% endif %}
+                {% if mp["government_positions"] %}
+                    <div class="well well-sm">
+                        {% for position in mp["government_positions"] %}
+                            <b>{{ position }}</b><br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if mp["government_departments"] %}
+                    <div class="well well-sm">
+                        <b>Government Departments</b><br>
+                        {% for dept in mp["government_departments"] %}
+                            <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-        </div>
-        <div class="col-md-6">
-            {% if mp["government_positions"] or mp["government_departments"] %}
-                <hr>
-            {% endif %}
+            </div>
+
+            <div class="col-md-12">
+                {% if mp["government_positions"] or mp["government_departments"] %}
+                    <hr>
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="list-group">
@@ -271,7 +273,7 @@
                 {% endfor %}
             </div>
         </div>
-        <hr>
+
     {% endif %}
 
     {% if mp.influences_detail.electoral_commission %}

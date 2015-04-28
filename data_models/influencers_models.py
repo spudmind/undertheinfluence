@@ -65,6 +65,8 @@ class Influencer(BaseDataModel):
         query = u"""
             MATCH (a:`Named Entity` {{name: "{0}"}})
             MATCH (m)-[:ATTENDED_BY]-(a) with m, a
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
+            OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
             RETURN count(m) as total
         """.format(self.vertex["name"])
         return self.query(query)[0]["total"]
@@ -73,8 +75,10 @@ class Influencer(BaseDataModel):
         results = []
         query = u"""
             MATCH (a:`Named Entity` {{name: "{0}"}})
-            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
-            RETURN DISTINCT m.host_name as mp
+            MATCH (m)-[:ATTENDED_BY]-(a) with m, a
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
+            OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
+            RETURN DISTINCT  mp.name as host
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:
@@ -86,8 +90,10 @@ class Influencer(BaseDataModel):
         results = []
         query = u"""
             MATCH (a:`Named Entity` {{name: "{0}"}})
-            MATCH (m)-[:ATTENDED_BY]-(a)with m, a
-            RETURN DISTINCT m.department as dept
+            MATCH (m)-[:ATTENDED_BY]-(a) with m, a
+            MATCH (m)-[:ATTENDED_BY]-(g:`Government Office`) with a, m, g
+            OPTIONAL MATCH (mp)-[:SERVED_IN]-(g) with a, m, g, mp
+            RETURN DISTINCT  m.department
         """.format(self.vertex["name"])
         output = self.query(query)
         for entry in output:

@@ -40,7 +40,7 @@
             </p>
 
             <div class="well well-sm">
-                {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
+                {% if "lobbying_registers" in entry.influences_summary and entry.influences_summary.lobbying_registers.client_count > 0 %}
                     <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
                     {% for client in entry.influences_summary.lobbying_registers.clients %}
                         * <a href="{{ client.details_url }}">{{ client.name }}</a>

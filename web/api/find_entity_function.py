@@ -37,6 +37,7 @@ class EntityApi(BaseAPI):
         field = 'name'
         query = args["search"]
         results, response = self._elastic.search(field, query)
+        merged_results = self._merge_duplicates(results)
         response["results"] = [
             {
                 "name": entry["name"],
@@ -52,6 +53,25 @@ class EntityApi(BaseAPI):
                 "labels": entry["labels"],
                 "influences_summary": entry["influences"]
             }
-            for entry in results
+            for entry in merged_results
         ]
         return response
+
+    @staticmethod
+    def _merge_duplicates(search_results):
+        merged_results = {}
+        for entry in search_results:
+            name = entry["name"]
+            if name not in merged_results:
+                merged_results[name] = entry
+            else:
+                existing_influences = merged_results[name]["influences"]
+                extra_influences = entry["influences"]
+
+                merged_influences = dict(existing_influences)
+                merged_influences.update(extra_influences)
+
+                merged_results[name].update(entry)
+                merged_results[name]["influences"] = merged_influences
+
+        return [v for k, v in merged_results.iteritems()]

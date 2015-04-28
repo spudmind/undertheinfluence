@@ -353,6 +353,7 @@ mapped_influencers = [
     (u"Midland Industrial Council", u"Midlands Industrial Council"),
     (u"Social Investment Business", u"Social Investment Business Group"),
     (u"JTI", u"Japan Tobacco International"),
+    (u"Map  License", u"Map License"),
 ]
 
 

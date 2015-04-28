@@ -25,6 +25,9 @@ class SearchInterface:
                 }
             }
         }
+
+        print search_query
+
         q = self._es.search(
             index=self._db, body=search_query, doc_type=api_collections
         )

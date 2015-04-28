@@ -90,7 +90,7 @@
             </p>
 
             {% if "meetings" in entry.influences_summary %}
-                {% if "meeting_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meeting_count > 0 %}
+                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 0 %}
                     <div class="well well-sm">
                         {% for position in entry.influences_summary.meetings.meetings_per_position %}
                             <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
@@ -135,7 +135,7 @@
 
 
             {% if "meetings" in entry.influences_summary %}
-                {% if "meeting_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meeting_count > 1 %}
+                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 0 %}
                     <div class="well well-sm">
                         {% for position in entry.influences_summary.meetings.meetings_per_position %}
                             <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
@@ -237,7 +237,7 @@
                 </p>
             {% endif %}
             {% if "meetings" in entry.influences_summary %}
-                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 1 %}
+                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 0 %}
                     <div class="well well-sm">
                         <b>{{ entry.influences_summary.meetings.meetings_count }} Ministerial Meetings</b>
                     </div>

@@ -27,8 +27,6 @@ class InfluencersApi(BaseAPI):
         self._filter_funding(args)
         self._filter_lobbyists(args)
 
-        print self.query
-
         results, response = self._db.query(self._db_table, query=self.query, page=page)
 
         if response['has_more']:

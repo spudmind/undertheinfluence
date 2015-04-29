@@ -5,19 +5,12 @@
 {% endblock %}
 
 {% block article %}
-<div class="col-md-4">
-
-    <div class="alert alert-dismissable alert-success">
-        <p><em>"The influence of lobbyists increases when it goes largely unnoticed by the public." </em></p>
-        <p>Lobbyists succeed by owning the terms of debate, steering conversations away from those they can't win and on to those they can. If a public discussion on a company's environmental impact is unwelcome, lobbyists will push instead to have a debate with politicians and the media on the hypothetical economic benefits of their ambitions. Once this narrowly framed conversation becomes dominant, dissenting voices will appear marginal and irrelevant.</p>
-    </div>
-
-</div>
-<div class="col-md-8">
-    <div id="container">
-        <div class="row">
-            <div class="col-md-10">
-                <p><b>"The influence of lobbyists increases when it goes largely unnoticed by the public."</b><br>
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="government-container">
+            <div class="row">
+                <div class="col-md-6">
+                   <p><b>"The influence of lobbyists increases when it goes largely unnoticed by the public."</b><br>
                     - Steve John, lobbyist for management consultants, McKinsey
                 </p>
 
@@ -26,13 +19,30 @@
                 <p>It is almost impossible to find out who is lobbying whom about what in Britain (unlike in the US and Canada). What information there is on the activities of commercial lobbyists, however, is presented here.</p>
                 <p>Find out who has hired lobbyists to influence the British government; who has hired the most; and who are the best connected lobbyists in the business. </p>
                 <ul>
-                    <li><a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">all organisations that hire lobbyists</a>; and all <a href="{{ url_for('show_lobbyists' )}}">lobbying agencies</a></li>
+
                 </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Explore the data</h3>
+
+                    <ul>
+                        <li><b>Browse <a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">all organisations that hire lobbyists</a></b></li>
+                        <li><b>Browse <a href="{{ url_for('show_lobbyists' )}}">all lobbying agencies</a></b></li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="row">
+
+
             </div>
         </div>
-        <div class="row">
-
-        </div>
     </div>
-</div>
+
+    <div class="col-md-1"></div>
 {% endblock article %}

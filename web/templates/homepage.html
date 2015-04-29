@@ -1,45 +1,76 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    The Big Picture
-{% endblock %}
-
 {% block article %}
-<div class="col-md-1"></div>
-<div class="col-md-10">
-    <div id="government-container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="well well-sm">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="government-container">
+            <div class="row">
+                <h4><b>Under The Influence:</b></h4>
+                <div class="col-md-6">
 
-                        <p><b>Under The Influence:</b></p>
+                    <ul>
+                        <li>maps the hidden relationships between the British government, business and other interests, and lobbyists;</li>
+                        <li>lets us know who is trying to influence British politics; and</li>
+                        <li>allows us to find out how money in politics affects our lives.</li>
+                    </ul>
 
-                        <ul>
-                            <li>maps the hidden relationships between the British government, business and other interests, and lobbyists;</li>
-                            <li>lets us know who is trying to influence British politics; and</li>
-                            <li>allows us to find out how money in politics affects our lives.</li>
-                        </ul>
-
-                        <p><a href="{{ url_for('show_about')}}">Read more</a></p>
-                        <p>Find out more about the <a href="{{ url_for('show_influencers')}}">influencers</a> and our <a href="{{ url_for('show_politicians')}}">politicians and officials</a></p>
-
+                    <p>Read more <a href="{{ url_for('show_about')}}">about this site</a></p>
 
                 </div>
-            </div>
-            <div class="col-md-6">
 
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-
+                <div class="col-md-6">
+                    <b>Find out more about <a href="{{ url_for('show_influencers')}}">influence &amp; lobbying</a></b><br>
+                    <b>Find out about our <a href="{{ url_for('show_politicians')}}">politicians and officials</a></b><br>
+                </div>
             </div>
 
-            <div class="col-md-6">
+            <hr>
 
+            <div class="row">
+                <h3>What the data shows</h3>
+                <div class="col-md-8">
+
+
+                    <h2>The political reach of the pharmaceutical industry in the UK</h2>
+                    <p><em>April 2015</em></p>
+
+                    <p>One of the most influential industries in the UK is the pharmaceutical business. Anecdotally, from talking to professional lobbyists with experience of the pharmaceutical lobby, it also has one of the worst reputations in the business.</p>
+
+                    <p>Not that you’re going to know anything of its activities from the <a href="https://registerofconsultantlobbyists.force.com/CLR_Search">UK’s official register of lobbyists</a>.</p>
+
+                    <p>The world’s biggest pharmaceutical company, Pfizer, which <a href="https://www.opensecrets.org/orgs/summary.php?id=D000000138">in the US</a> has spent roughly $80m on lobbyists in the past five years, doesn’t yet feature on the register.</p>
+
+                    <p>Novartis, the second biggest with an annual US lobbying spend of around $6.5m, is merely listed on the UK register as a client of two lobbying agencies (although, at the moment, the register is designed so you can’t find out which agencies these are).</p>
+
+                    <p>In reality, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Pfizer">Pfizer</a> and <a href="http://www.undertheinfluence.org.uk/influencer/detail/Novartis">Novartis</a> employ around ten lobbying agencies each in the UK.</p>
+                    <p>
+                        <img src="{{ url_for('static', filename='pharma.png') }}" ALT="pharma" width="125%" >
+                        <br><br>
+                    </p>
+
+                    <p>Some agencies stand out from the roster of lobbyists in the pay of these drug giants.</p>
+
+                    <ul>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/Incisive%20Health">Incisive Health</a> was established by Bill Morgan, the well-connected former aide to Health Secretary, Andrew Lansley. Its client list is almost entirely pharmaceutical companies and pharma-funded charities, to which it provides, among other things, access to health officials. Incisive Health has also had ample opportunity to feed into policy: Its co-founder Mike Birtwistle, for instance, had ‘significant input’ into a 2014 report on cancer in older people that concluded that they were less likely to receive cancer drugs than other groups. No mention was made of his lobbying firm’s pharma clients that might benefit as a result. A similar 2013 <a href="http://www.england.nhs.uk/wp-content/uploads/2013/12/old-people-rec-cancer-drugs.pdf">report</a>  report was entirely drafted by Birtwistle. Again his links to the pharma industry weren’t mentioned.</li><br>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/JMC%20Partners%20LLP">JMC Partners</a> is another lobbying firm whose clients are predominantly pharmaceutical, including the UK’s main lobby group, the Association for the British Pharmaceutical Industry (whose offices incidentally sit on top of the Victoria premises of NHS England, custodians of the £110bn NHS budget). Like Birtwistle at Incisive Health, JMC chief lobbyist, John Murray, has also been asked by NHS England to draft a report that has fed into health policy. He was invited as director of lobby group the <a href="http://www.independent.co.uk/news/uk/politics/revealed-big-pharma-links-to-nhs-policy-with-senior-mps-saying-medical-industry-uses-wealth-to-influence-government-9120187.html">Specialised Healthcare Alliance</a>, which is entirely funded by drug companies.</li><br>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/MHP%20Communications">MHP</a> is a large lobbying agency, part of the Engine Group of communications companies. It used to employ <a href="http://powerbase.info/index.php/Bill_Morgan">Bill Morgan</a>, former right hand man to the then Health Secretary, which it said put them ‘at the heart of major policy debates which will shape the future of the NHS’. MHP’s roster of clients contains all the big names in pharmaceuticals, as well as drug-funded health charities. Parent group, Engine, is also now an approved supplier of services to GP commissioners. Chinese walls aside, MHP could potentially find itself being paid by those who are buying care in the NHS, while also lobbying for private sector clients seeking to provide such care.</li><br>
+                        <li>Finally, <a href="http://www.undertheinfluence.org.uk/lobbyists/Hanover%20Communications%20International%20Ltd">Hanover</a> is another lobbying firm with expertise in healthcare. Leading the team is Andrew Harrison, former aide to Labour Health Minister, Alan Milburn, and a former close colleague of Simon Stevens, current chief executive of the NHS. Like Engine, Hanover is also bidding to supply services to GP groups in charge of commissioning NHS care. It is in a consortium of suppliers led by UnitedHealth, the US health giant (which has hired Hanover as its UK lobbyists since at least 2007). This presents Hanover with a possible conflict of interest, but could also privilege its other healthcare clients: the medical device firms, Deltex, and Alliance Medical; the many pharma companies it represents; and the insurance industry through its client the Association of British Insurers.</li><br>
+                    </ul>
+
+                    <p>We don’t know how many millions Pfizer, Novartis and the other drug giants are spending to influence the UK government and health officials. The data is not public (unlike in the US). But, with a bit of research, we can start to see the influence they are buying with their money.</p>
+
+                </div>
+
+                <div class="col-md-4">
+                    <h4>Featured Profile</h4>
+                    <div class="alert alert-dismissable alert-success">
+                        “<em>The truth is always an abyss. One must — as in a swimming pool — dare to dive from the quivering springboard of trivial everyday experience and sink into the depths, in order to later rise again — laughing and fighting for breath — to the now doubly illuminated surface of things.</em>”
+                        <br>― Franz Kafka
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="col-md-1"></div>
+    </div>
+    <div class="col-md-1"></div>
 {% endblock article %}

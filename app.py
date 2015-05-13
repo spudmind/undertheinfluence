@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import os.path
 
 from flask import Flask, render_template, request, url_for as flask_url_for
@@ -33,6 +34,14 @@ def url_for(endpoint, **kwargs):
     return flask_url_for(endpoint, **kwargs)
 
 app.jinja_env.globals['url_for'] = url_for
+
+def format_date(date):
+    try:
+        return datetime.strptime(date, '%Y-%m-%d').strftime('%d %h %Y')
+    except ValueError:
+        return date
+
+app.jinja_env.filters['date'] = format_date
 
 def _convert_to_currency(number):
     if isinstance(number, int):

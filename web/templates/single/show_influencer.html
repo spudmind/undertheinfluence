@@ -45,7 +45,7 @@
                                 <td><a href="{{ meeting.host["details_url"] }}">{{ meeting.host["name"] }}</a></td>
                                 <td>{{ meeting.party }}</td>
                                 <td>{{ meeting.purpose }}</td>
-                                <td>{{ meeting.date }}</td>
+                                <td>{{ meeting.date|date }}</td>
                                 <td>
                                     <small><a href="{{ meeting.source_url }}">Download</a></small> /
                                     <small><a href="{{ meeting.source_linked_from }}">Online</a></small>

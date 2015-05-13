@@ -49,8 +49,8 @@
                             {% for client in agency.influences_summary.lobbying_registers.clients %}
                                 <tr>
                                     <td><a href="{{ client.details_url }}">{{ client.name }}</a></td>
-                                    <td>{{ client.from_date }}</td>
-                                    <td>{{ client.to_date }}</td>
+                                    <td>{{ client.from_date|date }}</td>
+                                    <td>{{ client.to_date|date }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>

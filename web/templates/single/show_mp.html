@@ -91,8 +91,8 @@
                             <td>{{ meeting.purpose }}</td>
                             <td>{{ meeting.date }}</td>
                             <td>
-                                <small><a href="{{ meeting.source_url }}">link</a></small> /
-                                <small><a href="{{ meeting.source_linked_from }}">from</a></small>
+                                <small><a href="{{ meeting.source_url }}">Download</a></small> /
+                                <small><a href="{{ meeting.source_linked_from }}">Online</a></small>
                             </td>
                         </tr>
                     {% endfor %}
@@ -142,8 +142,8 @@
                                     <td>{{ interest.nature }}</td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
-                                        <small><a href="{{ interest.source_url }}">link</a></small> /
-                                        <small><a href="{{ interest.source_linked_from }}">from</a></small>
+                                        <small><a href="{{ interest.source_url }}">Download</a></small> /
+                                        <small><a href="{{ interest.source_linked_from }}">Online</a></small>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -184,8 +184,8 @@
                                     <td>{{ interest.interest["purpose"] }}</td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
-                                        <small><a href="{{ interest.source_url }}">link</a></small> /
-                                        <small><a href="{{ interest.source_linked_from }}">from</a></small>
+                                        <small><a href="{{ interest.source_url }}">Download</a></small> /
+                                        <small><a href="{{ interest.source_linked_from }}">Online</a></small>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -224,8 +224,8 @@
                                     <td>{{ interest.interest["donor_status"] }}</td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
-                                        <small><a href="{{ interest.source_url }}">link</a></small> /
-                                        <small><a href="{{ interest.source_linked_from }}">from</a></small>
+                                        <small><a href="{{ interest.source_url }}">Download</a></small> /
+                                        <small><a href="{{ interest.source_linked_from }}">Online</a></small>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -260,8 +260,8 @@
                                     <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
-                                        <small><a href="{{ interest.source_url }}">link</a></small> /
-                                        <small><a href="{{ interest.source_linked_from }}">from</a></small>
+                                        <small><a href="{{ interest.source_url }}">Download</a></small> /
+                                        <small><a href="{{ interest.source_linked_from }}">Online</a></small>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -320,8 +320,8 @@
                                 <small>{{ donation.reported }}</small>
                             </td>
                             <td>
-                                <small><a href="{{ donation.source_url }}">link</a></small> /
-                                <small><a href="{{ donation.source_linked_from }}">from</a></small>
+                                <small><a href="{{ donation.source_url }}">Download</a></small> /
+                                <small><a href="{{ donation.source_linked_from }}">Online</a></small>
                             </td>
                         </tr>
                     {% endfor %}

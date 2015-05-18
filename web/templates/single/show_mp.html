@@ -180,8 +180,8 @@
                                 <tr>
                                     <td>{{ interest.amount }}</td>
                                     <td><a href="{{ interest.interest['details_url'] }}">{{ interest.interest["name"] }}</a></td>
-                                    <td>{{ interest.interest["visit_dates"]|date }}</td>
-                                    <td>{{ interest.interest["purpose"] }}</td>
+                                    <td>{{ interest.visit_dates }}</td>
+                                    <td>{{ interest.purpose }}</td>
                                     <td>{{ interest.registered }}</td>
                                     <td>
                                         <small><a href="{{ interest.source_url }}">Download</a></small> /

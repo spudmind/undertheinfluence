@@ -301,7 +301,6 @@ class MemberOfParliament(NamedEntity):
                     detail["amount_int"] = entry["p.amount"]
 
                 if "visit_dates" in this_category:
-                    print "yup found visit dates", entry["p.visit_dates"]
                     detail["visit_dates"] = entry["p.visit_dates"]
 
                 if "purpose" in this_category:

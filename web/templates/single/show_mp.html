@@ -37,19 +37,11 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if mp["government_departments"] %}
-                    <div class="well well-sm">
-                        <b>Government Departments</b><br>
-                        {% for dept in mp["government_departments"] %}
-                            <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
-                        {% endfor %}
-                    </div>
-                {% endif %}
 
             </div>
 
             <div class="col-md-12">
-                {% if mp["government_positions"] or mp["government_departments"] %}
+                {% if mp["government_positions"] %}
                     <hr>
                 {% endif %}
             </div>

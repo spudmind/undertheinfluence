@@ -299,9 +299,7 @@ mapped_influencers = [
     (u"IPSOS Mori", u"Ipsos Mori"),
     (u"Ipsos MORI", u"Ipsos Mori"),
     (u"Comres", u"ComRes"),
-    (u"Pricewaterhouse Coopers", u"PriceWaterhouse Coopers LLP"),
-    (u"PricewaterhouseCoopers", u"PriceWaterhouse Coopers LLP"),
-    (u"PwC", u"PriceWaterhouse Coopers LLP"),
+
     (u"JCB Research", u"JCB Research Ltd"),
     (u"J C B Research Ltd", u"JCB Research Ltd"),
     (u"J C B Research", u"JCB Research Ltd"),
@@ -354,6 +352,20 @@ mapped_influencers = [
     (u"Social Investment Business", u"Social Investment Business Group"),
     (u"JTI", u"Japan Tobacco International"),
     (u"Map  License", u"Map License"),
+    (u"Pwc", u"PricewaterhouseCoopers"),
+    (u"PWC", u"PricewaterhouseCoopers"),
+    (u"PwC", u"PricewaterhouseCoopers"),
+    (u"Price Waterhouse Coopers LLP", u"PricewaterhouseCoopers"),
+    (u"Price Waterhouse Coopers", u"PricewaterhouseCoopers"),
+    (u"PriceWaterhouseCoopers LLP", u"PricewaterhouseCoopers"),
+    (u"PRICEWATERHOUSECOOPERS LLP (Sponsorship)", u"PricewaterhouseCoopers"),
+    (u"PriceWaterhouseCooper", u"PricewaterhouseCoopers"),
+    (u"Pricewaterhousecoopers", u"PricewaterhouseCoopers"),
+    (u"Pricewaterhouse Coopers", u"PricewaterhouseCoopers"),
+    (u"PriceWaterhouse Coopers LLP", u"PricewaterhouseCoopers"),
+    (u"DIAGEO", u"Diageo"),
+    (u"Diageo plc", u"Diageo"),
+    (u"Diageo GB", u"Diageo"),
 ]
 
 

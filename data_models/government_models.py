@@ -162,7 +162,7 @@ class MemberOfParliament(NamedEntity):
         return self._get_government_positions("Government Position")
 
     def _get_committees(self):
-        return self._get_government_positions("Government Committee")
+        return self._get_government_positions("Select Committee")
 
     def _get_government_positions(self, pos_type):
         results = []
@@ -938,7 +938,7 @@ class GovernmentOffices(BaseDataModel):
 
     def _get_committees(self):
         search_string = u"""
-            MATCH (n:`Government Committee`) with n
+            MATCH (n:`Select Committee`) with n
             MATCH (n)-[:SERVED_IN]-(x) with n, x
                 WHERE x.left_reason = "still_in_office"
                     OR x.left_reason = "general_election"
@@ -990,7 +990,7 @@ class GovernmentOffice(NamedEntity):
 
     def is_committee(self):
         properties = {"image_url": None}
-        labels = ["Named Entity", "Government Committee"]
+        labels = ["Named Entity", "Select Committee"]
         self.set_node_properties(properties=properties, labels=labels)
 
     def is_department(self, office_type="Constituency"):
@@ -1111,7 +1111,7 @@ class GovernmentOffice(NamedEntity):
         office_type = None
         if "Government Department" in labels:
             office_type = "department"
-        if "Government Committee" in labels:
+        if "Select Committee" in labels:
             office_type = "committee"
         return office_type
 

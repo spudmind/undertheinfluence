@@ -180,7 +180,7 @@
             {% endif %}
 
 
-        {% elif "Government Committee" in entry["labels"] or "Government Position" in entry["labels"] %}
+        {% elif "Select Committee" in entry["labels"] or "Government Position" in entry["labels"] %}
 
             <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                 {% if entry.party %}

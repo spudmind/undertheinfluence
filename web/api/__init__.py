@@ -30,7 +30,7 @@ class BaseAPI:
                 #api = u"/api/v0.1/getInfluencer?name={0}".format(name)
                 api = url_for('getInfluencer', name=name, _external=True)
                 web = url_for('show_influencer', name=name, _external=True)
-            elif "Government Committee" in labels:
+            elif "Select Committee" in labels:
                 api = url_for('getPoliticians', government_committee=name, _external=True)
                 web = url_for('show_politicians', government_committee=name, _external=True)
             elif "Government Department" in labels:

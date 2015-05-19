@@ -41,7 +41,7 @@
             </div>
 
             <div class="col-md-12">
-                {% if mp["government_positions"] %}
+                {% if mp["government_positions"] or "mp_website" in mp or "wikipedia" in mp or "guardian" in mp or "bbc" in mp %}
                     <hr>
                 {% endif %}
             </div>

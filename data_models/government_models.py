@@ -457,6 +457,17 @@ class MemberOfParliament(NamedEntity):
         labels = ["Named Entity", "Member of Parliament"]
         self.set_node_properties(properties, labels)
 
+    def set_membership(self):
+        query = u"""
+            MATCH (mp:`Member of Parliament` {{name: "{0}"}}) WITH mp
+            MATCH (mp)-[:ELECTED_FOR]-(t) with mp, t
+            RETURN mp.name, collect(t.left_reason) as left_reason
+        """.format(self.vertex["name"])
+        result = self.query(query)
+        left_reasons = self.query(query)[0]["left_reason"]
+        if not "still_in_office" in left_reasons:
+            self.set_node_properties(labels="Former")
+
     def link_position(self, position):
         self.create_relationship(
             self.vertex, "SERVED_IN", position.vertex

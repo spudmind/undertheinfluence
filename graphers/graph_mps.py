@@ -21,6 +21,7 @@ class GraphMPs():
         mp = self.graph_mp(node)
         if terms:
             self.import_terms(mp, terms)
+            mp.set_membership()
 
     def graph_mp(self, node):
         self._logger.debug("\n..................")
@@ -31,7 +32,9 @@ class GraphMPs():
         return self._create_mp(node)
 
     def _create_mp(self, mp_details):
-        new_mp = self.data_models.MemberOfParliament(mp_details["full_name"])
+        new_mp = self.data_models.MemberOfParliament(
+            mp_details["full_name"], get_properties=False
+        )
         if not new_mp.exists:
             new_mp.create()
 

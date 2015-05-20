@@ -86,7 +86,6 @@ class ParseMPsInterests:
             return self._parse_list_record(record)
             #pass
         elif category_name.lower() == "clients":
-            # TODO Fix client parser
             return self._parse_clients(record)
             #pass
         elif category_name.lower() == "land and property":

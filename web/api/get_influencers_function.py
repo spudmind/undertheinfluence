@@ -14,7 +14,7 @@ class InfluencersApi(BaseAPI):
         self._funding = "influences.electoral_commission.donation_total_int"
         self._lobbyists = "influences.lobby_registers.lobbyist_hired"
         #TODO update this search to use meetings_count once updated in api_gen
-        self._meetings = "influences.meetings.meeting_count"
+        self._meetings = "influences.meetings.meetings_count"
         self.query = {}
 
     def request(self, **args):

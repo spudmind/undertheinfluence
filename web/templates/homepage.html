@@ -4,9 +4,9 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div id="government-container">
+            <h3><b>What Under The Influence does:</b></h3>
             <div class="row">
-                <h3><b>What Under The Influence does:</b></h3>
-                <div class="col-md-6">
+                <div class="col-md-7">
 
                     <ul>
                         <li>maps the hidden relationships between the British government, business and other interests, and lobbyists;</li>
@@ -18,21 +18,26 @@
 
                 </div>
 
-                <div class="col-md-6">
-                    <b>Find out more about <a href="{{ url_for('show_influencers')}}">influence &amp; lobbying</a></b><br>
-                    <b>Find out about our <a href="{{ url_for('show_politicians')}}">politicians and officials</a></b><br>
+                <div class="col-md-5">
+                    <b>Find out more about <a href="{{ url_for('show_influence_and_lobbying')}}">influence &amp; lobbying</a></b><br>
+                    <b>Find out about our <a href="{{ url_for('show_government_and_politicians')}}">Government &amp; politicians</a></b><br>
                 </div>
             </div>
 
             <hr>
 
             <div class="row">
-                <h3>What the data shows</h3>
-                <div class="col-md-8">
 
+                <div class="col-md-7">
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
+                    </div>
 
-                    <h2>The political reach of the pharmaceutical industry in the UK</h2>
-                    <p><em>April 2015</em></p>
+                    <h2>Big pharma’s addiction to lobbying</h2>
+
+                    <p><em>21 May 2015, by Spinwatch</em></p>
+
+                    <a href="JavaScript:newPopup('{{ url_for('static', filename='pharma.png') }}');"><img src="{{ url_for('static', filename='pharma.png') }}" ALT="pharma" width="40%" align=right></a>
 
                     <p>One of the most influential industries in the UK is the pharmaceutical business. Anecdotally, from talking to professional lobbyists with experience of the pharmaceutical lobby, it also has one of the worst reputations in the business.</p>
 
@@ -43,10 +48,6 @@
                     <p>Novartis, the second biggest with an annual US lobbying spend of around $6.5m, is merely listed on the UK register as a client of two lobbying agencies (although, at the moment, the register is designed so you can’t find out which agencies these are).</p>
 
                     <p>In reality, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Pfizer">Pfizer</a> and <a href="http://www.undertheinfluence.org.uk/influencer/detail/Novartis">Novartis</a> employ around ten lobbying agencies each in the UK.</p>
-                    <p>
-                        <img src="{{ url_for('static', filename='pharma.png') }}" ALT="pharma" width="125%" >
-                        <br><br>
-                    </p>
 
                     <p>Some agencies stand out from the roster of lobbyists in the pay of these drug giants.</p>
 
@@ -61,12 +62,26 @@
 
                 </div>
 
-                <div class="col-md-4">
-                    <h4>Featured Profile</h4>
-                    <div class="alert alert-dismissable alert-success">
-                        “<em>The truth is always an abyss. One must — as in a swimming pool — dare to dive from the quivering springboard of trivial everyday experience and sink into the depths, in order to later rise again — laughing and fighting for breath — to the now doubly illuminated surface of things.</em>”
-                        <br>― Franz Kafka
+                <div class="col-md-5">
+                    <div class="row">
+                        <span class="label label-danger">PROFILE</span>
                     </div>
+                    <h3>Priti Patel</h3>
+
+                    <a href="JavaScript:newPopup('{{ url_for('static', filename='priti_patel.jpg') }}');"><img src="{{ url_for('static', filename='priti_patel.jpg') }}" ALT="priti_patel.jpg" width="25%" align=left hspace="10"></a>
+
+                    <p>The UK’s new employment minister, Priti Patel, is one of the big winners of the 2015 general election. Not only did she secure her seat of Witham in Essex with over 50% of the vote, she won herself a seat at the Cabinet table within only five years of becoming a Conservative MP.</p>
+
+                    <p>A controversial figure, Patel supports the reintroduction of the death penalty and is opposed to most measures that try to minimise the harm from cigarettes: the smoking ban, restrictions on the display of cigarettes, and plain packaging.</p>
+
+                    <p>Before becoming an MP, Patel was a commercial lobbyist with agency <a href="http://www.undertheinfluence.org.uk/influencer/detail/Weber%20Shandwick">Weber Shandwick</a>. One of the clients she worked for, according to internal tobacco company documents, was <a href="http://www.undertheinfluence.org.uk/influencer/detail/British%20American%20Tobacco">British American Tobacco</a>. This included providing BAT with ‘strategic advice... with a particular focus on the Conservative Party’.</p>
+
+                    <p>A couple of years before Patel entered Parliament, she also worked within the corporate relations team of alcohol giant, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Diageo">Diageo</a>. And in the months running up to the 2010 election, Patel lobbied for another Weber Shandwick client, International Financial Services London. Now known as <a href="http://www.undertheinfluence.org.uk/influencer/detail/TheCityUK">TheCityUK</a>, this is the lobby group for London’s bankers, a tough job in 2009 in the midst of the banking crisis. </p>
+
+                    <p>According to Patel's 2010 election campaign material ‘her career outside of politics means she has an innate understanding about the issues faced by small businesses’.</p>
+
+                    <p>More on Priti Patel on <a href="http://powerbase.info/index.php/Priti_Patel">Powerbase</a>.</p>
+
                 </div>
             </div>
         </div>

@@ -38,44 +38,39 @@
 </head>
 
 <body class="container">
-    {% include '_partials/_nav.html' %}
+{% include '_partials/_nav.html' %}
 
-    <div class="row">
-        <div class="col-md-12">
+<div class="row">
+    <div class="col-md-12">
         {% for message in get_flashed_messages() %}
             <div class="alert alert-success" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
-        </div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h1>{% block title %}{% endblock %}</h1>
-        </div>
+<div class="row">
+    <div class="col-md-12">
+        <h1>{% block title %}{% endblock %}</h1>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <hr>
-        </div>
+
+<div class="row">
+    {% block article %}{% endblock %}
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <hr>
     </div>
+</div>
 
-    <div class="row">
-        {% block article %}{% endblock %}
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <hr>
-        </div>
-    </div>
-
-    <footer>
-        <li><a href="{{ url_for('show_about') }}">About</a></li>
-        <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
-    </footer>
+<footer>
+    <li><a href="{{ url_for('show_about') }}">About</a></li>
+    <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
+</footer>
 
 </div> <!-- /container -->
 
@@ -94,6 +89,13 @@
 <script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
 <script src="{{ url_for('static', filename='material/scripts/material.js') }}"></script>
 <!-- <script src="{{ url_for('static', filename='js/app/main.js') }}"></script> -->
+<script type="text/javascript">
+    // Popup window code
+    function newPopup(url) {
+        popupWindow = window.open(
+                url,'popUpWindow','height=700,width=800,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+    }
+</script>
 
 {% block js_extras %}{% endblock %}
 

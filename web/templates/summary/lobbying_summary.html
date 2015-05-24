@@ -1,45 +1,102 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Who’s lobbying
+
 {% endblock %}
 
 {% block article %}
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div id="government-container">
+            <h3><b>Who’s lobbying</b></h3>
             <div class="row">
                 <div class="col-md-6">
-                   <p><b>"The influence of lobbyists increases when it goes largely unnoticed by the public."</b><br>
-                    - Steve John, lobbyist for management consultants, McKinsey
-                </p>
 
-                <p>Commercial lobbyists are paid to influence the decisions of government. The UK has the third-biggest lobbying industry in the world after Washington and Brussels. A best guess values the business in the UK at around £2bn.</p>
-                <p>Lobbying is central to our idea of democratic government, but it can also be a corrupting force that undermines democracy. Lobbying, as practised by those with any influence in the country, costs money. And those with the deepest pockets – mainly multi-national corporations – are buying themselves a louder voice in government than the rest of us. </p>
-                <p>It is almost impossible to find out who is lobbying whom about what in Britain (unlike in the US and Canada). What information there is on the activities of commercial lobbyists, however, is presented here.</p>
-                <p>Find out who has hired lobbyists to influence the British government; who has hired the most; and who are the best connected lobbyists in the business. </p>
-                <ul>
+                    <blockquote>
+                        <p>The influence of lobbyists increases when it goes largely unnoticed by the public.</p>
+                        <small>Steve John, lobbyist for management consultants, McKinsey</small>
+                    </blockquote>
 
-                </ul>
+                    <p>The UK has the third-biggest lobbying industry in the world after Washington and Brussels: a best guess values the UK’s commercial lobbying industry at around £2bn.These are people who are paid to influence the decisions of government.</p>
+
+                    <p>Most commercial lobbyists work for corporations. There is almost no public scrutiny of their activities, the one’s that work ‘in-house’. Others are lobbyists-for-hire, often working in PR agencies. And some of these voluntarily make public on a register who they are lobbying for. </p>
+
+                    <p>This information is presented here. It allows you to find out which companies (plus a handful of unions and charities) have hired lobbyists to influence the British government.</p>
+
                 </div>
 
                 <div class="col-md-6">
                     <h3>Explore the data</h3>
 
                     <ul>
-                        <li><b>Browse <a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">all organisations that hire lobbyists</a></b></li>
-                        <li><b>Browse <a href="{{ url_for('show_lobbyists' )}}">all lobbying agencies</a></b></li>
+                        <li><b>Browse <a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">organisations that hire lobbyists</a></b></li>
+                        <li><b>Browse <a href="{{ url_for('show_lobbyists' )}}">lobbying agencies</a></b></li>
                     </ul>
 
                 </div>
 
             </div>
 
-
+            <hr>
 
             <div class="row">
 
+                <div class="col-md-7">
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
+                    </div>
 
+                    <h2>Big pharma’s addiction to lobbying</h2>
+
+                    <p><em>21 May 2015, by Spinwatch</em></p>
+
+                    <a href="JavaScript:newPopup('{{ url_for('static', filename='pharma.png') }}');"><img src="{{ url_for('static', filename='pharma.png') }}" ALT="pharma" width="40%" align=right></a>
+
+                    <p>One of the most influential industries in the UK is the pharmaceutical business. Anecdotally, from talking to professional lobbyists with experience of the pharmaceutical lobby, it also has one of the worst reputations in the business.</p>
+
+                    <p>Not that you’re going to know anything of its activities from the <a href="https://registerofconsultantlobbyists.force.com/CLR_Search">UK’s official register of lobbyists</a>.</p>
+
+                    <p>The world’s biggest pharmaceutical company, Pfizer, which <a href="https://www.opensecrets.org/orgs/summary.php?id=D000000138">in the US</a> has spent roughly $80m on lobbyists in the past five years, doesn’t yet feature on the register.</p>
+
+                    <p>Novartis, the second biggest with an annual US lobbying spend of around $6.5m, is merely listed on the UK register as a client of two lobbying agencies (although, at the moment, the register is designed so you can’t find out which agencies these are).</p>
+
+                    <p>In reality, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Pfizer">Pfizer</a> and <a href="http://www.undertheinfluence.org.uk/influencer/detail/Novartis">Novartis</a> employ around ten lobbying agencies each in the UK.</p>
+
+                    <p>Some agencies stand out from the roster of lobbyists in the pay of these drug giants.</p>
+
+                    <ul>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/Incisive%20Health">Incisive Health</a> was established by Bill Morgan, the well-connected former aide to Health Secretary, Andrew Lansley. Its client list is almost entirely pharmaceutical companies and pharma-funded charities, to which it provides, among other things, access to health officials. Incisive Health has also had ample opportunity to feed into policy: Its co-founder Mike Birtwistle, for instance, had ‘significant input’ into a 2014 report on cancer in older people that concluded that they were less likely to receive cancer drugs than other groups. No mention was made of his lobbying firm’s pharma clients that might benefit as a result. A similar 2013 <a href="http://www.england.nhs.uk/wp-content/uploads/2013/12/old-people-rec-cancer-drugs.pdf">report</a>  report was entirely drafted by Birtwistle. Again his links to the pharma industry weren’t mentioned.</li><br>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/JMC%20Partners%20LLP">JMC Partners</a> is another lobbying firm whose clients are predominantly pharmaceutical, including the UK’s main lobby group, the Association for the British Pharmaceutical Industry (whose offices incidentally sit on top of the Victoria premises of NHS England, custodians of the £110bn NHS budget). Like Birtwistle at Incisive Health, JMC chief lobbyist, John Murray, has also been asked by NHS England to draft a report that has fed into health policy. He was invited as director of lobby group the <a href="http://www.independent.co.uk/news/uk/politics/revealed-big-pharma-links-to-nhs-policy-with-senior-mps-saying-medical-industry-uses-wealth-to-influence-government-9120187.html">Specialised Healthcare Alliance</a>, which is entirely funded by drug companies.</li><br>
+                        <li><a href="http://www.undertheinfluence.org.uk/lobbyists/MHP%20Communications">MHP</a> is a large lobbying agency, part of the Engine Group of communications companies. It used to employ <a href="http://powerbase.info/index.php/Bill_Morgan">Bill Morgan</a>, former right hand man to the then Health Secretary, which it said put them ‘at the heart of major policy debates which will shape the future of the NHS’. MHP’s roster of clients contains all the big names in pharmaceuticals, as well as drug-funded health charities. Parent group, Engine, is also now an approved supplier of services to GP commissioners. Chinese walls aside, MHP could potentially find itself being paid by those who are buying care in the NHS, while also lobbying for private sector clients seeking to provide such care.</li><br>
+                        <li>Finally, <a href="http://www.undertheinfluence.org.uk/lobbyists/Hanover%20Communications%20International%20Ltd">Hanover</a> is another lobbying firm with expertise in healthcare. Leading the team is Andrew Harrison, former aide to Labour Health Minister, Alan Milburn, and a former close colleague of Simon Stevens, current chief executive of the NHS. Like Engine, Hanover is also bidding to supply services to GP groups in charge of commissioning NHS care. It is in a consortium of suppliers led by UnitedHealth, the US health giant (which has hired Hanover as its UK lobbyists since at least 2007). This presents Hanover with a possible conflict of interest, but could also privilege its other healthcare clients: the medical device firms, Deltex, and Alliance Medical; the many pharma companies it represents; and the insurance industry through its client the Association of British Insurers.</li><br>
+                    </ul>
+
+                    <p>We don’t know how many millions Pfizer, Novartis and the other drug giants are spending to influence the UK government and health officials. The data is not public (unlike in the US). But, with a bit of research, we can start to see the influence they are buying with their money.</p>
+
+                </div>
+
+                <div class="col-md-5">
+                    <div class="row">
+                        <span class="label label-danger">PROFILE</span>
+                    </div>
+                    <h3>Edelman</h3>
+
+                    <a href="JavaScript:newPopup('{{ url_for('static', filename='edelman.jpg') }}');"><img src="{{ url_for('static', filename='edelman.jpg') }}" ALT="priti_patel.jpg" width="25%" align=left hspace="10"></a>
+
+                    <p>International agency, <a href="http://www.undertheinfluence.org.uk/lobbyists/Edelman%20Public%20Affairs">Edelman</a>, sees itself as an unconventional player in the corporate PR and lobbying world. Its New York office contains a chunk of the Berlin Wall; London visitors wait in reception to the sound of The Smiths.</p>
+
+                    <p>Yet most of its annual revenues – over $734 million worldwide in 2014, £51m of which comes from the UK – come from a overwhelmingly corporate and definitely un-hip client base.</p>
+
+                    <p>In the UK, the data reveals, Edelman has long lobbied for: alcohol giant, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Diageo%20plc">Diageo</a>, which for years has fought measures to protect public health; most of the world’s largest pharmaceutical firms; and for oil giant, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Royal%20Dutch%20Shell%20Group">Shell</a>.</p>
+
+                    <p>Edelman is a pioneer of lobbying techniques. It has a long history of working on astroturf campaigns, for example. This is where seemingly independent groups are created to defend corporate interests. Groups like the astroturf effort for The American Petroleum Institute and oil companies called Energy Citizens, which were supposedly regular folk opposed to oil industry regulation.</p>
+
+                    <p>Edelman has also been a leader in techniques to deal with groups opposing their clients. Key to this is the tactic of ‘divide and rule’, which involves isolating those campaigners with more ‘radical’ views, and engaging with those that might be swayed into agreeing with the corporation’s view. Edelman explains the rationale: ‘You’ve got an environmental disaster on your hands. Have you consulted `with <a href="http://www.undertheinfluence.org.uk/influencer/detail/Greenpeace">Greenpeace</a>? Co-opting your would-be attackers may seem counterintuitive, but it makes sense when you consider that NGOs (non-governmental organisations) are trusted by the public nearly two-to-one to ‘do what’s right’.”</p>
+
+                    <p>The data shows that Edelman’s lobbying skills, built working for US oil and gas giants, are currently being employed by the Shale gas industry in the UK. It acts as the secretariat of the supposedly independent <a href="http://www.undertheinfluence.org.uk/influencer/detail/Task%20Force%20on%20Shale%20Gas">Task Force on Shale Gas</a>. Edelman is also suitably well-connected to the government when it comes to lobbying for shale – or fracking – interests. It employs Katie Waring, who used to be an advisor to former energy minister <a href="http://www.undertheinfluence.org.uk/mp/Edward%20Davey">Ed Davey</a>, who steered the Coalition government’s ‘all out for shale’ policy.</p>
+                    <p>More on Edelman on <a href="http://powerbase.info/index.php/Edelman">Powerbase</a> (external site).</p>
+                    <p>More on the fracking lobby in the UK at <a href="http://www.spinwatch.org/index.php/issues/climate/item/5765-access-all-areas-frackers-lobbyists-and-the-revolving-door">Spinwatch</a> (external site)</p>
+                </div>
             </div>
         </div>
     </div>

@@ -1,67 +1,57 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Lobbying Agencies
-{% endblock title %}
-
 {% block article %}
-<div class="col-md-4">
-    <div class="alert alert-dismissable alert-success">
-        <p>“<em>A man who stands for nothing will fall for anything.</em>”
-            <br>― Malcolm X</p>
-    </div>
-</div>
-<div class="col-md-8">
-    <div id="government-container">
-        <div class="list-group">
-            {% for entry in lobbyists %}
-                <div class="list-group-item" >
-                    {% if entry.image_url and not entry.image_url == "None" %}
-                        <div class="row-picture">
-                            <img class="circle" src="{{ entry.image_url }}" alt="icon">
-                        </div>
-                    {% else %}
-                        <div class="row-action-primary">
-                            <i class="icon-material-folder" ></i>
-                        </div>
-                    {% endif %}
-                    <div class="row-content">
-                        <div class="col-md-11">
-                            <div class="least-content">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="government-container">
 
-                            </div>
+            <h3>Lobbying Agencies</h3>
 
-                            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                            <div class="row">
-                                <p>
-                                    {% for label in entry["labels"] %}
-                                        <span class="label label-success">{{ label }}</span>
-                                    {% endfor %}
-                                </p>
+            <div class="row">
+                <div class="col-md-7">
+                    <blockquote>
+                        <p>Here is a list of lobbying agencies in the UK register with the industry’s trade body, the Association of Professional Political Consultants.</p>
+                    </blockquote>
 
-                                <div class="well well-sm">
-                                    {% if entry.influences_summary.lobbying_registers.client_count > 0 %}
-                                        <b>{{ entry.influences_summary.lobbying_registers.client_count }} Clients</b><br>
-                                        {% for client in entry.influences_summary.lobbying_registers.clients %}
-                                            * <a href="{{ client.details_url }}">{{ client.name }}</a>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                    <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
+
+                    <hr>
+
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
                     </div>
+
+                    <br>
+                    <ul>
+                        <li><b>Big pharma’s addiction to lobbying</b></li>
+                        <li><b>Edelman</b></li>
+                        <li><b>Priti Patel</b></li>
+                    </ul>
+
                 </div>
-                <div class="list-group-separator"></div>
-            {% endfor %}
+
+                <div class="col-md-5">
+
+
+                    {% for entry in lobbyists %}
+                        <a href="{{ entry.detail_url }}"><h4>{{ entry.name }}</h4></a>
+                        <p>
+                            {% for label in entry["labels"] %}
+                                <span class="label label-success">{{ label }}</span>
+                            {% endfor %}
+                        </p>
+                        <hr>
+                    {% endfor %}
+
+                </div>
+
+
+            </div>
+
+
         </div>
-        <ul class="pager">
-            {% if page == 1  %}
-                <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-            {% else %}
-                <li class="previous"><a href="{{ url_for('show_lobbyists', page=page-1) }}">Previous page</a></li>
-            {% endif %}
-            <li class="next"><a href="{{ url_for('show_lobbyists', page=page+1) }}">Next page</a></li>
-        </ul>
     </div>
-</div>
+
+    <div class="col-md-1"></div>
+    </div>
 {% endblock article %}

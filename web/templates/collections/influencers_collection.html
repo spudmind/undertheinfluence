@@ -1,179 +1,114 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {% if title.header %}
-        <h1>Influence Detail: {{ title.header }}</h1>
-    {% else %}
-        <h1>All Influencers</h1>
-    {% endif %}
+
 {% endblock %}
 
 {% block article %}
-<div class="row">
-    <div class="col-md-4">
-        <div class="alert alert-dismissable alert-success">
-            <p><em>"The influence of lobbyists increases when it goes largely unnoticed by the public." </em></p>
-            <p>Lobbyists succeed by owning the terms of debate, steering conversations away from those they can't win and on to those they can. If a public discussion on a company's environmental impact is unwelcome, lobbyists will push instead to have a debate with politicians and the media on the hypothetical economic benefits of their ambitions. Once this narrowly framed conversation becomes dominant, dissenting voices will appear marginal and irrelevant.</p>
-        </div>
-        <form class="form-horizontal" action="{{ url_for('show_influencers_detail') }}" method="post">
-            <fieldset>
-                <legend>Dig Deeper</legend>
-
-                <div class="form-group">
-                    <label for="select" class="col-lg-3 control-label">Type</label>
-                    <div class="col-lg-8">
-                        <select multiple="" class="form-control" name="labels" >
-                            <option>Donor</option>
-                            <option>Registered Interest</option>
-                            <option>Lobby Agency Client</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Meetings</label>
-                    <div class="col-lg-8">
-                        <input class="form-control floating-label" name="meetings_gt" id="focusedInput" type="text" placeholder="number of meetings held" >
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Interests</label>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="interests_lt" id="focusedInput" type="text" placeholder="less than £... ">
-                    </div>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="interests_gt" id="focusedInput" type="text" placeholder="greater than £..." >
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Donations</label>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="donations_lt" id="focusedInput" type="text" placeholder="less than £...">
-                    </div>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="donations_gt" id="focusedInput" type="text" placeholder="greater than £..." >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Lobbyists</label>
-                    <div class="col-lg-8">
-                        <input class="form-control floating-label" name="lobbyists_gt" id="focusedInput" type="text" placeholder="number of lobbyists worked with" >
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-lg-10 col-lg-offset-7">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-
-    <div class="col-md-8">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
         <div id="government-container">
-            <div class="list-group">
-                {% if title.filter %}
-                    <div class="list-group-item" >
-                        <div class="row-content">
-                            <div class="alert alert-dismissable alert-warning">
-                                <b>Filtering for: </b>{{ title.filter }}
-                            </div>
-                        </div>
+
+            {% if title.header == "Donor" %}
+                <h3><b>Donors</b></h3>
+            {% elif title.header == "Registered Interest" %}
+                <h3><b>Registered Interests</b></h3>
+            {% elif title.header == "Lobby Agency Client" %}
+                <h3><b>Lobbying clients</b></h3>
+            {% else %}
+                <h3>All Influencers</h3>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-7">
+                    {% if title.header == "Donor" %}
+
+                        <blockquote>
+                            <p>Here is where you can find out who is funding our political parties and politicians. The data is from the <a href="http://www.electoralcommission.org.uk/">Electoral Commission</a> and is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
+                        </blockquote>
+                        <p>You can browse the donors on the right; use the search above; or take a look at some of our analysis below. </p>
+
+                    {% elif title.header == "Registered Interest" %}
+
+                        <blockquote>
+                            <p>Here is where you can find out who else is paying our politicians besides taxpayers. The data is from the MPs and Lords registers of interests and reveals: their second (third and fourth) jobs and directorships; any hospitality they have accepted; overseas trips accepted; and shareholdings. It is updated quarterly, starting in September 2010 (for older data, visit <a href="http://www.electoralcommission.org.uk/">TheyWorkForYou</a>).</p>
+                        </blockquote>
+                        <p>You can browse the registered interests on the right; use the search above; or take a look at some of our analysis below. </p>
+
+                    {% elif title.header == "Lobby Agency Client" %}
+
+                        <blockquote>
+                            <p>Here is where you can find out who is lobbying for whom. The data is from the lobbying industry’s voluntary register of lobbyists. The system is overseen by lobbyists and lacks any meaningful sanctions and so should not necessarily be seen as full and accurate record; nor are all commercial lobbyists registered. The list contains none of the law firms, accountancy firms, management consultants that also provide lobbying services to clients.</p>
+                        </blockquote>
+                        <p>The government has just introduced a <a href="https://registerofconsultantlobbyists.force.com/CLR_Search">compulsory register of lobbyists</a>, but it is very narrow in its scope. We will, however, import the additional information it contains soon.</p>
+                        <p>At the moment the industry register is updated quarterly, starting in September 2010 (for older data, visit the <a href="http://www.appc.org.uk/previous-registers/">Association of Professional Political Consultants</a>).</p>
+                        <p>You can browse the lobbyists' clients in the list on the right; use the search above; or take a look at some of our analysis below. A list of the commercial lobbying agencies registered can be found <a href="{{ url_for('show_lobbyists' )}}">here</a>.</p>
+
+                    {% else %}
+
+                        <blockquote>
+                            <p>Here is where you can find <a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Donors</a>, <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a> and <a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Clients</a> in one collection.</p>
+                        </blockquote>
+                        <p>You can browse the collection on the right; use the search above; or take a look at some of our analysis below. </p>
+
+                    {% endif %}
+
+                    <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
+
+                    <hr>
+
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
                     </div>
-                {% endif %}
-                {% for entry in influencers %}
-                    <div class="list-group-item" >
-                        <div class="row-action-primary">
-                            <i class="icon-material-folder" ></i>
+                    <br>
+                    <ul>
+                        <li><b>Gifts from the tax avoidance industry</b></li>
+                        <li><b>Tobacco firms lay it on for MPs</b></li>
+                    </ul>
+
+                </div>
+
+                <div class="col-md-5">
+
+                    {% if title.filter %}
+
+                        <div class="row">
+                            <span class="label label-danger"><b>FILTERING FOR: {{ title.filter }}</b></span>
                         </div>
-                        <div class="row-content">
-                            <div class="col-md-10">
-                                <div class="least-content ">
 
-                                </div>
-                                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                                <div class="row">
+                    {% endif %}
+                    {% for entry in influencers %}
+                        <a href="{{ entry.detail_url }}"><h4>{{ entry.name }}</h4></a>
+                        <p>
+                            {% for label in entry["labels"] %}
+                                <span class="label label-success">{{ label }}</span>
+                            {% endfor %}
+                        </p>
+                        <hr>
+                    {% endfor %}
 
-                                    <p>
-                                        {% for label in entry["labels"] %}
-                                            <span class="label label-success">{{ label }}</span>
-                                        {% endfor %}
-                                    </p>
+                </div>
 
-                                    {% if "meetings" in entry.influences_summary %}
-
-                                        {% if entry.influences_summary.meetings.meetings_count > 1 %}
-                                            <div class="well well-sm">
-                                                <b>{{ entry.influences_summary.meetings.meeting_count }} Ministerial Meetings</b> with:
-                                                {% for politician in entry.influences_summary.meetings.politicians_met %}
-                                                    <a href="{{ politician.details_url }}">{{ politician.name }}</a>
-                                                    {% if not loop.last %}
-                                                        ,
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-
-
-                                    {% if "lobby_registers" in entry.influences_summary %}
-                                        {% if entry.influences_summary.lobby_registers.lobbyist_hired == 1 %}
-                                            <div class="well well-sm">
-                                                <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agency hired</b>
-                                            </div>
-                                        {% else %}
-                                            <div class="well well-sm">
-                                                <b>{{ entry.influences_summary.lobby_registers.lobbyist_hired }} lobbying agencies hired</b>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-
-                                    {% if "register_of_interests" in entry.influences_summary %}
-                                        <div class="well well-sm">
-                                            <b>Register of Interests</b><br>
-                                            {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
-                                                {{ entry.influences_summary.register_of_interests.remuneration_total }} in
-                                            {% endif %}
-                                            {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
-                                                {{ entry.influences_summary.register_of_interests.remuneration_count }} registered interests
-                                                across
-                                            {% endif %}
-                                            {{ entry.influences_summary.register_of_interests.relationship_count }} relationships
-                                        </div>
-                                    {% endif %}
-                                    {% if "electoral_commission" in entry.influences_summary %}
-                                        <div class="well well-sm">
-                                            <b>Electoral Commission</b><br>
-                                            {{ entry.influences_summary.electoral_commission.donation_total }} donated across
-                                            {{ entry.influences_summary.electoral_commission.donation_count }} donations
-                                        </div>
-                                    {% endif %}
-
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-separator"></div>
-                {% endfor %}
+                <ul class="pager">
+                    {% if not pager.previous %}
+                        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
+                    {% else %}
+                        <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
+                    {% endif %}
+                    {% if pager.next %}
+                        <li class="next"><a href="{{ pager.next }}">Next page</a></li>
+                    {% else %}
+                        <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
+                    {% endif %}
+                </ul>
             </div>
-            <ul class="pager">
-                {% if not pager.previous %}
-                    <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-                {% else %}
-                    <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
-                {% endif %}
-                {% if pager.next %}
-                    <li class="next"><a href="{{ pager.next }}">Next page</a></li>
-                {% else %}
-                    <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
-                {% endif %}
-            </ul>
+
+
+
+
         </div>
     </div>
-</div>
+
+    <div class="col-md-1"></div>
+    </div>
 {% endblock article %}

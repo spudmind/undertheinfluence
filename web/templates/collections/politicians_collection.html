@@ -1,289 +1,101 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {% if title.header %}
-        <h1>{{ title.header }}</h1>
-    {% else %}
-        <h1>Politicians</h1>
-    {% endif %}
-{% endblock title %}
+
+{% endblock %}
 
 {% block article %}
-    <div class="col-md-4">
-        <div class="alert alert-dismissable alert-success">
-            <p>It's been a year since the Lobbying Bill passed into law – amid howls of protest from charities, derision from transparency campaigners, and warnings from Parliament. Is it delivering on its promises to clean up politics?</p>
-        </div>
-        <form class="form-horizontal" action="{{ url_for('show_politicians_detail') }}" method="post">
-            <fieldset>
-                <legend>Dig Deeper</legend>
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Politician</label>
-                    <div class="col-lg-8">
-                        <div class="radio radio-primary">
-                            <label>
-                                <input type="radio" name="type" id="optionsRadios1" value="" checked="">
-                                All
-                            </label>
-                        </div>
-                        <div class="radio radio-primary">
-                            <label>
-                                <input type="radio" name="type" id="optionsRadios2" value="mp" >
-                                Members of Parliament
-                            </label>
-                        </div>
-                        <div class="radio radio-primary">
-                            <label>
-                                <input type="radio" name="type" id="optionsRadios3" value="lord">
-                                Lords
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <label for="select" class="col-lg-3 control-label">Party</label>
-                    <div class="col-lg-8">
-                        <select class="form-control" id="select" name="party">
-                            <option></option>
-                            <option>Conservative Party</option>
-                            <option>Labour Party</option>
-                            <option>Liberal Democrats</option>
-                            <option>Green Party</option>
-                            <option>UK Independence Party</option>
-                            <option>Scottish National Party</option>
-                            <option>Democratic Unionist Party</option>
-                            <option>Sinn Fein</option>
-                        </select>
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <label for="select" class="col-lg-3 control-label">Type</label>
-                    <div class="col-lg-8">
-                        <select multiple="" class="form-control" name="labels" >
-                            <option>Donor</option>
-                            <option>Donation Recipient</option>
-                            <option>Registered Interest</option>
-                        </select>
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Meetings</label>
-                    <div class="col-lg-8">
-                        <input class="form-control floating-label" name="meetings_gt" id="focusedInput" type="text" placeholder="number of meetings held" >
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Interests</label>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="interests_lt" id="focusedInput" type="text" placeholder="less than £...">
-                    </div>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="interests_gt" id="focusedInput" type="text" placeholder="greater than £..." >
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Donations</label>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="donations_lt" id="focusedInput" type="text" placeholder="less than £...">
-                    </div>
-                    <div class="col-lg-4">
-                        <input class="form-control floating-label" name="donations_gt" id="focusedInput" type="text" placeholder="greater than £..." >
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <div class="col-lg-10 col-lg-offset-7">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-    <div class="col-md-8">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
         <div id="government-container">
-            <div class="list-group">
-                {% if title.filter %}
-                    <div class="list-group-item" >
-                        <div class="row-content">
-                            <div class="alert alert-dismissable alert-warning">
-                                <b>Filtering for: </b>{{ title.filter }}
-                            </div>
-                        </div>
+
+            {% if title.header == "Donation Recipient" %}
+                <h3><b>Donations to politicians’ offices</b></h3>
+            {% elif title.header == "Outside Interests" %}
+                <h3><b>Politicians outside earnings</b></h3>
+            {% else %}
+                <h3>Politicians</h3>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-7">
+                    {% if title.header == "Donation Recipient" %}
+
+                        <blockquote>
+                            <p>Here is where you can find out who is funding our political parties and politicians. The data is from the <a href="http://www.electoralcommission.org.uk/">Electoral Commission</a> and is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
+                        </blockquote>
+                        <p>You can browse the donors on the right; use the search above; or take a look at some of our analysis below. </p>
+
+                    {% else %}
+
+                        <blockquote>
+                            <p>Under current Parliamentary rules, our lawmakers are allowed to hold second jobs as long as they are declared. There are rules, however, that prevent them from accepting cash in return for favour. Numerous scandals have revealed the weakness of these rules.</p>
+                            <p>It is argued that Parliament is richer for the experience these outside jobs bring. The fact that much of the time, this experience is limited to being a director of a private healthcare company, or an advisor to a financial services firm – rather than, say, bringing the experience of being a teacher, or a scientist – weakens the case fought by Parliamentarians. </p>
+                        </blockquote>
+                        <p>The information here is from the MPs and Lords registers of interests. It allows us to see which legislators earn the most outside politics; and as important, who they are working for.</p>
+                        <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below. </p>
+
+                    {% endif %}
+
+                    <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
+
+                    <hr>
+
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
                     </div>
-                {% endif %}
-                {% for entry in politicians %}
-                    <div class="list-group-item" >
-                        {% if entry.image_url %}
-                            <div class="row-picture">
-                                <img class="circle" src="{{ entry.image_url }}" alt="icon">
-                            </div>
-                        {% else %}
-                            <div class="row-action-primary">
-                                <i class="icon-material-folder" ></i>
-                            </div>
-                        {% endif %}
-                        <div class="row-content">
-                            <div class="col-md-10">
-                                <div class="least-content">
+                    <br>
+                    <ul>
+                        <li><b>Gifts from the tax avoidance industry</b></li>
+                        <li><b>Tobacco firms lay it on for MPs</b></li>
+                    </ul>
 
-                                </div>
+                </div>
 
-                                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
-                                <div class="row">
-                                    <p>
-                                        {% if entry.party %}
-                                            <a href="{{ entry.party_url }}"><span class="label label-primary">{{ entry.party }}</span></a>
-                                        {% endif %}
-                                        {% for label in entry["labels"] %}
-                                            <span class="label label-success">{{ label }}</span>
-                                        {% endfor %}
-                                    </p>
+                <div class="col-md-5">
 
+                    {% if title.filter %}
 
-                                    {% if "Member of Parliament" in entry["labels"] %}
-                                        {% if entry["government_positions"] %}
-                                            <div class="well well-sm">
-                                                {% for position in entry["government_positions"] %}
-                                                    <b>{{ position }}</b><br>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        {% if entry["government_departments"] %}
-                                            <div class="well well-sm">
-                                                <b>Government Departments</b><br>
-                                                {% for dept in entry["government_departments"] %}
-                                                    <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        {% if "meetings" in entry.influences_summary %}
-                                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
-                                                <div class="well well-sm">
-                                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
-                                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
-                                                        <br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if "register_of_interests" in entry.influences_summary %}
-                                            {% if entry.influences_summary.register_of_interests.remuneration_count > 0 %}
-                                                <div class="well well-sm">
-                                                    <b>Register of Interests</b><br>
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
-                                                    {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
-                                                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                                        {% if "electoral_commission" in entry.influences_summary %}
-                                            {% if entry.influences_summary.electoral_commission.donor_count > 0 %}
-                                                <div class="well well-sm">
-                                                    <b>Electoral Commission</b><br>
-                                                    {{ entry.influences_summary.electoral_commission.donation_total }} received from
-                                                    {{ entry.influences_summary.electoral_commission.donor_count }} donations
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endif %}
-
-                                    {% if "Lord" in entry["labels"] %}
-
-                                        {% if entry["government_positions"] %}
-                                            <div class="well well-sm">
-                                                {% for position in entry["government_positions"] %}
-                                                    <b>{{ position }}</b><br>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        {% if entry["government_departments"] %}
-                                            <div class="well well-sm">
-                                                <b>Government Departments</b><br>
-                                                {% for dept in entry["government_departments"] %}
-                                                    <a href="{{ dept.detail_url }}">{{ dept.name }}</a><br>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        {% if "meetings" in entry.influences_summary %}
-                                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
-                                                <div class="well well-sm">
-                                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
-                                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
-                                                        <br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-
-                                        {% if "meetings" in entry.influences_summary %}
-                                            {% if entry.influences_summary.meetings.meetings_total > 1 %}
-                                                <div class="well well-sm">
-                                                    {% for position in entry.influences_summary.meetings.meetings_per_position %}
-                                                        <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
-                                                        <br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if "register_of_interests" in entry.influences_summary %}
-                                            {% if "interest_relationships" in entry.influences_summary.register_of_interests and entry.influences_summary.register_of_interests.interest_relationships > 0 %}
-                                                <div class="well well-sm">
-                                                    <b>Register of Interests</b><br>
-                                                    {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
-                                                    {{ entry.influences_summary.register_of_interests.interest_categories }} categories
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if "electoral_commission" in entry.influences_summary %}
-                                            {% if entry.influences_summary.electoral_commission.donation_count > 0 %}
-                                                <div class="well well-sm">
-                                                    <b>Electoral Commission</b><br>
-                                                    {{ entry.influences_summary.electoral_commission.donation_total }} donated across
-                                                    {{ entry.influences_summary.electoral_commission.donation_count }} donations
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endif %}
-
-
-                                </div>
-                            </div>
+                        <div class="row">
+                            <span class="label label-danger"><b>FILTERING FOR: {{ title.filter }}</b></span>
                         </div>
-                    </div>
-                    <div class="list-group-separator"></div>
 
-                {% endfor %}
+                    {% endif %}
+                    {% for entry in politicians %}
+                        <a href="{{ entry.detail_url }}"><h4>{{ entry.name }}</h4></a>
+                        <p>
+                            {% if entry.party %}
+                                <a href="{{ entry.party_url }}"><span class="label label-primary">{{ entry.party }}</span></a>
+                            {% endif %}
+                            {% for label in entry["labels"] %}
+                                <span class="label label-success">{{ label }}</span>
+                            {% endfor %}
+                        </p>
+                        <hr>
+                    {% endfor %}
+
+                </div>
+
+                <ul class="pager">
+                    {% if not pager.previous %}
+                        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
+                    {% else %}
+                        <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
+                    {% endif %}
+                    {% if pager.next %}
+                        <li class="next"><a href="{{ pager.next }}">Next page</a></li>
+                    {% else %}
+                        <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
+                    {% endif %}
+                </ul>
             </div>
-            <ul class="pager">
-                {% if not pager.previous %}
-                    <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-                {% else %}
-                    <li class="previous"><a href="{{ pager.previous }}">Previous page</a></li>
-                {% endif %}
-                {% if pager.next %}
-                    <li class="next"><a href="{{ pager.next }}">Next page</a></li>
-                {% else %}
-                    <li class="next disabled"><a href="javascript:void(0)">Next page</a></li>
-                {% endif %}
-            </ul>
+
+
+
+
         </div>
+    </div>
+
+    <div class="col-md-1"></div>
     </div>
 {% endblock article %}

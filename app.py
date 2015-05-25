@@ -97,7 +97,7 @@ def show_politicians():
         'summary/politicians_summary.html', mps=mps_summary, lords=lords_summary)
 
 
-@app.route('/lobbyists')
+@app.route('/lobbying-agencies')
 def show_lobbyists():
     try:
         page = int(request.args.get('page', 1))
@@ -510,10 +510,10 @@ def _build_title(args):
         if args["type"] == "lord":
             title["header"] = "Lords"
             filters.append("Lords")
-    if "government_committee" in args:
-        if args["government_committee"]:
-            title["header"] = args["government_committee"]
-            filters.append("Select Committee: %s" % args["government_committee"])
+    if "select_committee" in args:
+        if args["select_committee"]:
+            title["header"] = args["select_committee"]
+            filters.append("Select Committee: %s" % args["select_committee"])
     if "government_department" in args:
         if args["government_department"]:
             title["header"] = args["government_department"]

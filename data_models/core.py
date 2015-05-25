@@ -135,21 +135,31 @@ class BaseDataModel:
         return category_fields
 
     def set_date(self, date, relationship):
-        if '/' in date:
-            d = date.split('/')
-            month, day, year = int(d[0]), int(d[1]), int(d[2])
-        elif '-' in date:
-            d = date.split('-')
-            year, month, day = int(d[0]), int(d[1]), int(d[2])
-        elif ' ' in date:
-            d = date.split(' ')
-            month_digit = self._convert_month(d[1])
-            day, month, year = int(d[0]), int(month_digit), int(d[2])
-        self.create_relationship(
-            self.vertex,
-            relationship,
-            self.g.calendar.date(year, month, day).day
-        )
+        converted = self._convert_date(date)
+        if converted:
+            self.create_relationship(
+                self.vertex,
+                relationship,
+                self.g.calendar.date(converted[0], converted[1], converted[2]).day
+            )
+
+    def _convert_date(self, date):
+        year_month_day = None
+        try:
+            if '/' in date:
+                d = date.split('/')
+                month, day, year = int(d[0]), int(d[1]), int(d[2])
+            elif '-' in date:
+                d = date.split('-')
+                year, month, day = int(d[0]), int(d[1]), int(d[2])
+            elif ' ' in date:
+                d = date.split(' ')
+                month_digit = self._convert_month(d[1])
+                day, month, year = int(d[0]), int(month_digit), int(d[2])
+            year_month_day = (year, month, day)
+            return year_month_day
+        except:
+            return year_month_day
 
     @staticmethod
     def _convert_to_currency(number):

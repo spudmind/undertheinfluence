@@ -49,9 +49,8 @@ class GraphMPsInterests():
         self._logger.debug("%s x %s" % (node["date"], node["mp"]))
         self._logger.debug("..................")
 
-        if self._is_date_imported(node["mp"], node["date"]):
+        if not self._is_date_imported(node["mp"], node["date"]):
             mp = self._find_mp(node["mp"])
-
             self._parse_categories(mp, node["interests"])
             #self._parse_categories(node["interests"])
         else:
@@ -70,55 +69,57 @@ class GraphMPsInterests():
         for category in categories:
 
             self.current_detail["category"] = category["category_name"]
-            category_name = category["category_name"]
-            new_category = self._create_category(mp.name, category_name)
-            mp.link_interest_category(new_category)
+            if category["category_records"]:
+                category_name = category["category_name"]
+                new_category = self._create_category(mp.name, category_name)
+                mp.link_interest_category(new_category)
+                mp.set_node_properties(labels="Outside Interests")
 
-            if category_name == "Directorships":
-                self._logger.debug(category_name)
-                self._graph_list(new_category, category["category_records"])
-            elif category_name == "Remunerated directorships":
-                self._logger.debug(category_name)
-                self._graph_list(new_category, category["category_records"])
-            elif category_name == "Remunerated employment, office, profession etc":
-                self._logger.debug(category_name)
-                self._graph_list(new_category, category["category_records"])
-            elif category_name == "Remunerated employment, office, profession, etc_":
-                self._logger.debug(category_name)
-                self._graph_list(new_category, category["category_records"])
-            elif category_name == "Clients":
-                if category["category_records"]:
+                if category_name == "Directorships":
                     self._logger.debug(category_name)
-                    # self._graph_unstructured(new_category, category["category_records"])
-                    self._create_graph(new_category, category["category_records"])
-                # self._create_graph(new_category, category["category_records"])
-            elif category_name == "Land and Property":
-                pass
-            elif category_name == "Shareholdings":
-                self._logger.debug(category_name)
-                self._graph_unstructured(new_category, category["category_records"])
-            elif category_name == "Registrable shareholdings":
-                self._logger.debug(category_name)
-                self._graph_unstructured(new_category, category["category_records"])
-            elif category_name == "Sponsorships":
-                self._logger.debug(category_name)
-                self._graph_sponsorship(new_category, category["category_records"])
-            elif category_name == "Sponsorship or financial or material support":
-                self._logger.debug(category_name)
-                self._graph_sponsorship(new_category, category["category_records"])
-            elif category_name == "Overseas visits":
-                self._logger.debug(category_name)
-                self._graph_travel(new_category, category["category_records"])
-            elif category_name == "Gifts, benefits and hospitality (UK)":
-                self._logger.debug(category_name)
-                self._graph_gifts(new_category, category["category_records"])
-            elif category_name == "Overseas benefits and gifts":
-                self._logger.debug(category_name)
-                self._graph_gifts(new_category, category["category_records"])
-            elif category_name == "Miscellaneous":
-                self._logger.debug(category_name)
-                self._graph_unstructured(new_category, category["category_records"])
-            self._logger.debug("*")
+                    self._graph_list(new_category, category["category_records"])
+                elif category_name == "Remunerated directorships":
+                    self._logger.debug(category_name)
+                    self._graph_list(new_category, category["category_records"])
+                elif category_name == "Remunerated employment, office, profession etc":
+                    self._logger.debug(category_name)
+                    self._graph_list(new_category, category["category_records"])
+                elif category_name == "Remunerated employment, office, profession, etc_":
+                    self._logger.debug(category_name)
+                    self._graph_list(new_category, category["category_records"])
+                elif category_name == "Clients":
+                    if category["category_records"]:
+                        self._logger.debug(category_name)
+                        # self._graph_unstructured(new_category, category["category_records"])
+                        self._create_graph(new_category, category["category_records"])
+                    # self._create_graph(new_category, category["category_records"])
+                elif category_name == "Land and Property":
+                    pass
+                elif category_name == "Shareholdings":
+                    self._logger.debug(category_name)
+                    self._graph_unstructured(new_category, category["category_records"])
+                elif category_name == "Registrable shareholdings":
+                    self._logger.debug(category_name)
+                    self._graph_unstructured(new_category, category["category_records"])
+                elif category_name == "Sponsorships":
+                    self._logger.debug(category_name)
+                    self._graph_sponsorship(new_category, category["category_records"])
+                elif category_name == "Sponsorship or financial or material support":
+                    self._logger.debug(category_name)
+                    self._graph_sponsorship(new_category, category["category_records"])
+                elif category_name == "Overseas visits":
+                    self._logger.debug(category_name)
+                    self._graph_travel(new_category, category["category_records"])
+                elif category_name == "Gifts, benefits and hospitality (UK)":
+                    self._logger.debug(category_name)
+                    self._graph_gifts(new_category, category["category_records"])
+                elif category_name == "Overseas benefits and gifts":
+                    self._logger.debug(category_name)
+                    self._graph_gifts(new_category, category["category_records"])
+                elif category_name == "Miscellaneous":
+                    self._logger.debug(category_name)
+                    self._graph_unstructured(new_category, category["category_records"])
+                self._logger.debug("*")
 
     def _graph_list(self, category, records):
         if records:

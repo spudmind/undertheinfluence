@@ -326,7 +326,11 @@ class LobbyAgency(NamedEntity):
             MATCH (f:`Lobby Agency` {{name: "{0}"}})
             RETURN f.contact_details
         """.format(self.name)
-        return self.query(query)[0][0]
+        results = self.query(query)
+        if results:
+            return results[0][0]
+        else:
+            return None
 
     def _get_clients(self):
         results = []

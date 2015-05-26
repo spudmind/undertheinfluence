@@ -49,7 +49,7 @@ class GraphMPsInterests():
         self._logger.debug("%s x %s" % (node["date"], node["mp"]))
         self._logger.debug("..................")
 
-        if not self._is_date_imported(node["mp"], node["date"]):
+        if not self._is_previously_imported(node["mp"], node["date"]):
             mp = self._find_mp(node["mp"])
             self._parse_categories(mp, node["interests"])
             #self._parse_categories(node["interests"])
@@ -627,7 +627,7 @@ class GraphMPsInterests():
     def _print_out(self, key, value):
         self._logger.debug("  %-25s%-25s" % (key, value))
 
-    def _is_date_imported(self, mp, date):
+    def _is_previously_imported(self, mp, date):
         result = False
         query = u"""
             MATCH (n:`Interest Detail`)
@@ -637,9 +637,10 @@ class GraphMPsInterests():
         dates = self.core.query(query)[0]["dates"]
         if date in dates:
             result = True
+        for entry in dates:
+            if date in entry:
+                result = True
         return result
-
-
 
     @staticmethod
     def _is_remuneration(record):

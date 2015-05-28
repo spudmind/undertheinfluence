@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block article %}
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="government-container">
+            <h3><b>Government & Politicians</b></h3>
+            <div class="row">
+                <div class="col-md-7">
+
+                    <blockquote>
+                        <p>Lobbying – we all know how it works. The lunches, the quiet word in your ear, the ex-ministers and ex-advisors for hire, helping big business find the right way to get its way... We don’t know who is meeting whom. We don’t know whether any favours are being exchanged.</p>
+                        <small>David Cameron in a speech ahead of the 2010 general election</small>
+                    </blockquote>
+
+                    <p>You can find some of this information here: which of our legislators are ‘for-hire’; who is meeting whom and gain an insight into the hospitality lavished on our lawmakers.</p>
+
+                    <p>This section contains information on our politicians and those, with real power, who have made it into government. It includes data from the registers of interests of MPs and Lords; ministers quarterly meeting logs with outside interests; and data on the funding of politician’s offices. </p>
+
+                    <p>Find out more about: which politicians earn the most outside Parliament; who has attracted the most funding; and which government departments declare the most meetings with big business. </p>
+
+                </div>
+
+                <div class="col-md-5">
+                    <h3>Explore the data</h3>
+
+                    <ul>
+                        <li><b>Explore <a href="{{ url_for('show_politicians_detail')}}">all politicians’</a></b></li>
+                        <li><b>Explore politicians’ outside earnings</b></li>
+                        <li><b>Explore donations to politicians’ offices</b></li>
+                        <li><b>Explore meetings with ministers</b></li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-7">
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
+                    </div>
+
+
+                </div>
+
+
+                <div class="col-md-5">
+                    <div class="row">
+                        <span class="label label-danger">PROFILE</span>
+                    </div>
+                    <h3>John Hutton</h3>
+
+                    <a><img src="{{ url_for('static', filename='john_hutton.jpg') }}" ALT="john_hutton.jpg" width="25%" align=left hspace="10"></a>
+
+                    <p>The ex-Barrow and Furness MP, <a href="http://www.undertheinfluence.org.uk/lord/Lord%20Hutton%20of%20Furness">John Hutton</a>, joined the upper house in July 2010, after a successful run as a senior Cabinet member in the previous Labour government.</p>
+
+                    <p>His career since has seen him take on many commercial jobs. Perhaps most notable is his role as head of the lobbying group, the <a href="http://www.undertheinfluence.org.uk/influencer/detail/Nuclear%20Industry%20Association">Nuclear Industry Association</a>, which afforded him the privilege of co-writing the foreword to the Coalition government’s nuclear strategy.</p>
+
+                    <p>A health minister under Tony Blair from 1998 to 2005, Hutton oversaw radical changes to the NHS. In 2014, he landed a directorship with <a href="http://www.undertheinfluence.org.uk/influencer/detail/Circle%20Holdings%20Plc">Circle Holdings</a>, the investment arm of private healthcare provider Circle, famous for controversially being the first private company to take over the running of a whole NHS hospital.</p>
+
+                    <p>Hutton is also a paid adviser to tax avoidance experts, <a href="http://www.undertheinfluence.org.uk/influencer/detail/PriceWaterhouse%20Coopers%20LLP">PWC</a>, which is also heavily involved in public sector reform: it claims to have ‘acted on more privatisations than any other financial adviser’. The former defence secretary (2008-09) is also a paid consultant to US arms giant <a href="http://www.undertheinfluence.org.uk/influencer/detail/Lockheed%20Martin">Lockheed Martin</a> (also interested in NHS outsourcing work); and <a href="http://www.undertheinfluence.org.uk/influencer/detail/Bechtel">Bechtel Corporation</a>, the US’s largest construction and engineering firm.</p>
+
+                    <p>Hutton has also been involved with the global lobbying firm <a href="http://www.undertheinfluence.org.uk/lobbyists/APCO%20Worldwide">APCO</a>, although this was never declared in his official register of interests. Until recently, he was listed as a member of APCO’s board of senior advisers, which helps clients with, among other things, political intelligence, government relations, reputation management and policymaking processes. It singles out its expert counsel on government systems for defence and public service reform. Hutton said he ‘doesn’t concentrate on’ the areas, but declined to expand on this, or why he had not declared the interest.</p>
+
+                    <p>More on John Hutton on <a href="http://powerbase.info/index.php/John_Hutton">Powerbase</a> (external site).</p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-1"></div>
+{% endblock article %}

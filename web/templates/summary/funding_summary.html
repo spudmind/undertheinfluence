@@ -1,25 +1,27 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Who’s funding politics
+
 {% endblock %}
 
 {% block article %}
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div id="government-container">
+            <h3><b>Who funds our politics</b></h3>
             <div class="row">
-                <div class="col-md-6">
-                    <p><b>“All the main political parties have been prepared to grant access and influence to those with the wherewithal to fund their operations.”</b><br>
-                        - Robert Peston, BBC business correspondent
-                    </p>
+                <div class="col-md-7">
+                    <blockquote>
+                        <p>All the main political parties have been prepared to grant access and influence to those with the wherewithal to fund their operations.</p>
+                        <small>Robert Peston, BBC business correspondent</small>
+                    </blockquote>
 
-                    <p>The main aim of much of the money that is channeled into British politics is to influence decisions taken by government. The funding of political parties is no exception. Political parties’ expenditures are thought to have risen threefold since the 1970s, while membership of the parties has plummeted. Stepping into the gap are a limited number of very wealthy donors from business and finance, regardless of the colour of the party. </p>
+                    <p>The main aim of much of the money that is channeled into British politics is to influence decisions taken by government. The funding of political parties is no exception. Political parties’ expenditures are thought to have risen threefold since the 1970s, while membership of the parties has plummeted. Stepping into the gap are the trade unions, for Labour, and a limited number of very wealthy donors from business and finance in the Conservative Party’s case.</p>
                     <p>Find out who is funding politics in the UK; how they disguise their funding through, for example, dining clubs; and provide in-kind funding to politicians. </p>
 
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <h3>Explore the data</h3>
 
                     <ul>
@@ -33,64 +35,49 @@
             <hr>
 
             <div class="row">
-                <h3>What the data shows</h3>
-                <div class="col-md-8">
 
-                    <div class="col-md-5">
-                        <h3>Top Donors</h3>
-                        <table class="table table-striped table-hover ">
-                            <colgroup>
-                                <col span="1" style="width: 20%;">
-                                <col span="1" style="width: 5%;">
-                            </colgroup>
-                            <thead>
-                            <tr>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for top in influencers.electoral_commission.top.donation_count %}
-                                <tr>
-                                    <td><a href="{{ top.details_url }}">{{ top.name }}</a></td>
-                                    <td>{{ top.total}}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                <div class="col-md-7">
+                    <div class="row">
+                        <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
                     </div>
 
+                    <h2>Gifts from the tax avoidance industry</h2>
 
-                    <div class="col-md-5">
-                        <h3>Biggest Donors</h3>
-                        <table class="table table-striped table-hover ">
-                            <colgroup>
-                                <col span="1" style="width: 20%;">
-                                <col span="1" style="width: 5%;">
-                            </colgroup>
-                            <thead>
-                            <tr>
+                    <p><em>21 May 2015, by Spinwatch</em></p>
 
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for top in influencers.electoral_commission.top.donation_total %}
-                                <tr>
-                                    <td><a href="{{ top.details_url }}">{{ top.name }}</a></td>
-                                    <td>{{ top.total}}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                    <a><img src="{{ url_for('static', filename='deloitte.jpg') }}" ALT="deloitte" width="40%" align=right></a>
+
+                    <p>The four global accountancy firms – <a href="http://www.undertheinfluence.org.uk/influencer/detail/PriceWaterhouse%20Coopers%20LLP">PWC</a>, <a href="http://www.undertheinfluence.org.uk/influencer/detail/KPMG">KPMG</a>, <a href="http://www.undertheinfluence.org.uk/influencer/detail/Deloitte">Deloitte</a> and <a href="http://www.undertheinfluence.org.uk/influencer/detail/Ernst%20and%20Young">Ernst & Young</a>, also known as the Big Four – have captured the British government. They are embedded in it, earning hundreds of millions of pounds a year in government business, advising on everything from tax law to privatisation programmes.</p>
+
+                    <p>They also famously donate hundreds of thousands of pounds in staff time to political parties every year. This expertise is not for free. It is a way of currying favour.</p>
+
+                    <p>The data shows that ahead of the 2010 general election, the Conservative Party’s ‘Implementation Team’ – under <a href="http://www.undertheinfluence.org.uk/mp/Francis%20Maude">Francis Maude</a> – received the following donations in the form of Big Four staff: £145k of KPMG’s time; £100k from PWC; £21k from Ernst & Young; and £9k from Deloitte. </p>
+
+                    <p>Ahead of the 2015 election, Labour were the main beneficiaries: shadow Cabinet member <a href="http://www.undertheinfluence.org.uk/mp/Rachel%20Reeves">Rachel Reeves</a> took £100k of staff time from PWC in 2014; <a href="http://www.undertheinfluence.org.uk/mp/Tristram%20Hunt">Tristram Hunt</a> £75k; and David Hanson (shadow immigration minister) was given £66k.</p>
+
+                    <p>At the same time, the Big Four are central to the tax avoidance industry. You work it out.</p>
+
+                    <p>More on the Big Four’s relationships with government at <a href="http://www.spinwatch.org/index.php/issues/finance-lobbying/item/5505-who-really-runs-this-place">Spinwatch</a> (external site).</p>
 
                 </div>
-                <div class="col-md-4">
-                    <h4>Featured Profile</h4>
-                    <div class="alert alert-dismissable alert-success">
-                        <p><em>"The influence of lobbyists increases when it goes largely unnoticed by the public." </em></p>
-                        <p>Lobbyists succeed by owning the terms of debate, steering conversations away from those they can't win and on to those they can. If a public discussion on a company's environmental impact is unwelcome, lobbyists will push instead to have a debate with politicians and the media on the hypothetical economic benefits of their ambitions. Once this narrowly framed conversation becomes dominant, dissenting voices will appear marginal and irrelevant.</p>
-                    </div>
-                </div>
 
+                <div class="col-md-5">
+                    <div class="row">
+                        <span class="label label-danger">PROFILE</span>
+                    </div>
+                    <h3>Peter Cruddas</h3>
+
+                    <p>Referred to as the City's richest self-made man, billionaire businessman <a href="http://www.undertheinfluence.org.uk/influencer/detail/Mr%20Peter%20A%20Cruddas">Peter Cruddas</a>, made his fortune in the City, founding spread-betting firm <a href="http://www.undertheinfluence.org.uk/influencer/detail/CMC%20Markets%20UK%20Plc">CMC Markets</a>.</p>
+
+                    <p>He first donated to the Conservative Party in 2009, gifting them £200k. In 2011 he gave a further £400k. His total donations amount to over £1m. He was appointed Conservative Party’s Co-Treasurer in 2011.</p>
+
+                    <p>We have Cruddas to thank, partly, for the UK still having a first past the post voting system. In the 2015 general election this delivered results that saw a Tory MP needing just 34k votes to secure a seat, but UKIP and the Greens winning a single seat with 3.8m and 1.1m votes. This ‘democratic fraud’ could have been averted had the UK voted to adopt an Altervative Voting system in 2011. Cruddas gifted £400k to the No2AV campaign.</p>
+
+                    <p>In 2012 Cruddas was embroiled in the Cash for Access scandal by undercover reporters from the Sunday Times. He informed the journalists, who said they from an overseas wealth fund, that large donations to his party would grant them access to the PM and Chancellor. He described donations of £250,000 as “premier league” and would allow donors a chance to influence government policy, before claiming that it would be “awesome for your business”.</p>
+
+                    <p>The revelations forced Cruddas to immediately resign from his role as Party Treasurer. The Conservatives swiftly replaced him with major donor <a href="http://www.undertheinfluence.org.uk/influencer/detail/Mr%20Stanley%20Fink">Lord Stanley Fink</a>.</p>
+
+                </div>
             </div>
         </div>
     </div>

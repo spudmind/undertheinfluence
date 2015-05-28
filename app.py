@@ -79,6 +79,15 @@ def show_contact():
     return render_template('page/contact.html')
 
 
+@app.route('/government-and-politicians')
+def show_government_and_politicians():
+    reply = get_summary_function.SummaryApi().request()
+    mps_summary = reply["results"]["summary"]["mps"]
+    lords_summary = reply["results"]["summary"]["lords"]
+    return render_template(
+        'summary/government_politicians.html', mps=mps_summary, lords=lords_summary)
+
+
 @app.route('/politicians')
 def show_politicians():
     reply = get_summary_function.SummaryApi().request()
@@ -88,7 +97,7 @@ def show_politicians():
         'summary/politicians_summary.html', mps=mps_summary, lords=lords_summary)
 
 
-@app.route('/lobbyists')
+@app.route('/lobbying-agencies')
 def show_lobbyists():
     try:
         page = int(request.args.get('page', 1))
@@ -114,8 +123,8 @@ def show_lobby_agency(name):
     agency = get_lobby_agency_function.LobbyAgencyApi().request(args)
     return render_template('single/show_lobby_agency.html', agency=agency)
 
-@app.route('/influencers')
-def show_influencers():
+@app.route('/influence-and-lobbying')
+def show_influence_and_lobbying():
     args = {}
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
@@ -123,8 +132,8 @@ def show_influencers():
     return render_template('summary/influencers_summary.html', influencers=influencer_summary)
 
 
-@app.route('/funding')
-def show_funding_landing():
+@app.route('/who-funds-our-politics')
+def show_who_funds_our_politics():
     args = {}
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
@@ -132,8 +141,8 @@ def show_funding_landing():
     return render_template('summary/funding_summary.html', influencers=influencer_summary)
 
 
-@app.route('/interests')
-def show_interests_landing():
+@app.route('/who-provides-for-our-lawmakers')
+def show_who_provides_for_our_lawmakers():
     args = {}
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
@@ -141,8 +150,8 @@ def show_interests_landing():
     return render_template('summary/interests_summary.html', influencers=influencer_summary)
 
 
-@app.route('/lobbying')
-def show_lobbying_landing():
+@app.route('/who-is-lobbying')
+def show_who_is_lobbying():
     args = {}
     args["labels"] = request.args.get('labels', None)
     reply = get_summary_function.SummaryApi().request()
@@ -501,10 +510,10 @@ def _build_title(args):
         if args["type"] == "lord":
             title["header"] = "Lords"
             filters.append("Lords")
-    if "government_committee" in args:
-        if args["government_committee"]:
-            title["header"] = args["government_committee"]
-            filters.append("Select Committee: %s" % args["government_committee"])
+    if "select_committee" in args:
+        if args["select_committee"]:
+            title["header"] = args["select_committee"]
+            filters.append("Select Committee: %s" % args["select_committee"])
     if "government_department" in args:
         if args["government_department"]:
             title["header"] = args["government_department"]

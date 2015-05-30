@@ -360,6 +360,8 @@ mapped_influencers = [
     (u"PWC", u"PricewaterhouseCoopers"),
     (u"PwC", u"PricewaterhouseCoopers"),
     (u"Price Waterhouse Coopers LLP", u"PricewaterhouseCoopers"),
+    (u"PricewaterhouseCoopers LLP", u"PricewaterhouseCoopers"),
+    (u"PricewaterhouseCoopers (consultancy)", u"PricewaterhouseCoopers"),
     (u"Price Waterhouse Coopers", u"PricewaterhouseCoopers"),
     (u"PriceWaterhouseCoopers LLP", u"PricewaterhouseCoopers"),
     (u"PRICEWATERHOUSECOOPERS LLP (Sponsorship)", u"PricewaterhouseCoopers"),

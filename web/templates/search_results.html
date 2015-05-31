@@ -78,7 +78,7 @@
             </p>
 
             {% if "meetings" in entry.influences_summary %}
-                {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 0 %}
+                {% if "meetings_total" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_total > 0 %}
                     <div class="well well-sm">
                         {% for position in entry.influences_summary.meetings.meetings_per_position %}
                             <b>{{ position["meetings_count"] }} meetings as {{ position["position"] }}</b>
@@ -88,15 +88,15 @@
                 {% endif %}
             {% endif %}
 
-            {% if "register_of_interests" in entry.influences_summary %}
+            {% if "register_of_interests" in entry.influences_summary and entry.influences_summary.register_of_interests.interest_relationships > 0 %}
                 <div class="well well-sm">
                     <b>Register of Interests</b><br>
-                    {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
+                    Esitmated {{ entry.influences_summary.register_of_interests.interest_relationships }} interest relationships across
                     {{ entry.influences_summary.register_of_interests.interest_categories }} categories
                 </div>
             {% endif %}
 
-            {% if "electoral_commission" in entry.influences_summary %}
+            {% if "electoral_commission" in entry.influences_summary and entry.influences_summary.electoral_commission.donation_count > 0 %}
                 <div class="well well-sm">
                     <b>Electoral Commission</b><br>
                     {{ entry.influences_summary.electoral_commission.donation_total }} donated across

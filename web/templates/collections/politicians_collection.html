@@ -14,7 +14,7 @@
             {% elif title.header == "Outside Interests" %}
                 <h3><b>Politicians outside earnings</b></h3>
             {% else %}
-                <h3>Politicians</h3>
+                <h3>All Politicians</h3>
             {% endif %}
 
             <div class="row">
@@ -26,7 +26,7 @@
                         </blockquote>
                         <p>You can browse the donors on the right; use the search above; or take a look at some of our analysis below. </p>
 
-                    {% else %}
+                    {% elif title.header == "Outside Interests" %}
 
                         <blockquote>
                             <p>Under current Parliamentary rules, our lawmakers are allowed to hold second jobs as long as they are declared. There are rules, however, that prevent them from accepting cash in return for favour. Numerous scandals have revealed the weakness of these rules.</p>
@@ -35,6 +35,79 @@
                         <p>The information here is from the MPs and Lords registers of interests. It allows us to see which legislators earn the most outside politics; and as important, who they are working for.</p>
                         <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below. </p>
 
+                    {% else %}
+
+                        <p>The information here is from the MPs and Lords registers of interests. It allows us to see which legislators earn the most outside politics; and as important, who they are working for.</p>
+                        <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below. </p>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <form class="form-horizontal" action="{{ url_for('show_politicians_detail') }}" method="post">
+                                    <fieldset>
+                                        <legend>Explore</legend>
+
+                                        <div class="form-group">
+                                            <label class="col-lg-3 control-label">Politician</label>
+                                            <div class="col-lg-8">
+                                                <div class="radio radio-primary">
+                                                    <label>
+                                                        <input type="radio" name="type" id="optionsRadios1" value="" checked="">
+                                                        All
+                                                    </label>
+                                                </div>
+                                                <div class="radio radio-primary">
+                                                    <label>
+                                                        <input type="radio" name="type" id="optionsRadios2" value="mp" >
+                                                        Members of Parliament
+                                                    </label>
+                                                </div>
+                                                <div class="radio radio-primary">
+                                                    <label>
+                                                        <input type="radio" name="type" id="optionsRadios3" value="lord">
+                                                        Lords
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="select" class="col-lg-3 control-label">Party</label>
+                                            <div class="col-lg-8">
+                                                <select class="form-control" id="select" name="party">
+                                                    <option></option>
+                                                    <option>Conservative Party</option>
+                                                    <option>Labour Party</option>
+                                                    <option>Liberal Democrats</option>
+                                                    <option>Green Party</option>
+                                                    <option>UK Independence Party</option>
+                                                    <option>Scottish National Party</option>
+                                                    <option>Democratic Unionist Party</option>
+                                                    <option>Sinn Fein</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="select" class="col-lg-3 control-label">Type</label>
+                                            <div class="col-lg-8">
+                                                <select multiple="" class="form-control" name="labels" >
+                                                    <option>Donor</option>
+                                                    <option>Donation Recipient</option>
+                                                    <option>Outside Interests</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="col-lg-10 col-lg-offset-7">
+                                                <button type="submit" class="btn btn-primary">Filter</button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
                     {% endif %}
 
                     <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>

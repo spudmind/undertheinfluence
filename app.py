@@ -38,7 +38,7 @@ app.jinja_env.globals['url_for'] = url_for
 def format_date(date):
     try:
         return datetime.strptime(date, '%Y-%m-%d').strftime('%d %h %Y')
-    except ValueError:
+    except (ValueError, TypeError):
         return date
 
 app.jinja_env.filters['date'] = format_date
@@ -193,6 +193,7 @@ def show_politicians_detail():
         args["type"] = request.args.get('type', None)
         args["government_committee"] = request.args.get('government_committee', None)
         args["government_department"] = request.args.get('government_department', None)
+        args["labels"] = request.args.get('labels', None)
 
     title = _build_title(args)
     reply = get_politicians_function.PoliticiansApi().request(**args)

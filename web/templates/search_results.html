@@ -1,38 +1,29 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Search Results: {{ search_string }}
+
 {% endblock title %}
 
 {% block article %}
-<div class="col-md-4"></div>
-<div class="col-md-8">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
     <div id="government-container">
-        <div class="list-group">
-        {% for entry in results %}
-        <div class="list-group-item" >
-        {% if entry.image_url %}
-            <div class="row-picture">
-                <img class="circle" src="{{ entry.image_url }}" alt="icon">
-            </div>
-        {% else %}
-            <div class="row-action-primary">
-                <i class="icon-material-folder" ></i>
-            </div>
-        {% endif %}
-        <div class="row-content">
-        <div class="least-content">
+    <h3>Search Results: <b>{{ search_string }}</b></h3>
 
-        </div>
+    <div class="row">
+
+    <div class="col-md-6">
+        <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
+    </div>
+
+    <div class="col-md-6">
+
+    {% for entry in results %}
+
         {% if "Lobby Agency" in entry["labels"] %}
 
-            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
-                {% if entry.party %}
-                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
-                {% endif %}
-            </h4>
-            <div class="row">
-            <div class="col-md-12">
+            <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+
             <p>
                 {% for label in entry["labels"] %}
                     <span class="label label-success">{{ label }}</span>
@@ -48,15 +39,14 @@
                 {% endif %}
             </div>
 
-
         {% elif "Political Party" in entry["labels"] %}
-            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+
+            <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                 {% if entry.party %}
                     - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
                 {% endif %}
             </h4>
-            <div class="row">
-            <div class="col-md-12">
+
             <p>
                 {% for label in entry["labels"] %}
                     <span class="label label-success">{{ label }}</span>
@@ -73,16 +63,14 @@
 
             </div>
 
-
         {% elif "Lord" in entry["labels"] %}
 
-            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+            <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                 {% if entry.party %}
-                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                    - {{ entry.party }}
                 {% endif %}
             </h4>
-            <div class="row">
-            <div class="col-md-12">
+
             <p>
                 {% for label in entry["labels"] %}
                     <span class="label label-success">{{ label }}</span>
@@ -113,20 +101,18 @@
                     <b>Electoral Commission</b><br>
                     {{ entry.influences_summary.electoral_commission.donation_total }} donated across
                     {{ entry.influences_summary.electoral_commission.donation_count }} donations
-
                 </div>
             {% endif %}
 
 
         {% elif "Member of Parliament" in entry["labels"] %}
 
-            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+            <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                 {% if entry.party %}
-                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                    - {{ entry.party }}
                 {% endif %}
             </h4>
-            <div class="row">
-            <div class="col-md-12">
+
             <p>
                 {% for label in entry["labels"] %}
                     <span class="label label-success">{{ label }}</span>
@@ -163,32 +149,38 @@
                 </div>
             {% endif %}
 
-            {% if "register_of_interests" in entry.influences_summary %}
+            {% if "register_of_interests" in entry.influences_summary and entry.influences_summary.register_of_interests.remuneration_count > 0 %}
                 <div class="well well-sm">
                     <b>Register of Interests</b><br>
-                    {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
+                    Estimated {{ entry.influences_summary.register_of_interests.remuneration_total }} received from
                     {{ entry.influences_summary.register_of_interests.remuneration_count }} interests across
                     {{ entry.influences_summary.register_of_interests.interest_categories }} categories
                 </div>
             {% endif %}
+
             {% if "electoral_commission" in entry.influences_summary %}
-                <div class="well well-sm">
-                    <b>Electoral Commission</b><br>
-                    {{ entry.influences_summary.electoral_commission.donation_total }} received from
-                    {{ entry.influences_summary.electoral_commission.donor_count }} donations
-                </div>
+                {% if "donor_count" in entry.influences_summary.electoral_commission and entry.influences_summary.electoral_commission.donor_count > 0 %}
+                    <div class="well well-sm">
+                        <b>Electoral Commission</b><br>
+                        Estimated {{ entry.influences_summary.electoral_commission.donation_total }} received from
+                        {{ entry.influences_summary.electoral_commission.donor_count }} donations
+                    </div>
+
+                {% elif "donation_count" in entry.influences_summary.electoral_commission and entry.influences_summary.electoral_commission.donation_count > 0 %}
+
+                    <div class="well well-sm">
+                        <b>Electoral Commission</b><br>
+                        {{ entry.influences_summary.electoral_commission.donation_total }} donated across
+                        {{ entry.influences_summary.electoral_commission.donation_count }} donations
+                    </div>
+                {% endif %}
             {% endif %}
 
 
         {% elif "Select Committee" in entry["labels"] or "Government Position" in entry["labels"] %}
 
-            <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
-                {% if entry.party %}
-                    - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
-                {% endif %}
-            </h4>
-            <div class="row">
-            <div class="col-md-12">
+            <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a></h4>
+
             <p>
                 {% for label in entry["labels"] %}
                     <span class="label label-success">{{ label }}</span>
@@ -219,23 +211,22 @@
                 {% endif %}
             </div>
 
-
         {% elif "Lobby Agency Client" in entry["labels"] or "Donor" in entry["labels"] or "Registered Interest" in entry["labels"] or "Meeting Attendee" in entry["labels"] and not "Political Party" in entry["labels"] %}
 
             {% if not "Political Party" in entry["labels"] %}
-                <h4 class="list-group-item-heading"><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
+                <h4><a href="{{ entry.detail_url }}">{{ entry.name }}</a>
                     {% if entry.party %}
-                        - <a href="{{ entry.party_url }}">{{ entry.party }}</a>
+                        - {{ entry.party }}
                     {% endif %}
                 </h4>
-                <div class="row">
-                <div class="col-md-12">
+
                 <p>
                     {% for label in entry["labels"] %}
                         <span class="label label-success">{{ label }}</span>
                     {% endfor %}
                 </p>
             {% endif %}
+
             {% if "meetings" in entry.influences_summary %}
                 {% if "meetings_count" in entry.influences_summary.meetings and entry.influences_summary.meetings.meetings_count > 0 %}
                     <div class="well well-sm">
@@ -259,6 +250,7 @@
             {% if "register_of_interests" in entry.influences_summary %}
                 <div class="well well-sm">
                     <b>Register of Interests</b><br>
+                    Estimated
                     {% if entry.influences_summary.register_of_interests.remuneration_total_int > 0 %}
                         {{ entry.influences_summary.register_of_interests.remuneration_total }} in
                     {% endif %}
@@ -282,23 +274,9 @@
 
         {% endif %}
 
-
-    </div>
-    </div>
-    </div>
-    </div>
-        <div class="list-group-separator"></div>
+        <hr>
 
     {% endfor %}
-</div>
-<ul class="pager">
-    {% if page == 1  %}
-        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-    {% else %}
-        <li class="previous"><a href="{{ url_for('show_search_result', page=page-1) }}">Previous page</a></li>
-    {% endif %}
-    <li class="next disabled"><a href="{{ url_for('show_search_result', page=page+1) }}">Next page</a></li>
-</ul>
-</div>
-</div>
+
+    <div class="col-md-1"></div>
 {% endblock article %}

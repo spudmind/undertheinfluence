@@ -61,7 +61,12 @@ class EntityApi(BaseAPI):
     @staticmethod
     def _merge_duplicates(search_results):
         merged_results = {}
-        result_order = [x["name"] for x in search_results]
+        seen = set()
+        seen_add = seen.add
+        result_order = [
+            y for y in [x["name"] for x in search_results]
+            if not (y in seen or seen_add(y))
+        ]
         for entry in search_results:
             name = entry["name"]
             if name not in merged_results:

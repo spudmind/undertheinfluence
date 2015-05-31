@@ -19,11 +19,14 @@ class SearchInterface:
                 "match": {
                     "{}".format(field): {
                         "query": u"{}".format(search),
-                        "fuzziness": 2,
-                        "prefix_length": 1
+                        "fuzziness": 1,
+                        "prefix_length": 5
                     }
                 }
-            }
+            },
+            "sort": [
+                "_score"
+            ]
         }
 
         q = self._es.search(

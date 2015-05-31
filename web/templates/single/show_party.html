@@ -1,15 +1,28 @@
 {% extends "single/single.html" %}
 
 {% block title %}
-    {{ party.name }}
+
 {% endblock %}
 
 {% block article %}
-<div class="col-md-12">
-    <div id="government-container">
-        <div class="list-group">
-            {% if "electoral_commission" in party["influences_detail"] %}
-                <div class="list-group-item">
+
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="government-container">
+            <h3><b>{{ party.name }}</b></h3>
+            <div class="row">
+                <div class="col-md-7">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <hr>
+        <div id="government-container">
+            <div class="list-group">
+                {% if "electoral_commission" in party["influences_detail"] %}
+
                     <div class="row-content">
                         <h4 class="list-group-item-heading">Electoral Commission</h4>
                         <table class="table table-striped table-hover ">
@@ -39,22 +52,22 @@
                             <tbody>
                             {% for donation in party.influences_detail.electoral_commission %}
                                 <tr>
-                                    <td><small>{{ donation.amount }}</small></td>
-                                    <td><small><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></small></td>
-                                    <td><small>{{ donation.donor["donor_type"] }}</small></td>
-                                    <td><small>{{ donation.received }}</small></td>
-                                    <td><small>{{ donation.reported }}</small></td>
-                                    <td><small>{{ donation.accepted }}</small></td>
-                                    <td><small>{{ donation.nature }}</small></td>
+                                    <td>{{ donation.amount }}</td>
+                                    <td><a href="{{ donation.donor["details_url"] }}">{{ donation.donor["name"] }}</a></td>
+                                    <td>{{ donation.donor["donor_type"] }}</td>
+                                    <td>{{ donation.received }}</td>
+                                    <td>{{ donation.reported }}</td>
+                                    <td>{{ donation.accepted }}</td>
+                                    <td>{{ donation.nature }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                         <div class="list-group-separator"></div>
                     </div>
-                </div>
-            {% endif %}
+
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 {% endblock article %}

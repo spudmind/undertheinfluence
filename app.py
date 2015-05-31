@@ -38,7 +38,7 @@ app.jinja_env.globals['url_for'] = url_for
 def format_date(date):
     try:
         return datetime.strptime(date, '%Y-%m-%d').strftime('%d %h %Y')
-    except ValueError:
+    except (ValueError, TypeError):
         return date
 
 app.jinja_env.filters['date'] = format_date

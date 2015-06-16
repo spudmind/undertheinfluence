@@ -85,7 +85,8 @@ def show_government_and_politicians():
     mps_summary = reply["results"]["summary"]["mps"]
     lords_summary = reply["results"]["summary"]["lords"]
     return render_template(
-        'summary/government_politicians.html', mps=mps_summary, lords=lords_summary)
+        'summary/government_politicians.html', mps=mps_summary, lords=lords_summary
+    )
 
 
 @app.route('/politicians')
@@ -94,7 +95,8 @@ def show_politicians():
     mps_summary = reply["results"]["summary"]["mps"]
     lords_summary = reply["results"]["summary"]["lords"]
     return render_template(
-        'summary/politicians_summary.html', mps=mps_summary, lords=lords_summary)
+        'summary/politicians_summary.html', mps=mps_summary, lords=lords_summary
+    )
 
 
 @app.route('/lobbying-agencies')

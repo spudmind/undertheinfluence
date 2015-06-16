@@ -12,26 +12,27 @@
             <div class="row">
                 <div class="col-md-7">
 
-                    <blockquote>
-                        <p>The influence of lobbyists increases when it goes largely unnoticed by the public.</p>
-                        <small>Steve John, lobbyist for management consultants, McKinsey</small>
-                    </blockquote>
-
                     <p>The UK has the third-biggest lobbying industry in the world after Washington and Brussels: a best guess values the UK’s commercial lobbying industry at around £2bn.These are people who are paid to influence the decisions of government.</p>
-
                     <p>Most commercial lobbyists work for corporations. There is almost no public scrutiny of their activities, the one’s that work ‘in-house’. Others are lobbyists-for-hire, often working in PR agencies. And some of these voluntarily make public on a register who they are lobbying for. </p>
-
                     <p>This information is presented here. It allows you to find out which companies (plus a handful of unions and charities) have hired lobbyists to influence the British government.</p>
+
+                    <b>Explore the data</b>
+
+                    <ul>
+                        <li>Browse <a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">organisations that hire lobbyists</a></li>
+                        <li>Browse <a href="{{ url_for('show_lobbyists' )}}">lobbying agencies</a></li>
+                    </ul>
 
                 </div>
 
                 <div class="col-md-5">
-                    <h3>Explore the data</h3>
 
-                    <ul>
-                        <li><b>Browse <a href="{{  url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">organisations that hire lobbyists</a></b></li>
-                        <li><b>Browse <a href="{{ url_for('show_lobbyists' )}}">lobbying agencies</a></b></li>
-                    </ul>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>“The influence of lobbyists increases when it goes largely unnoticed by the public.”</h4>
+                            - Steve John, lobbyist for management consultants, McKinsey
+                        </div>
+                    </div>
 
                 </div>
 

@@ -11,24 +11,25 @@
             <h3><b>Who provides for our lawmakers</b></h3>
             <div class="row">
                 <div class="col-md-7">
-
-                    <blockquote>
-                        <p>I'm a bit like a sort of cab for hire... I still get a lot of confidential information because I'm still linked to No 10.</p>
-                        <small>Former secretary of state, Stephen Byers</small>
-                    </blockquote>
-
                     <p>Access and influence are enhanced by having someone on your payroll with power. This could be a former minister, a current legislator, or a political staffer. Under the current Parliamentary rules, our lawmakers are allowed to hold second jobs as long as they are declared.</p>
                     <p>Those seeking to influence lawmakers can also been generous hosts, providing MPs and Lords with lavish hospitality and trips abroad. These too are acceptable as long as they are publicly registered.</p>
                     <p>Find out which companies and lobby groups have a politician on their payroll; and which  are most generous with their hospitality. </p>
 
+                    <b>Explore the data</b>
+
+                    <ul>
+                        <li>Browse <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">all registered interests</a></li>
+                    </ul>
                 </div>
 
                 <div class="col-md-5">
-                    <h3>Explore the data</h3>
 
-                    <ul>
-                        <li><b>Browse <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">all registered interests</a></b></li>
-                    </ul>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>“I'm a bit like a sort of cab for hire... I still get a lot of confidential information because I'm still linked to No 10.”</h4>
+                            - Former secretary of state, Stephen Byers
+                        </div>
+                    </div>
 
                 </div>
 

@@ -9,10 +9,15 @@
     <div class="col-md-10">
         <div id="government-container">
 
-            <h3><b>Meetings with ministers</b></h3>
+            <h3><b>Who are ministers meeting?</b></h3>
 
             <div class="row">
                 <div class="col-md-7">
+                    <p>Since 2010 all government ministers have published a quarterly record of their meetings with outside organisations. Information is given on who met with whom, the date of the meeting and a brief description of the purpose of the meeting.</p>
+                    <p>In reality, the ministerial meeting logs provide only a tiny window on discussions held with corporations and other outside interests. Not all meetings are recorded; and of those that are, few details are given on what has been discussed, with meetings frequently logged merely as ‘catch-up’ meetings, or ‘general discussions’. Records are also often published months late, not at all, or in remote corners of departmental websites. </p>
+                    <p>Ministerial meeting data can sometimes provide a starting point for further investigation.</p>
+                    <p><b>Explore the data</b></p>
+                    <p>You can browse the government departments on the right; use the search above; or take a look at some of our analysis below.</p>
 
                     <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
 
@@ -34,55 +39,12 @@
                     <div class="row">
                         <span class="label label-danger"><b>SHOWING DATA FOR: Ministerial Meetings</b></span>
                     </div>
+                    <br>
                     {% for entry in departments %}
-
-                        <div class="row-content">
-
-                            <a href="{{ entry.detail_url }}"><h4>{{ entry.name }}</h4></a>
-                            <div class="row">
-
-                                <table class="table table-striped table-hover ">
-                                    <colgroup>
-                                        <col span="1" style="width: 25%;">
-                                        <col span="1" style="width: 60%;">
-                                        <col span="1" style="width: 5%;">
-                                    </colgroup>
-                                    <thead>
-                                    <tr>
-                                        <th>Host</th>
-                                        <th>Position</th>
-                                        <th>Meetings</th>
-                                    </tr>
-                                    </thead>
-
-                                    <tbody>
-                                    {% for meeting in entry.influences_summary.meetings_summary %}
-                                        <tr>
-                                            <td><a href="{{ meeting.host["details_url"] }}">{{ meeting.host["name"] }}</a></td>
-                                            <td>{{ meeting.position }}</td>
-                                            <td>{{ meeting.meetings }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-
-                            </div>
-
-                        </div>
-
+                        <p><b>{{ entry.name }}</b> <a href="{{ entry.detail_url }}"> >> </a></p>
                     {% endfor %}
-
-
                 </div>
 
-                <ul class="pager">
-                    {% if page == 1  %}
-                        <li class="previous disabled"><a href="javascript:void(0)">Previous page</a></li>
-                    {% else %}
-                        <li class="previous"><a href="{{ url_for('show_meetings', page=page-1) }}">Previous page</a></li>
-                    {% endif %}
-                    <li class="next"><a href="{{ url_for('show_meetings', page=page+1) }}">Next page</a></li>
-                </ul>
             </div>
 
         </div>

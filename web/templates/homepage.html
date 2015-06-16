@@ -1,28 +1,21 @@
 {% extends "layout.html" %}
 
 {% block article %}
+
+
+
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div id="government-container">
-            <h3><b>What Under The Influence does:</b></h3>
-            <div class="row">
-                <div class="col-md-7">
+            <h3><b>Who is influencing our politicians?</b></h3>
 
-                    <ul>
-                        <li>maps the hidden relationships between the British government, business and other interests, and lobbyists;</li>
-                        <li>lets us know who is trying to influence British politics; and</li>
-                        <li>allows us to find out how money in politics affects our lives.</li>
-                    </ul>
+            <p>Many people in Britain today feel they have no say in how the country is run. They sense that government listens to big business, lobbyists and wealthy party donors with far more attention than ordinary citizens.</p>
+            <p>Are the British people right? How do you find out who has access to and influence over our politicians?</p>
+            <p>undertheInfluence attempts to answer these questions by mapping the hidden relationships between government, business, lobbyists and others. It lets you explore who is having a quiet word with ministers; who is paying politicians (besides taxpayers); and which interests are ploughing money into politics and lobbying.</p>
 
-                    <p>Read more <a href="{{ url_for('show_about')}}">about this site</a></p>
-
-                </div>
-
-                <div class="col-md-5">
-                    <b>Find out more about <a href="{{ url_for('show_influence_and_lobbying')}}">influence &amp; lobbying</a></b><br>
-                    <b>Find out about our <a href="{{ url_for('show_government_and_politicians')}}">Government &amp; politicians</a></b><br>
-                </div>
-            </div>
+            <b>Find out more about <a href="{{ url_for('show_influence_and_lobbying')}}">influence &amp; lobbying</a></b><br>
+            <b>Find out about our <a href="{{ url_for('show_government_and_politicians')}}">Government &amp; politicians</a></b><br>
+            <b>Read more <a href="{{ url_for('show_about')}}">about <em>underthe</em>Influence</a></b><br>
 
             <hr>
 

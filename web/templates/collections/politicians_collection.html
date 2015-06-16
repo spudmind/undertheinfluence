@@ -10,107 +10,38 @@
         <div id="government-container">
 
             {% if title.header == "Donation Recipient" %}
-                <h3><b>Donations to politicians’ offices</b></h3>
+                <h3><b>Politicians’ extra funds</b></h3>
             {% elif title.header == "Outside Interests" %}
                 <h3><b>Politicians outside earnings</b></h3>
             {% else %}
-                <h3>All Politicians</h3>
+                <h3>{{ title.header }}</h3>
             {% endif %}
 
             <div class="row">
                 <div class="col-md-7">
                     {% if title.header == "Donation Recipient" %}
-
-                        <blockquote>
-                            <p>Here is where you can find out who is funding our political parties and politicians. The data is from the <a href="http://www.electoralcommission.org.uk/">Electoral Commission</a> and is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
-                        </blockquote>
-                        <p>You can browse the donors on the right; use the search above; or take a look at some of our analysis below. </p>
+                        <p>Under the party funding system, donations can be made to central parties, such as the Labour Party or the Conservative Party, but also to individual politicians. </p>
+                        <p>Donations of this type can be used to fly MPs on ‘fact finding’ trips abroad. Donors can also make contributions to the politician’s private office, which can be used to cover extra staff, research or accommodation, or any political activity that can’t come out of taxpayer funds, such as party conference expenses.</p>
+                        <p>Donations to private offices must be registered with the Electoral Commission. The information is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
+                        <p><b>Explore the data</b></p>
+                        <p>You can browse the MPs on the right; use the search above; or take a look at some of our analysis below.</p>
 
                     {% elif title.header == "Outside Interests" %}
 
-                        <blockquote>
-                            <p>Under current Parliamentary rules, our lawmakers are allowed to hold second jobs as long as they are declared. There are rules, however, that prevent them from accepting cash in return for favour. Numerous scandals have revealed the weakness of these rules.</p>
-                            <p>It is argued that Parliament is richer for the experience these outside jobs bring. The fact that much of the time, this experience is limited to being a director of a private healthcare company, or an advisor to a financial services firm – rather than, say, bringing the experience of being a teacher, or a scientist – weakens the case fought by Parliamentarians. </p>
-                        </blockquote>
+                        <p>Under current Parliamentary rules, our lawmakers are allowed to hold second jobs as long as they are declared on a public register. There are rules, however, that prevent them from accepting cash in return for favour.</p>
+                        <p>Numerous scandals have revealed the weakness of these rules.</p>
+                        <p>It is argued that Parliament is richer for the experience these outside jobs bring. The fact that much of the time, this experience is limited to being a director of a private healthcare company, or an advisor to a financial services firm – rather than, say, bringing the experience of being a carer, or a scientist – weakens the case fought by Parliamentarians to keep earning on the side.</p>
                         <p>The information here is from the MPs and Lords registers of interests. It allows us to see which legislators earn the most outside politics; and as important, who they are working for.</p>
-                        <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below. </p>
+                        <p><b>Explore the data</b></p>
+                        <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below.</p>
 
                     {% else %}
 
-                        <p>The information here is from the MPs and Lords registers of interests. It allows us to see which legislators earn the most outside politics; and as important, who they are working for.</p>
                         <p>You can browse the politicians on the right; use the search above; or take a look at some of our analysis below. </p>
-                        <div class="row">
-                            <div class="col-md-10">
-                                <form class="form-horizontal" action="{{ url_for('show_politicians_detail') }}" method="post">
-                                    <fieldset>
-                                        <legend>Explore</legend>
 
-                                        <div class="form-group">
-                                            <label class="col-lg-3 control-label">Politician</label>
-                                            <div class="col-lg-8">
-                                                <div class="radio radio-primary">
-                                                    <label>
-                                                        <input type="radio" name="type" id="optionsRadios1" value="" checked="">
-                                                        All
-                                                    </label>
-                                                </div>
-                                                <div class="radio radio-primary">
-                                                    <label>
-                                                        <input type="radio" name="type" id="optionsRadios2" value="mp" >
-                                                        Members of Parliament
-                                                    </label>
-                                                </div>
-                                                <div class="radio radio-primary">
-                                                    <label>
-                                                        <input type="radio" name="type" id="optionsRadios3" value="lord">
-                                                        Lords
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="form-group">
-                                            <label for="select" class="col-lg-3 control-label">Party</label>
-                                            <div class="col-lg-8">
-                                                <select class="form-control" id="select" name="party">
-                                                    <option></option>
-                                                    <option>Conservative Party</option>
-                                                    <option>Labour Party</option>
-                                                    <option>Liberal Democrats</option>
-                                                    <option>Green Party</option>
-                                                    <option>UK Independence Party</option>
-                                                    <option>Scottish National Party</option>
-                                                    <option>Democratic Unionist Party</option>
-                                                    <option>Sinn Fein</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="form-group">
-                                            <label for="select" class="col-lg-3 control-label">Type</label>
-                                            <div class="col-lg-8">
-                                                <select multiple="" class="form-control" name="labels" >
-                                                    <option>Donor</option>
-                                                    <option>Donation Recipient</option>
-                                                    <option>Outside Interests</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <div class="col-lg-10 col-lg-offset-7">
-                                                <button type="submit" class="btn btn-primary">Filter</button>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </form>
-                            </div>
-                        </div>
                     {% endif %}
 
-                    <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check the source before citing. </p>
+                    <p class="text-muted">As always, if you find glitches or inaccuracies in the data, please let us know, and always check information at the source before citing.</p>
 
                     <hr>
 
@@ -162,9 +93,6 @@
                     {% endif %}
                 </ul>
             </div>
-
-
-
 
         </div>
     </div>

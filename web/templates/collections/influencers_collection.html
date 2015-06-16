@@ -22,33 +22,21 @@
             <div class="row">
                 <div class="col-md-7">
                     {% if title.header == "Donor" %}
-
-                        <blockquote>
-                            <p>Here is where you can find out who is funding our political parties and politicians. The data is from the <a href="http://www.electoralcommission.org.uk/">Electoral Commission</a> and is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
-                        </blockquote>
+                        <p>Here is where you can find out who is funding our political parties and politicians. The data is from the <a href="http://www.electoralcommission.org.uk/">Electoral Commission</a> and is updated quarterly, starting in September 2010 (for older data, visit the Electoral Commission).</p>
                         <p>You can browse the donors on the right; use the search above; or take a look at some of our analysis below. </p>
 
                     {% elif title.header == "Registered Interest" %}
-
-                        <blockquote>
-                            <p>Here is where you can find out who else is paying our politicians besides taxpayers. The data is from the MPs and Lords registers of interests and reveals: their second (third and fourth) jobs and directorships; any hospitality they have accepted; overseas trips accepted; and shareholdings. It is updated quarterly, starting in September 2010 (for older data, visit <a href="http://www.electoralcommission.org.uk/">TheyWorkForYou</a>).</p>
-                        </blockquote>
+                        <p>Here is where you can find out who else is paying our politicians besides taxpayers. The data is from the MPs and Lords registers of interests and reveals: their second (third and fourth) jobs and directorships; any hospitality they have accepted; overseas trips accepted; and shareholdings. It is updated quarterly, starting in September 2010 (for older data, visit <a href="http://www.electoralcommission.org.uk/">TheyWorkForYou</a>).</p>
                         <p>You can browse the registered interests on the right; use the search above; or take a look at some of our analysis below. </p>
 
                     {% elif title.header == "Lobby Agency Client" %}
-
-                        <blockquote>
-                            <p>Here is where you can find out who is lobbying for whom. The data is from the lobbying industry’s voluntary register of lobbyists. The system is overseen by lobbyists and lacks any meaningful sanctions and so should not necessarily be seen as full and accurate record; nor are all commercial lobbyists registered. The list contains none of the law firms, accountancy firms, management consultants that also provide lobbying services to clients.</p>
-                        </blockquote>
+                        <p>Here is where you can find out who is lobbying for whom. The data is from the lobbying industry’s voluntary register of lobbyists. The system is overseen by lobbyists and lacks any meaningful sanctions and so should not necessarily be seen as full and accurate record; nor are all commercial lobbyists registered. The list contains none of the law firms, accountancy firms, management consultants that also provide lobbying services to clients.</p>
                         <p>The government has just introduced a <a href="https://registerofconsultantlobbyists.force.com/CLR_Search">compulsory register of lobbyists</a>, but it is very narrow in its scope. We will, however, import the additional information it contains soon.</p>
                         <p>At the moment the industry register is updated quarterly, starting in September 2010 (for older data, visit the <a href="http://www.appc.org.uk/previous-registers/">Association of Professional Political Consultants</a>).</p>
                         <p>You can browse the lobbyists' clients in the list on the right; use the search above; or take a look at some of our analysis below. A list of the commercial lobbying agencies registered can be found <a href="{{ url_for('show_lobbyists' )}}">here</a>.</p>
 
                     {% else %}
-
-                        <blockquote>
-                            <p>Here is where you can find <a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Donors</a>, <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a> and <a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Clients</a> in one collection.</p>
-                        </blockquote>
+                        <p>Here is where you can find <a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">Donors</a>, <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">Registered Interests</a> and <a href="{{ url_for('show_influencers_detail', labels="Lobby Agency Client" )}}">Lobbying Clients</a> in one collection.</p>
                         <p>You can browse the collection on the right; use the search above; or take a look at some of our analysis below. </p>
 
                     {% endif %}

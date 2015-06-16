@@ -12,27 +12,24 @@
             <div class="row">
                 <div class="col-md-7">
 
-                    <blockquote>
-                        <p>Democracy is in crisis. Political legitimacy stems not from votes, but from money: the more of it you have, the more government pays attention to your concerns.</p>
-                        <small>Steve Hilton, former chief strategist to PM David Cameron</small>
-                    </blockquote>
+                    <p>This section contains information on who funds political parties; (imperfect) data on who is lobbying for whom; and details of which organisations employ which UK legislators. Find out which politicians have accepted funds from the tobacco industry; which industry hires the most lobbyists; how many politicians are in the hire of the banks; and more..</p>
 
-                    <p>You can find out who is channeling money into our politics here. This section contains information on who funds political parties; (imperfect) data on who is lobbying for whom; and details of which organisations employ which UK legislators.</p>
-
-                    <p>Find out which politicians have accepted funds from the tobacco industry; which industry hires the most lobbyists; how many politicians are in the hire of the banks; and more.</p>
-
-                    <p>Find out more about <a href="{{ url_for('show_who_funds_our_politics')}}">who’s funding political parties</a> and <a href="{{ url_for('show_who_provides_for_our_lawmakers')}}">employing legislators</a></p>
+                    <b>Explore the data</b>
+                    <ul>
+                        <li>Explore <a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">who funds our politics</a></li>
+                        <li>Explore <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">who provides for our legislators</a></li>
+                        <li>Explore <a href="{{ url_for('show_lobbyists' )}}">who’s lobbing</a></li>
+                        <li>Browse <a href="{{ url_for('show_influencers_detail')}}">all influencers</a></li>
+                    </ul>
                 </div>
 
                 <div class="col-md-5">
-                    <h3>Explore the data</h3>
-
-                    <ul>
-                        <li><b>Explore <a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">who funds our politics</a></b></li>
-                        <li><b>Explore <a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">who provides for our legislators</a></b></li>
-                        <li><b>Explore <a href="{{ url_for('show_lobbyists' )}}">who’s lobbing</a></b></li>
-                        <li><b>Browse <a href="{{ url_for('show_influencers_detail')}}">all influencers</a></b></li>
-                    </ul>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>“Democracy is in crisis. Political legitimacy stems not from votes, but from money: the more of it you have, the more government pays attention to your concerns.”</h4>
+                            - Steve Hilton, former chief strategist to David Cameron, May 2015
+                        </div>
+                    </div>
 
                 </div>
 

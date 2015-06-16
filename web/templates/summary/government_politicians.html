@@ -12,29 +12,24 @@
             <div class="row">
                 <div class="col-md-7">
 
-                    <blockquote>
-                        <p>Lobbying – we all know how it works. The lunches, the quiet word in your ear, the ex-ministers and ex-advisors for hire, helping big business find the right way to get its way... We don’t know who is meeting whom. We don’t know whether any favours are being exchanged.</p>
-                        <small>David Cameron in a speech ahead of the 2010 general election</small>
-                    </blockquote>
+                    <p>This section contains information on our Parliamentarians and those who have made it into government. The various data sources reveal: which politicians earn what from their jobs outside Parliament; which MPs have attracted political donations; and the meetings government departments declare with big business.</p>
+                    <p><b>Explore the data</b></p>
 
-                    <p>You can find some of this information here: which of our legislators are ‘for-hire’; who is meeting whom and gain an insight into the hospitality lavished on our lawmakers.</p>
-
-                    <p>This section contains information on our politicians and those, with real power, who have made it into government. It includes data from the registers of interests of MPs and Lords; ministers quarterly meeting logs with outside interests; and data on the funding of politician’s offices. </p>
-
-                    <p>Find out more about: which politicians earn the most outside Parliament; who has attracted the most funding; and which government departments declare the most meetings with big business. </p>
+                    <ul>
+                        <li>Explore <a href="{{ url_for('show_politicians_detail', labels="Outside Interests" )}}">politicians’ outside earnings</a></li>
+                        <li>Explore <a href="{{ url_for('show_politicians_detail', labels="Donation Recipient" )}}">donations to politicians’ offices</a></li>
+                        <li>Explore <a href="{{ url_for('show_meetings')}}">meetings with ministers</a></li>
+                    </ul>
 
                 </div>
 
                 <div class="col-md-5">
-                    <h3>Explore the data</h3>
-
-                    <ul>
-                        <li><b>Browse <a href="{{ url_for('show_politicians_detail')}}">all politicians’</a></b></li>
-                        <li><b>Explore <a href="{{ url_for('show_politicians_detail', labels="Outside Interests" )}}">politicians’ outside earnings</a></b></li>
-                        <li><b>Explore <a href="{{ url_for('show_politicians_detail', labels="Donation Recipient" )}}">donations to politicians’ offices</a></b></li>
-                        <li><b>Explore <a href="{{ url_for('show_meetings')}}">meetings with ministers</a></b></li>
-                    </ul>
-
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>“Lobbying – we all know how it works. The lunches, the quiet word in your ear, the ex-ministers and ex-advisors for hire, helping big business find the right way to get its way...”</h4>
+                            - David Cameron, February 2010
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -47,8 +42,6 @@
                     <div class="row">
                         <span class="label label-danger">ANALYSIS: WHAT THE DATA SHOWS</span>
                     </div>
-
-
                 </div>
 
 

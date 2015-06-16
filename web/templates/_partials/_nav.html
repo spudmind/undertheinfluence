@@ -7,7 +7,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{{ url_for('home') }}">Under The Influence</a>
+        <!-- <a class="navbar-brand" href="{{ url_for('home') }}">UTI</a> -->
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -17,8 +17,8 @@
                 <ul class="dropdown-menu">
                     <li><a href="{{ url_for('show_government_and_politicians')}}">Government &amp; Politicians</a></li>
                     <li><a href="{{ url_for('show_politicians_detail', labels="Outside Interests" )}}">Politicians' outside earnings</a></li>
-                    <li><a href="{{ url_for('show_politicians_detail', labels="Donation Recipient" )}}">Donations to MPs' offices</a></li>
-                    <li><a href="{{ url_for('show_meetings')}}">Meetings with Ministers</a></li>
+                    <li><a href="{{ url_for('show_politicians_detail', labels="Donation Recipient" )}}">Politicians’ extra funds</a></li>
+                    <li><a href="{{ url_for('show_meetings')}}">Who are ministers meeting?</a></li>
                 </ul>
             </li>
 
@@ -34,14 +34,10 @@
 
             <li><a href="{{ url_for('show_sources')}}">Sources &amp; Resources</a></li>
             <form class="navbar-form navbar-left" action="{{ url_for('show_search_result') }}" method="post">
-                <input type="text" name="search" class="form-control col-lg-8" placeholder="Search">
+                <input type="text" name="search" class="form-control col-lg-8" placeholder="SEARCH">
             </form>
+           <li><a href="{{ url_for('show_contact')}}">Get Involved</a></li>
             <li><a href="{{ url_for('show_about')}}">About</a></li>
-            <li><a href="{{ url_for('show_contact')}}">Contact</a></li>
-        </ul>
-
-        <ul>
-
         </ul>
 
     </div><!-- /.navbar-collapse -->

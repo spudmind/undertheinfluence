@@ -8,30 +8,84 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div id="government-container">
-            <h3><b>About this site</b></h3>
-            <p>Under The Influence catalogues the people and organisations that are influencing British politics.</p>
-
-            This includes: individuals and organisations that:
+            <h3>
+                <b>About this site:</b>
+            </h3>
             <ul>
-                <li><a href="{{ url_for('show_influencers_detail', labels="Donor" )}}">fund political parties</a></li>
-                <li><a href="{{ url_for('show_influencers_detail', labels="Registered Interest" )}}">organisations that employ</a> MPs and Lords</li>
-                <li>organisations that meet with government ministers</li>
-                <li><a href="{{ url_for('show_lobbyists' )}}">organisations that hire</a> lobbyists</li>
+                <li><a href="#What is undertheInfluence">What is <em>underthe</em><b>Influence</b>?</a></li>
+                <li><a href="#Who is it for">Who is it for?</a></li>
+                <li><a href="#How to use the site">How to use the site</a></li>
+                <li><a href="#Who runs undertheInfluence">Who runs <em>underthe</em><b>Influence</b>?</a></li>
             </ul>
 
-            <p>We’ve brought this information together here for the first time so that you can search across the board who is influencing our politics. The data is all publicly available, but a lot of the time it is hard to find, and at the moment it is all unconnected, having numerous publishers.</p>
+            <hr>
 
+            <h3 id="What is undertheInfluence">
+                <b>What is</b> <em>underthe</em><b>Influence?</b>
+            </h3>
+            <p><em>underthe</em><b>Influence</b> catalogues the people and organisations that are influencing British politics.</p>
+            <p>The site brings together a number of publicly-available data sources that reveal:</p>
+            <ul>
+                <li><a href="{{ url_for('show_who_funds_our_politics')}}">who funds our political parties</a></li>
+                <li><a href="{{ url_for('show_who_provides_for_our_lawmakers')}}">who else is paying our politicians</a></li>
+                <li><a href="{{ url_for('show_meetings')}}">who government ministers are meeting</a></li>
+                <li><a href="{{ url_for('show_who_is_lobbying')}}">who is hiring lobbyists</a></li>
+            </ul>
+
+            <p>(visit the <a href="{{ url_for('show_sources')}}">Sources & Resources</a> page for a list of current data sources)</p><br>
+
+            <p>This is the first time that this information has been brought together, so that we can see across the board who is influencing our politics. The data is currently all published online, most of it by the government, but it’s in separate places, formatted differently and some of it is hard to find. </p>
             <p>The UK government has the ambition of being the most transparent in the world, with more information being put into the public domain all the time. It is currently being done badly, however, and often fails to increase transparency, or create more accountable government (the ultimate aim of transparency).</p>
+            <p>One of the aims of <em>underthe</em><b>Influence?</b>, then, is to demonstrate what real transparency in this context looks like. We have tried to fix the government’s data where possible, and iron out the most obvious glitches. You find find that we haven’t caught them all. For this reason we recommend that you verify information by going to the original source, a link to which is always provided, particularly if you are going to cite it. </p>
+            <p>If you can think of ways to improve the site, please do let us know. We welcome comments, suggestions and offers of help on:</p>
+            <ul>
+                <li>technical aspects of the site</li>
+                <li>analysing the data</li>
+                <li>incorporating additional data sources; and </li>
+                <li>interesting things you’ve found in the data</li>
+            </ul>
+            <p><a href="{{ url_for('show_contact')}}">Send us an email and get involved.</a></p>
 
-            <p>Another of the aims of Under The Influence, then, is to demonstrate what real transparency in this context looks like. We have tried to fix the government’s data where possible, and iron out the most obvious glitches. You find find that we haven’t caught them all (we recommend that you verify information by going to the original source, a link to which is always provided).</p>
+            <hr>
 
-            <p>We welcome comments and suggestions for ways to improve the site, so please get in touch. We would also encourage you to let us know if you would like to contribute to the site. [link to Contact Us page]</p>
+            <h3 id="Who is it for">
+                <b>Who is it for?</b>
+            </h3>
+            <p>We hope the site is useful for lots of people: NGOs and campaigners, who might find information in the data on particular issues, companies, or individuals; journalists researching stories; or anyone that is concerned about the health of our democracy, and curious about the interests that are seeking to influence it.</p>
 
-            <h3>Who we are</h3>
+            <hr>
 
-            <p>Under The Influence is a project of <a href="http://www.spinwatch.org/">Spinwatch</a> and <a href="http://www.unlockdemocracy.org.uk/">Unlock Democracy</a>, with generous funding from the <a href="http://www.jrrt.org.uk/">Joseph Rowntree Reform Trust</a>. It has been built by <a href="https://github.com/wrrrrn">Warren Ali</a> and <a href="http://treadsoft.ly/">Andy Lulham</a>.</p>
+            <h3 id="How to use the site">
+                <b>How to use the site</b>
+            </h3>
+            <p>You can use <em>underthe</em><b>Influence</b> to:</p>
+            <ul>
+                <li><b>Find out more about particular individuals, organisations, and industries.</b></li>
+            </ul>
+            <p>We have been exploring the data and have written up some of what we have found in brief <span class="label label-danger">ANALYSIS: What the data shows</span> and <span class="label label-danger">PROFILE</span> pieces. <a href="{{ url_for('show_who_is_lobbying')}}">‘Big pharma’s addiction to lobbying’</a>, for example, looks at the large number of lobbying agencies working for the worlds biggest pharmaceutical companies. We then combined this with information from Spinwatch’s wiki, <a href="http://powerbase.info/index.php/Main_Page">Powerbase.info</a>, to profile some of those agencies and show their connections to government. More articles will be regularly added to the site.</p>
 
-            <p>Spinwatch investigates the way that the public relations (PR) industry and corporate and government propaganda distort public debate and undermine democracy. Unlock Democracy campaigns for democratic reform in the UK, including party funding reform and a constitutional convention. Both organisations lead the campaign for robust transparency regulations for commercial lobbyists, in the form of a statutory lobbying register.</p>
+            <ul>
+                <li><b>Discover more about particular politicians.</b></li>
+            </ul>
+            <p>You might want to know if your MP has any outside interests; or, about politicians that are speaking for or against an issue that you care about; or, who the minister that oversees your profession or industry is meeting. Connections revealed in the data aren’t proof of influence, but they can be explored further. </p>
+
+            <ul>
+                <li><b>Explore the data yourself.</b></li>
+            </ul>
+            <p>Are you interested in a particular issue – climate change, tax avoidance, housing and planning – that the data might have information on?</p>
+            <p>In the case of the latter, you might want to start by looking at the housing and planning minister who, according to google, is Brandon Lewis. His <em>underthe</em><b>Influence</b> entry reveals that he has accepted funds from, among others, JCB (one of the largest construction machine makers in the world); and CH2M Hill, the US engineering giant, which is involved in Crossrail, HS2 and nuclear power in the UK (also googled). According to the data source CH2M covered the £4000 costs of a fundraising dinner for Lewis. What might CH2M seek to gain from this? Is Brandon Lewis’ involved in any decisions that might benefit CH2M’s business? It could be a starting point for further research. Or you might want to find out more about CH2M’s lobbying agency, Pagefield, which has lobbied for others in the nuclear industry (see its profile on <a href="http://powerbase.info/index.php/Pagefield">Powerbase</a>). <em>underthe</em><b>Influence</b> also shows that CH2M Hill has already discussed ‘planning regulations’ with the business secretary, Vince Cable. Has it influenced these regulations? And who else might it be talking to in government? You might use the Freedom of Information Act to find out (the MySociety website <a href="https://www.mysociety.org/2014/08/15/how-to-make-a-freedom-of-information-request-with-whatdotheyknow/">WhatDoTheyKnow</a> has guidance on how to do this). Remember to always check information at the source.</p>
+
+
+            <hr>
+
+            <h3 id="Who runs undertheInfluence">
+                <b>Who runs</b> <em>underthe</em><b>Influence</b>?
+            </h3>
+            <p><em>underthe</em><b>Influence?</b> is a project of <a href="http://www.spinwatch.org/">Spinwatch</a> and <a href="http://www.unlockdemocracy.org.uk/">Unlock Democracy</a>.</p>
+            <p>Spinwatch is a non-profit organisation that investigates the way that the public relations (PR) industry, lobbying and government propaganda distort public debate and undermine democracy (the UK has the second biggest PR and lobbying industry in the world). Spinwatch also runs the research wiki <a href="http://powerbase.info/index.php/Main_Page">Powerbase.info</a>, which contains profiles of individuals and institutions shaping the public agenda.</p>
+            <p>Unlock Democracy is a grassroots campaign for democratic reform and to increase participation in politics. We are owned and run by our members. Our aim is to build a better democracy, reconnecting politics with ordinary people. We are campaigning to reform the way our Parliament is elected and how it is run. We want to limit the influence of big money in politics. We want to empower people to decide how to run their local communities.</p>
+            <p><em>underthe</em><b>Influence?</b> has been funded by the <a href="http://www.jrrt.org.uk/">Joseph Rowntree Reform Trust</a>.</p>
+            <p>It has been built by <a href="https://github.com/wrrrrn">Warren Ali</a> and <a href="http://treadsoft.ly/">Andy Lulham</a>.</p>
 
         </div>
     </div>

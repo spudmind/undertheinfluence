@@ -38,28 +38,19 @@
 </head>
 
 <body class="container">
-{% include '_partials/_nav.html' %}
 
 <div class="row">
-    <div class="col-md-12">
-        {% for message in get_flashed_messages() %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <h1><a href="{{ url_for('home') }}" style="color: #000000"><em>underthe</em><b>Influence</b></a></h1>
+        <p>Exposing Money and influence in British politics</p>
+
+        {% include '_partials/_nav.html' %}
     </div>
+    <div class="col-md-1"></div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <h1>{% block title %}{% endblock %}</h1>
-    </div>
-</div>
-
-
-<div class="row">
-    {% block article %}{% endblock %}
-</div>
+{% block article %}{% endblock %}
 
 <div class="row">
     <div class="col-md-12">

@@ -15,7 +15,7 @@ elasticsearch==1.4.0
 fuzzywuzzy==0.4.0
 gunicorn==19.3.0
 itsdangerous==0.24
-lxml==3.4.1
+lxml==4.6.5
 mechanize==0.2.5
 py2neo==2.0.1
 pymongo==2.7.2
